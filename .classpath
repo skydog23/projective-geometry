@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry combineaccessrules="false" kind="src" path="/jrworkspace"/>
+	<classpathentry excluding="charlesgunn/video/VideoTexture.java|charlesgunn/jreality/oldtools/|charlesgunn/jreality/worlds/AnimatedTexture.java|charlesgunn/jreality/worlds/TestKernelHull.java|mathvisws12/|charlesgunn/bicycle/BicycleVR.java|charlesgunn/jreality/geometry/MarchingCubesTest.java|charlesgunn/jreality/worlds/projective/StrahlUndAchse (original).java|charlesgunn/jreality/worlds/projective/HopfFibrationAssignment.java" kind="src" path="src">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jreality/jni/macosx"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="de/jreality/tools/|de/jreality/geometry/TestGL2C.java|de/jreality/tutorial/MeshFrame.java" kind="src" path="src-test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/beans"/>
+	<classpathentry kind="lib" path="/lib/jh.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/animation"/>
+	<classpathentry kind="lib" path="/lib/quickhull3d.jar"/>
+	<classpathentry kind="lib" path="/lib/jmf.jar"/>
+	<classpathentry kind="lib" path="/lib/numericalMethods-22.05.06.jar"/>
+	<classpathentry kind="lib" path="/jreality/lib/colorpicker.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/lib/mfc-14-04-05.jar"/>
+	<classpathentry kind="lib" path="/lib/mathExpr-14-04-05.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/projgeom"/>
+	<classpathentry kind="lib" path="/lib/android.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/Users/gunn/Software/android-sdk-mac_86/docs/reference/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/lib/discretegroup.jar"/>
+	<classpathentry kind="lib" path="/jreality/lib/beans.jar"/>
+	<classpathentry kind="lib" path="/jreality/lib/bsh.jar"/>
+	<classpathentry kind="lib" path="/jreality/lib/jterm.jar"/>
+	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all-noawt-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all.jar"/>
+	<classpathentry kind="lib" path="/lib/discretegroupCGG.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<title>Rendering Viewable Spheres Conformally Using Stereographic Projection</title>
+</head>
+
+<body lang="EN-US" link=blue vlink=purple>
+<h2 align="center">Conformal rendering of the viewable sphere</h2>
+<p align="center">Author: <a href="mailto:gunn@math.tu-berlin.de">Charles Gunn (</a><a href="http://page.math.tu-berlin.de/~gunn" target="_new">Website</a>)</p>
+<p align="center">&nbsp;</p>
+<p><a href="http://page.math.tu-berlin.de/~gunn/webstart/jnlp/PhotoSphere.jnlp" target="_new">Run the webstart.</a></p>
+<h3>Mathematical background</h3>
+<p>This application demonstrates a method of rendering <strong>viewable spheres</strong>, also known as <strong>spherical panoramas</strong>.  This projection is based on stereographic projection of the sphere onto the plane. See the <a href="SixPointPerspectivePlugin.html" target="_new">documentation of the six-point perspective plugin</a> for details of this process.</p>
+<p>For a fuller explanation of the mathematics and the implementation details see <a href="http://page.math.tu-berlin.de/~gunn/Documents/Papers/sixPointPersp.pdf" target="_new">this paper</a>, &quot;Rendering the Whole World with Conformal Curvilinear Perspective&quot;, to appear in Bridges 2013, Enschede, Holland July 27-31, 2013.</p>
+<h3>User interface</h3>
+<p>When the program starts up, it should appear roughly as in the screen-shot below. On the right is a &quot;tiny planet&quot; created from a PhotoSphere image by <a href="http://www.colbybrownphotography.com/can-photo-spheres-change-the-way-we-experience-the-world" target="_new">the photographer Colby Brown</a>. Left-clicking on this window and dragging rotates the viewable sphere, changing the projection point and creating more six-point perspective images. Middle-mouse click-and-drag to rotate in the x-y plane of the screen, for example, to bring the human figures to the top of the ball without changing the projection point.</p>
+<p>The controls on the LHS are as follows. Click on the <strong>Load photosphere </strong>button to load a single image representing a viewable sphere. For example, PhotoSphere format images can be loaded. (There are of course other formats for such viewable spheres, e. g., cube maps, but they are not loadable here).</p>
+<p>For use of the six-point perspective panel, see <a href="SixPointPerspectivePlugin.html">the documentation on this plugin</a>.</p>
+<p>You can fly around by using the arrow keys, but it isn't recommended since the three camera positions provided are all you really need. If you do fly around, you can undo the flying by using the <strong>Cycle camera </strong> button to return to the standard positions.</p>
+<p>To save images in png or jpg format use the menu item &quot;File-&gt;Export-&gt;Image...&quot;</p>
+<p>Questions and suggestions can be directed to the author, Charles Gunn, at gunn@math.tu-berlin.de</p>
+<p align="left">For more on the scene graph used: <a href="http://www3.math.tu-berlin.de/jreality" title="jReality" target="_new">jReality</a></p>
+<p>&nbsp;</p>
+<p><img src="ConformalPhotoSphereRender.jpg" width="800" height="457"></p>
+</body>
+</html>

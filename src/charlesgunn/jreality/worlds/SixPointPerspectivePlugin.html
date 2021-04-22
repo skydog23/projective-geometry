@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<title>Rendering Viewable Spheres Conformally Using Stereographic Projection</title>
+</head>
+
+<body lang="EN-US" link=blue vlink=purple>
+<h2 align="center">Six-point perspective plugin for<a href="http://www3.math.tu-berlin.de/jreality" target="_new"> jReality</a></h2>
+<p align="center">Author: <a href="mailto:gunn@math.tu-berlin.de">Charles Gunn (</a><a href="http://page.math.tu-berlin.de/~gunn" target="_new">Website</a>)</p>
+<p align="center">&nbsp;</p>
+<h2>Mathematical background</h2>
+<p>This plugin provides support for a method of flat rendering of the <strong>viewable sphere</strong>, also known as <strong>spherical panoramas</strong>.  This projection is based on stereographic projection of the sphere onto the plane. This sphere can be thought of as created by painting onto a spherical canvas centered at the viewer's eye (or the camera), or by creating a panoramic photo image, such as an <a href="http://maps.google.com/help/maps/streetview/contribute/#all" target="_new">Google Photo Sphere</a>. </p>
+<p align="left">The projection is defined as follows: One this chooses a point on the sphere as a central projection point and carries out a stereographic projection from this point onto the plane tangent to the antipodal point of the projection point (for example, if the projection point is the North Pole, the projection plane is tangent to the South Pole). This process can be carried out in real-time by applying the image data onto a  sphere as a texture map, positioning a camera at the projection point whose axis is aligned with the line from the projection point through the center of the sphere, and rendering without doing shading or lighting. The figure below shows how this process works; the viewable spherein this case has been computed using a tessellation of euclidean 3-space. One sees that straight lines in the scene (the beams of the tessellation) are rendered as curved lines in the image, but angles are correctly represented.</p>
+<p align="center"><img src="illustration-02.png" width="482" height="399" alt="illustration"></p>
+<p>&nbsp;</p>
+<p>One obtains arbitrarily large fractions of the viewable sphere in the resulting image my increasing the field of view of the camera. This approach has the advantage of being conformal , as mentioned above, and in being particularly simple to compute. The resulting images often appear as a &quot;tiny planet&quot; hence this term has become common to describe this form of projection. We also sometimes refer to them as &quot;six-point perspective&quot; pictures since they often contain the vanishing points of the positive <strong>and</strong> negative (x,y,z) axes. </p>
+<p>For a fuller explanation of the mathematics and the implementation details and references, see <a href="http://page.math.tu-berlin.de/~gunn/Documents/Papers/sixPointPersp.pdf" target="_new">this paper</a>, to appear in Bridges 2013, Enschede, Holland July 27-31, 2013.</p>
+<h2>User interface</h2>
+<p>We document here only the simpler version of the plugin, designed for viewing pre-computed viewable spheres, such as PhotoSpheres. A forthcoming extension or separate document will describe the full features of the plugin designed for use with a changeable synthetic scenery within <a href="http://www3.math.tu-berlin.de/jreality" target="_new">jReality</a>.</p>
+<p>At any point in using this plugin, you can rotate the displayed sphere in the graphics window (see example image below, featuring an image from  <a href="http://www.colbybrownphotography.com/can-photo-spheres-change-the-way-we-experience-the-world" target="_new">the photographer Colby Brown</a>). Left-clicking on this window and dragging rotates the viewable sphere around its center, creating new six-point perspective images as different points of the scene move through the fixed projection point. Middle-mouse click-and-drag to rotate in the x-y plane of the screen, for example, to bring the human figures to the top of the ball without changing the projection point.</p>
+<p>In this reduced-feature version of the plugin, leave the button labeled <strong>6 Point</strong> selected. It's only of interest in case the viewable sphere is created from a virtual scene, in which case this button toggles between display of this scene and the derived six-point perspective scene graph.</p>
+<p>The <strong>Labels</strong> button displays semi-transparent labels identifying the six faces  (FT, BK, LF, RT, UP, DN) of the underlying cube map used to perform the texturing. They may help you understand the process of stereographic projection better.</p>
+<p>The <strong>Cycle camera</strong> button moves the camera position through three positions: </p>
+<ul>
+  <li><strong>On	</strong> the surface of the viewable sphere. This is the default position which produces the conformal projections of interest.</li>
+  <li><strong>In  </strong>the middle of the viewable sphere. Then one obtains traditional perspective pictures, (all possible ones, in fact!) in which straight lines appear straight but one cannot see as much of the worlds as in 1). </li>
+  <li><strong>Outside</strong> the viewable sphere. If one rotates the sphere now one sees that in fact the complete scene (viewable sphere) appears on its surface.</li>
+</ul>
+<p>The <strong>FOV</strong> text field and slider allows you to control the field of view of the camera.</p>
+<p>Finally, the <strong>texture size </strong> field controls the fineness of the rendering of the viewable sphere (independently of the resolution of the loaded viewable sphere data). If in the unlikely case you have performance problems, reduce the size of the texture.</p>
+<p>You can fly around by using the arrow keys, but it isn't recommended since the three camera positions provided are all you really need. If you do fly around, you can undo the flying by using the &quot;Cycle camera&quot; button to return to the standard positions.</p>
+<p>To <strong>save images</strong> in png or jpg format use the menu item &quot;File-&gt;Export-&gt;Image...&quot;</p>
+<p>Clicking on the '?' symbol in the upper right corner of the panel opens a browser on ... this document!</p>
+<p>Questions and suggestions can be directed to the author, <a href="mailto:gunn@math.tu-berlin.de">Charles Gunn</a>.</p>
+<p align="left">For more on the scene graph used, <a href="http://www3.math.tu-berlin.de/jreality" title="jReality" target="_new">jReality</a>.</p>
+<p align="left"><img src="ConformalPhotoSphereRender.jpg" alt="Screenshot of plugin being used within an application" width="800" height="457"></p>
+<p align="center"></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+</html>

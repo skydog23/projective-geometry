@@ -1,0 +1,8 @@
+# here go the exclude file patterns for files that shoult not be compiled and
+# inserted into the dist jar archive.
+
+**/video/*.java
+**/MyPluginViewerApp.java
+**/ToolBarPlugin.java
+**/sirsikar*/*.java
+**/mathvisws12/*.java

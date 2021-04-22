@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="lib/charlesgunn.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ProjectiveGeometry/build.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.math.clifford"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.gui"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.applet"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.test"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.worlds.projective"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.mandelbrot"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.newtools"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.bicycle"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.resources"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.tools"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.pathcurve"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.jogl"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.plugin"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.geometry"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.math"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.renderman"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.projective"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.tensegrity"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.pcl4"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.worlds.projective.help"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.worlds"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.portal"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.texture"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.viewer"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.geometry.projective"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.video"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.plugin.help"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.util"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.worlds.resources"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.examples.jogl"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality"/>
+    </selectedElements>
+</jardesc>
