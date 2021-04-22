@@ -4,8 +4,8 @@
  */
 package charlesgunn.jreality.geometry.projective;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.math.Pn;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class SkewQuad extends RegulusFactory {
 

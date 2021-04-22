@@ -3,6 +3,7 @@ package charlesgunn.jreality.geometry.projective;
 import java.security.InvalidParameterException;
 
 import charlesgunn.anim.util.AnimationUtility;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.QuadMeshFactory;
@@ -12,7 +13,6 @@ import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.data.Attribute;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.LoggingSystem;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class PointRangeFactory extends Abstract1DExtentFactory{
 

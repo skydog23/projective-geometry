@@ -4,12 +4,12 @@
  */
 package charlesgunn.jreality.geometry.projective;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Rn;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class PlanePencilFactory extends Abstract1DExtentFactory {
 

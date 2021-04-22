@@ -1,5 +1,7 @@
 package charlesgunn.jreality.geometry.projective;
 
+import charlesgunn.math.p5.P5;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.math.P3;
@@ -9,8 +11,6 @@ import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.P5;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class LinePencilFactory {
 

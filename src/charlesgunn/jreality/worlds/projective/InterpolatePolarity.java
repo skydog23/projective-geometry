@@ -29,6 +29,7 @@ import charlesgunn.jreality.tools.CameraTool;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.GlobalProperties;
 import charlesgunn.jreality.viewer.LoadableScene;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.IndexedLineSetFactory;
@@ -46,7 +47,6 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.DefaultMatrixSupport;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 /**
  * @author gunn
  *

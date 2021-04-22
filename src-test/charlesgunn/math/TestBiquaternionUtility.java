@@ -1,9 +1,9 @@
 package charlesgunn.math;
 
-import junit.framework.TestCase;
 import charlesgunn.math.Biquaternion.Metric;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.math.Rn;
-import de.jtem.projgeom.PlueckerLineGeometry;
+import junit.framework.TestCase;
 
 public class TestBiquaternionUtility extends TestCase {
 

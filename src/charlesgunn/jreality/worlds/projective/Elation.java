@@ -9,6 +9,7 @@ import java.awt.Color;
 import android.R.color;
 import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.viewer.Assignment;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.SphereUtility;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
@@ -17,7 +18,6 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class Elation extends Assignment {
 

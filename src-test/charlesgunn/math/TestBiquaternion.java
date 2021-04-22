@@ -2,16 +2,15 @@ package charlesgunn.math;
 
 import java.util.logging.Level;
 
-import junit.framework.TestCase;
 import charlesgunn.math.Biquaternion.Metric;
+import charlesgunn.math.p5.P5;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
 import de.jreality.math.Quaternion;
 import de.jreality.math.Rn;
-import de.jtem.projgeom.P5;
-import de.jtem.projgeom.PlueckerLineGeometry;
-import jdk.nashorn.internal.runtime.BitVector;
+import junit.framework.TestCase;
 
 public class TestBiquaternion extends TestCase {
 	Level logLevel = Level.INFO;

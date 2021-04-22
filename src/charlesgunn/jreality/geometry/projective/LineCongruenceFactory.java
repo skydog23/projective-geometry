@@ -2,11 +2,11 @@ package charlesgunn.jreality.geometry.projective;
 
 import java.awt.Color;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 /**
  * For now, all lines are represented by 6-vector Plucker coordinates and are assumed to represent 

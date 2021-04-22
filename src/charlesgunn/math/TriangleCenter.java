@@ -1,9 +1,9 @@
 package charlesgunn.math;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class TriangleCenter {
 

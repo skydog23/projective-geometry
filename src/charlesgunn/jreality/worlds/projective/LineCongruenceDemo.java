@@ -27,6 +27,7 @@ import charlesgunn.jreality.newtools.SelectLineTool;
 import charlesgunn.jreality.newtools.SelectLineTool.LineSelectionEvent;
 import charlesgunn.jreality.tools.ToolManager;
 import charlesgunn.jreality.viewer.LoadableScene;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.math.P3;
@@ -44,7 +45,6 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 
 public class LineCongruenceDemo extends LoadableScene implements SelectLineTool.LineSelectionListener {

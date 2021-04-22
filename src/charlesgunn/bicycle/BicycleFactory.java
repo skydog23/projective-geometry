@@ -10,6 +10,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 
 import charlesgunn.jreality.geometry.projective.LineUtility;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.ParametricSurfaceFactory;
@@ -22,7 +23,6 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class BicycleFactory {
 	double tx, 

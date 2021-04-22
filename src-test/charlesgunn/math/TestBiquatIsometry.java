@@ -6,14 +6,14 @@ package charlesgunn.math;
 
 import java.util.logging.Level;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
 import charlesgunn.math.Biquaternion.Metric;
+import charlesgunn.math.p5.P5;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
-import de.jtem.projgeom.P5;
+import junit.framework.Assert;
+import junit.framework.TestCase;
 
 
 public class TestBiquatIsometry extends TestCase {

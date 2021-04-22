@@ -19,7 +19,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/lib/mfc-14-04-05.jar"/>
 	<classpathentry kind="lib" path="/lib/mathExpr-14-04-05.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/projgeom"/>
 	<classpathentry kind="lib" path="/lib/android.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/Users/gunn/Software/android-sdk-mac_86/docs/reference/"/>

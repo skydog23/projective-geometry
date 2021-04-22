@@ -4,7 +4,6 @@ import de.jreality.math.Matrix;
 import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
-import de.jtem.projgeom.P5;
 
 // TODO: implement method which computes homogeneous coordinates of the plane in P3
 // which is spanned by two intersecting plueckerLines

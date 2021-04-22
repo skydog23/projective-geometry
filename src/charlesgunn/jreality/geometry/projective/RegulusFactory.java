@@ -4,12 +4,12 @@
  */
 package charlesgunn.jreality.geometry.projective;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class RegulusFactory extends Abstract1DExtentFactory {
 

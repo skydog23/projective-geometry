@@ -4,6 +4,7 @@
  */
 package charlesgunn.jreality.geometry.projective;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
@@ -12,7 +13,6 @@ import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.util.Rectangle3D;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class LineUtility {
 

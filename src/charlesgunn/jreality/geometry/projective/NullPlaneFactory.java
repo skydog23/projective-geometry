@@ -7,6 +7,7 @@ package charlesgunn.jreality.geometry.projective;
 import java.awt.Color;
 
 import charlesgunn.anim.util.AnimationUtility;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
@@ -16,7 +17,6 @@ import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class NullPlaneFactory {
 

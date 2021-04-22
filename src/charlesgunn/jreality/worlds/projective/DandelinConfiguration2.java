@@ -21,6 +21,7 @@ import charlesgunn.jreality.geometry.projective.RegulusFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.Utility;
 import charlesgunn.math.clifford.ConicSection;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.IndexedFaceSetFactory;
@@ -45,7 +46,6 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class DandelinConfiguration2 extends Assignment {
 

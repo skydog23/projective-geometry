@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 
 import charlesgunn.jreality.tools.UserTool;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.Primitives;
 import de.jreality.jogl.plugin.HelpOverlay;
@@ -18,7 +19,6 @@ import de.jreality.scene.SceneGraphPath;
 import de.jreality.scene.pick.PickResult;
 import de.jreality.scene.tool.ToolContext;
 import de.jreality.shader.CommonAttributes;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class SelectLineTool extends UserTool {
 

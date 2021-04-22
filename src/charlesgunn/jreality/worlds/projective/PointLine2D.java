@@ -23,6 +23,7 @@ import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.geometry.projective.LineUtility;
 import charlesgunn.jreality.geometry.projective.PlanePencilFactoryOld;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.scene.Appearance;
@@ -30,7 +31,6 @@ import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class PointLine2D extends AbstractDualGeometry {
 

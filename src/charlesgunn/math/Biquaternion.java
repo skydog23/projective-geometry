@@ -3,12 +3,12 @@ package charlesgunn.math;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.math.Matrix;
 import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Quaternion;
 import de.jreality.math.Rn;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 /**
  * @author gunn

@@ -34,6 +34,7 @@ import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.tools.TranslateShapeTool;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.Utility;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
@@ -57,7 +58,6 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class DualEuclideanHexaDemo extends Assignment {
 

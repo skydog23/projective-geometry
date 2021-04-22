@@ -9,6 +9,7 @@ import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Matrix;
@@ -33,7 +34,6 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.shader.EffectiveAppearance;
 import de.jreality.util.CopyVisitor;
 import de.jreality.util.SceneGraphUtility;
-import de.jtem.projgeom.PlueckerLineGeometry;
 
 public class DualizeSceneGraph {
 
