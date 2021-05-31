@@ -8,184 +8,481 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 
 import charlesgunn.jreality.geometry.projective.PlanePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.jreality.geometry.projective.RegulusFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.Utility;
 import charlesgunn.math.clifford.ConicSection;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
+import de.jreality.geometry.GeometryUtility;
+import de.jreality.geometry.IndexedFaceSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
-import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.P2;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.Camera;
+import de.jreality.scene.ClippingPlane;
+import de.jreality.scene.DirectionalLight;
 import de.jreality.scene.IndexedLineSet;
+import de.jreality.scene.Light;
 import de.jreality.scene.SceneGraphComponent;
+import de.jreality.scene.SceneGraphPath;
+import de.jreality.scene.event.TransformationEvent;
+import de.jreality.scene.event.TransformationListener;
 import de.jreality.shader.CommonAttributes;
+import de.jreality.util.CameraUtility;
+import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
 public class DandelinConfiguration extends Assignment {
 
 	private double[][] 
-	           points3 = new double[6][3], 
+	           points3, 
 	           lines3 = new double[6][3], 
 	           points4, 
 	           regLines = new double[6][6],
+	    	       regLinesW = new double[6][6],
 	           conicPoints3,
-	           conicPoints4,
-	           planes = new double[6][4];
-	private double[] perpLine = new double[3], middlePoint;
-	private double[] cut1, join1, cut2, join2;
-	int numPoints = 100;
-	double parameter = .2,
-		pitch =1.0/3.0,
-		shear = .5,
-		sphereRadius = 3;
-	private SceneGraphComponent world,
-		pointsSGC,
-		linesSGC,
-		planesSGCParent,
-			planesSGC[],
-		basePlaneSGC,
-		conicSGC;
+	           conicPoints4;
+
+	int numPoints = 200,
+			numRulings = 100;
+	double parameter = 0.3,
+		depth = .625,
+		sphereRadius = 20,
+		epsilon = 5.0;
+	boolean show3D = false,
+			clip = false;
+	private SceneGraphComponent 
+	world,
+	    clip1SGC,
+	    clip2SGC,
+	world2,
+		regulusSGC,
+			rotateSGC,
+				bothSGC,
+			        regFacSGC,
+			        leitSharSGC,
+		theRestSGC,
+			pointsSGC,
+			    onConicSGC,
+			    onRegSGC,
+			linesSGC,
+			pascalTriSGC,
+			conicSGC;
+		;
+	SceneGraphPath pathToRegulus;
 	private PointSetFactory pointsFactory;
-	private PointRangeFactory[] lineFactories = new PointRangeFactory[6],
+	private IndexedFaceSetFactory pascalTriFac;
+	private PointRangeFactory[] lineFactories = new PointRangeFactory[10],
 		regLineFactories = new PointRangeFactory[6];
 	private PlanePencilFactory[] planeFactories = new PlanePencilFactory[6];
+	RegulusFactory regFac = RegulusFactory.getRegulusFactory();
+	Color y = Color.yellow, g = Color.green, m = new Color(200,0,50), 
+			c = Color.cyan, bl = Color.black, vi = new Color(100,0,180),
+			bl2 = new Color(40,40,40), bl3 = new Color(20,20,20), gr = new Color(0,135,50);
 	ConicSection conic = new ConicSection();
+	Appearance regAp, leitAp;
 
 	@Override
 	public SceneGraphComponent getContent() {
+		if (world !=null) return world;
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
+		clip1SGC = SceneGraphUtility.createFullSceneGraphComponent("clip1");
+		clip2SGC = SceneGraphUtility.createFullSceneGraphComponent("clip2");
+		world2 = SceneGraphUtility.createFullSceneGraphComponent("world2");
+		regulusSGC = SceneGraphUtility.createFullSceneGraphComponent("regulus");
+		rotateSGC = SceneGraphUtility.createFullSceneGraphComponent("rotate regulus");
+		bothSGC = SceneGraphUtility.createFullSceneGraphComponent("both rulings of regulus");
+		theRestSGC = SceneGraphUtility.createFullSceneGraphComponent("the rest");
 		pointsSGC = SceneGraphUtility.createFullSceneGraphComponent("points");
+		onConicSGC = SceneGraphUtility.createFullSceneGraphComponent("on conic");
+		onRegSGC = SceneGraphUtility.createFullSceneGraphComponent("on regulus");
 		linesSGC = SceneGraphUtility.createFullSceneGraphComponent("lines");
-		linesSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, false);
 		linesSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
+//		linesSGC.getAppearance().setAttribute(CommonAttributes.LINE_WIDTH, 1.5);
 		linesSGC.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.black);
+		linesSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, false);
 		MatrixBuilder.euclidean().translate(0,0,.01).assignTo(linesSGC);
-		planesSGCParent = SceneGraphUtility.createFullSceneGraphComponent("planesSGC");
-		planesSGCParent.getAppearance().setAttribute(CommonAttributes.EDGE_DRAW, false);
-		planesSGCParent.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		planesSGCParent.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.black);
+		pascalTriSGC = SceneGraphUtility.createFullSceneGraphComponent("pascalTri");
+		Appearance ap = pascalTriSGC.getAppearance();
+		ap.setAttribute(CommonAttributes.EDGE_DRAW, false);
+		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
+//		ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, true);
+		ap.setAttribute(CommonAttributes.TRANSPARENCY, 0.6);
+		
 		pointsSGC.getAppearance().setAttribute(CommonAttributes.POINT_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.yellow);
 		conicSGC = SceneGraphUtility.createFullSceneGraphComponent("conic");
 		conicSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, false);
 		conicSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		conicSGC.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.red);
+		conicSGC.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.green);
 		MatrixBuilder.euclidean().translate(0,0,.01).assignTo(conicSGC);
-		basePlaneSGC = SceneGraphUtility.createFullSceneGraphComponent("basePlane");
-		planesSGCParent = SceneGraphUtility.createFullSceneGraphComponent("planes");
-		world.addChildren(pointsSGC, linesSGC, planesSGCParent, conicSGC, basePlaneSGC, planesSGCParent);
 
+		theRestSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
+		theRestSGC.getAppearance().setAttribute("lineShader.lineWidth", 3.0);
+
+		world.addChildren(world2, clip1SGC, clip2SGC);
+		world2.addChildren(regulusSGC, theRestSGC);
+		pointsSGC.addChildren(onConicSGC, onRegSGC);
+		theRestSGC.addChildren(pointsSGC, linesSGC, conicSGC, pascalTriSGC);
+		regulusSGC.addChildren(rotateSGC);
+		rotateSGC.addChildren(bothSGC);
+		regulusSGC.setVisible(show3D);
+		
+		regAp = new Appearance();
+		leitAp = new Appearance();
+		regAp.setAttribute("lineShader."+"diffuseColor", new Color(255,50,50));
+		leitAp.setAttribute("lineShader."+"diffuseColor",new Color(50,150,255));	
+		regFac.setNumberOfSamples(numRulings);
+		regFacSGC = regFac.getRegulus();
+		leitSharSGC = regFac.getLeitSchar();
+		regFacSGC.setAppearance(regAp);
+		leitSharSGC.setAppearance(leitAp);
+		bothSGC.addChildren(regFacSGC, leitSharSGC);
+		ap = bothSGC.getAppearance();
+		ap.setAttribute(CommonAttributes.TUBES_DRAW,false);
+		ap.setAttribute(CommonAttributes.LINE_WIDTH, 1.0);
+		ap.setAttribute(CommonAttributes.TUBE_RADIUS, .02);
+		bothSGC.setPickable(false);
+		bothSGC.setVisible(false);
+
+		
+		regAp = new Appearance();
+		leitAp = new Appearance();
+		regAp.setAttribute("diffuseColor", new Color(255,50,50));
+		leitAp.setAttribute("diffuseColor",new Color(50,150,255));	
+		regulusSGC.getAppearance().setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, false);
+		regulusSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
+		pathToRegulus = SceneGraphUtility.getPathsBetween(regulusSGC, rotateSGC).get(0);
+		rotateSGC.addTool(new de.jreality.tools.RotateTool());
+		MatrixBuilder.euclidean().translate(0,0,depth).assignTo(regulusSGC);
+		rotateSGC.getTransformation().addTransformationListener(new TransformationListener() {
+			
+			@Override
+			public void transformationMatrixChanged(TransformationEvent ev) {
+				update();
+			}
+		});
 		init();
 
+		pointsSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, true);
+		pointsSGC.getAppearance().setAttribute(CommonAttributes.POINT_RADIUS, 0.03);
+		pointsSGC.getAppearance().setAttribute(CommonAttributes.POINT_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.black);
+		pointsSGC.getAppearance().setAttribute(CommonAttributes.TEXT_SHADER+"."+CommonAttributes.TEXT_SCALE, .003);
+		pointsSGC.getAppearance().setAttribute(CommonAttributes.TEXT_SCALE, .003);
+
+		conicSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
+
+		world.getAppearance().setAttribute(CommonAttributes.SMOOTH_SHADING, false);
+		world.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
+//		world.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, false);
+		world.getAppearance().setAttribute(CommonAttributes.DIFFUSE_COLOR	, Color.white);
+//		world.getAppearance().setAttribute("lineShader.lineWidth", 2.5);
+		update();
+		
+		Light dl = new DirectionalLight();
+		dl.setIntensity(1.0);
+		world2.setLight(dl);
+		
+		clip1SGC.setGeometry(new ClippingPlane());
+		clip2SGC.setGeometry(new ClippingPlane());
+		updateClippingPlanes();
+		
+		MatrixBuilder.euclidean().translate(0,0,-8).assignTo(world2);
+
+
+		return world;
+	}
+	private void updateClippingPlanes() {
+		double amt = (epsilon > 1 ? 10E8 : epsilon);
+		MatrixBuilder.euclidean().translate(0,0,-8-amt).scale(-1).assignTo(clip1SGC);
+		MatrixBuilder.euclidean().translate(0,0,-8+amt).assignTo(clip2SGC);
+	}
+	/** build the regulus first, then slice it to get a conic
+	 * Start with a 2x3 set of lines, the middle pair is the x-, resp., y-axis
+	 * Then on either side of the x-axis, a pair of lines lying on a
+	 * helix that includes the x-axis, and similarly for the y-axis.
+	 * Each of x- group meets each of the y-group, so form the
+	 * two guide-lines of the regulus.  
+	*/
+	protected void init()	{
+		points4 = new double[18][4];
+		points3 = Utility.demote(points3, points4);
+		
 		pointsFactory = new PointSetFactory();
 		pointsFactory.setVertexCount(points4.length);
 		pointsFactory.setVertexCoordinates(points4);
+		pointsFactory.setVertexLabels(new String[]{
+				"A","B","C","A'","B'","C'",
+				"A''","B''","C''","0''","1''","2''",
+				"0","1","2","0'","1'","2'"
+		});
+		Color[] pointColors = new Color[]{y,y,y,y,y,y,c,c,c,c,c,c,m,gr,vi,m,gr,vi};
+
+		pointsFactory.setVertexColors(pointColors);
 		pointsFactory.update();
 		pointsSGC.setGeometry(pointsFactory.getPointSet());
-		IndexedLineSet conic = IndexedLineSetUtility.createCurveFromPoints(conicPoints4, true);
-		conicSGC.setGeometry(conic);
-		double s = 2;
-		basePlaneSGC.setGeometry(Primitives.texturedQuadrilateral(new double[]{-s,-s,0, s, -s,0,  s,s,0,  -s,s,0}));
-		world.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		world.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, false);
-		world.getAppearance().setAttribute(CommonAttributes.DIFFUSE_COLOR	, Color.white);
-		update();
-		
-		MatrixBuilder.euclidean().translate(0,0,-4).assignTo(world);
-		return world;
+
+		updateReglines();
+
+		Color[] colors = new Color[]{m,gr,vi,m,gr,vi, Color.blue, m, gr, vi};
+		Boolean[] stipple = {true, true, true, true, true, true, false, false, false, false};
+		int[] stippleVals = {127, 127, 127, 127, 127, 127, 15*257,165*257, 234*257, 15*257, 165*257, 234*257,0, 0, 0, 0};
+		for (int i = 0; i<10; ++i)	{
+			lineFactories[i] = new PointRangeFactory(); 
+			lineFactories[i].setFiniteSphere(true);
+			lineFactories[i].setSphereRadius(sphereRadius);
+			lineFactories[i].setElement0(points4[i]);
+			lineFactories[i].setElement1(points4[(i+1)%6]);
+			lineFactories[i].update();
+			SceneGraphComponent child = new SceneGraphComponent("line"+i);
+			linesSGC.addChild(child);
+			child.setAppearance(new Appearance());
+			child.getAppearance().setAttribute("lineShader.diffuseColor", colors[i]);
+			child.getAppearance().setAttribute(CommonAttributes.LINE_STIPPLE, stipple[i]);
+			child.getAppearance().setAttribute(CommonAttributes.LINE_STIPPLE_PATTERN, stippleVals[i]);
+			child.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
+			child.setGeometry(lineFactories[i].getLine());
+		}
+		for (int i = 0; i<6; ++i)	{
+			regLineFactories[i] = new PointRangeFactory(); 
+			regLineFactories[i].setFiniteSphere(true);
+			regLineFactories[i].setSphereRadius(sphereRadius);
+			regLineFactories[i].setPluckerLine(regLines[i]);
+			regLineFactories[i].update();
+			SceneGraphComponent child = new SceneGraphComponent("line"+i);
+			child.setAppearance(new Appearance());
+			child.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
+			child.setAppearance( ((i%2) == 0) ? regAp : leitAp);
+			rotateSGC.addChild(child);
+			child.setGeometry(regLineFactories[i].getLine());
+		}
 	}
+
+	double[] xaxis = {1,0,0,0}, yaxis = {0,1,0,0};
 	double[] fixedPlane = {0,0,1,0};  // z=0 plane
-	int[] perm = {0,2,4,1,3,5}, steps = {0,1,2,3,5,4};
-	protected void init()	{
+	double pitch = Math.PI/4, lean = 0;
+	int[] hexagoner = {0,1,2,3,4,5},
+			doubleDiamonds = {0,1,2,5,4,3},
+			atomMull = {0,1,2,4,5,3};
+
+	int pascalTris[][] = {{0,1,2},{0,2,1},{1,0,2},{1,2,0},{2,0,1},{2,1,0}},
+			pascalTri[] = pascalTris[0];
+	int[][] hexagon = new int[6][2];
+	boolean[] showFaces = {false, false, false, false, false, false};
+	int[][] pascalIndices = {
+			{12, 13, 17},
+			{15, 16, 14},
+			{13, 14, 12},
+			{16, 17, 15},
+			{14, 15, 13},
+			{17, 12, 16}
+	};
+	Color[] pascalColors = { gr, gr, vi, vi, m, m};
+	
+	protected void update()	{
+		updateReglines();
+		
+		points4 = new double[show3D ? 18 : 9][4];
+		// find intersections with fixed z=0 plane
 		for (int i = 0; i<6; ++i)	{
-			double angle = steps[i]*Math.PI * 2.0/6.0;
-			int index = perm[i];
-			points3[index][0] = Math.cos(angle);
-			points3[index][1] = Math.sin(angle);
-			points3[index][2] = 1.0;
+			points4[i] = PlueckerLineGeometry.lineIntersectPlane(null, regLinesW[i], fixedPlane);
+			Pn.dehomogenize(points4[i], points4[i]);
 		}
+		points3 = Utility.demote(points3, points4);
+		for (int i = 0; i<6; ++i)	{
+			lineFactories[i].setElement0(points4[i]);
+			lineFactories[i].setElement1(points4[(i+1)%6]);
+			lineFactories[i].update();
+			// we need five 2D lines depending on the first five points in a pentagram arrangement
+			// to generate the conic
+			if (i < 5) lines3[i] = P2.lineFromPoints(null, points3[i%5], points3[(i+1)%5]);
+		}
+		
+		for (int i = 0; i<3; ++i)	{
+			int index = (i+1)%3;
+			points4[6+i] = PlueckerLineGeometry.intersectionPoint(null, 
+					lineFactories[index].getPluckerLine(), 
+					lineFactories[index+3].getPluckerLine());
+		}
+		pointsFactory.setVertexCount(points4.length);
+		if (show3D) {
+			// points[9-11] are the three points of the three "unused" planes of the regulus
+			for (int i = 0; i<3; ++i)	{
+				points4[i+9] = PlueckerLineGeometry.intersectionPoint(null, regLinesW[i], regLinesW[i+3]);
+			}
+			for (int i = 0; i<6; ++i)	{
+				points4[i+12] = PlueckerLineGeometry.intersectionPoint(null, regLinesW[(i+1)%6], regLinesW[(i+2)%6]);
+			}			
+			pointsFactory.setVertexLabels(new String[]{
+					"A","B","C","A'","B'","C'",
+					"A''","B''","C''","0''","1''","2''",
+					"0","1","2","0'","1'","2'"
+			});
+			Color[] pointColors = new Color[]{y,y,y,y,y,y,c,c,c,c,c,c,m,gr,vi,m,gr,vi};
+			pointsFactory.setVertexColors(pointColors);
+		} else {
+			pointsFactory.setVertexLabels(new String[]{
+					"A","B","C","A'","B'","C'",
+					"A''","B''","C''"
+			});
+			Color[] pointColors = new Color[]{y,y,y,y,y,y,c,c,c};
+			pointsFactory.setVertexColors(pointColors);
+		}
+		Pn.dehomogenize(points4, points4);
+		pointsFactory.setVertexCoordinates(points4);
+
+		pointsFactory.update();
+
+		// get the pascal line
+		lineFactories[6].setElement0(points4[6]);
+		lineFactories[6].setElement1(points4[7]);
+		lineFactories[6].update();
+
+		// these are the lines bounding the pascal triangle in 3-space
+		if (show3D)	{
+			for (int i = 0; i<3; ++i)	{
+				lineFactories[i+7].setElement0(points4[i+9]);
+				lineFactories[i+7].setElement1(points4[9+((i+1)%3)]);
+				lineFactories[i+7].update();
+			}			
+		}
+		
+		if (show3D) updatePascalTriangle();
+
+		updateConic();
+		
+		updateVisibility();
+	}
+	private void updateVisibility() {
+		pascalTriSGC.setVisible(show3D);
+		regulusSGC.setVisible(show3D);
+		clip1SGC.setVisible(show3D);
+		clip2SGC.setVisible(show3D);
+		if (show3D)	{
+			world.addChildren(clip1SGC, clip2SGC);
+		} else {
+			world.removeChild(clip1SGC);
+			world.removeChild(clip2SGC);
+		}
+		for (int i = 0; i<3; ++i)	{
+			linesSGC.getChildComponent(i+7).setVisible(show3D);
+		}
+	}
+	private void updateConic() {
 		conic.setInitialPoints(points3);
-		points4 = Utility.promote(points4, points3);
-		for (int i = 0; i<6; ++i)	{
-			lines3[i] = P2.lineFromPoints(null, points3[i], points3[(i+1)%6]);
-		}
 		conicPoints3 = new double[numPoints][];
 		for (int i = 0; i<numPoints; ++i)	{
 			double t = i *(1.0/(numPoints));
 			conicPoints3[i] = conic.getValueAtTime(null, t);
 		}
 		conicPoints4 = Utility.promote(conicPoints4, conicPoints3);
-		// initialize planes and 5 of the six regulus lines
-		// create a very regular regulus
-		regLines[0] = regLineAt(null, Math.PI*2*(0.0/6.0));
-		regLines[2] = regLineAt(null, Math.PI*2*(4.0/6.0));
-		regLines[4] = regLineAt(null, Math.PI*2*(5.0/6.0));
-		regLines[1] = leitLineAt(null, Math.PI*2*(2.0/6.0));
-		regLines[3] = leitLineAt(null, Math.PI*2*(1.0/6.0));
-		regLines[5] = leitLineAt(null, Math.PI*2*(3.0/6.0));
-//		double[] tmp = points4[0].clone();
-//		tmp[0] += .5; tmp[1] = .3; tmp[2] = 1;
-//		PlueckerLineGeometry.lineFromPoints(regLines[0], points4[0], tmp);
-//		tmp = points4[4].clone();
-//		tmp[0] -= .5; tmp[1] = -.3; tmp[2] = 1;
-//		PlueckerLineGeometry.lineFromPoints(regLines[4], points4[4], tmp);
-//		planes[0] = PlueckerLineGeometry.lineJoinPoint(planes[0], regLines[0], points4[1]);
-//		planes[3] = PlueckerLineGeometry.lineJoinPoint(planes[3], regLines[4], points4[3]);
-//		double[] tplane = PlueckerLineGeometry.lineJoinPoint(null, regLines[0], points4[3]);
-//		PlueckerLineGeometry.lineFromPlanes(regLines[3], planes[3], tplane);
-//		tplane = PlueckerLineGeometry.lineJoinPoint(null, regLines[4], points4[1]);
-//		PlueckerLineGeometry.lineFromPlanes(regLines[1], planes[0], tplane);
-//		planes[1] = PlueckerLineGeometry.lineJoinPoint(planes[1], regLines[1], points4[2]);
-//		planes[2] = PlueckerLineGeometry.lineJoinPoint(planes[2], regLines[3], points4[2]);
-//		PlueckerLineGeometry.lineFromPlanes(regLines[2], planes[1],planes[2]);
-//		regLines[5] = regLines[0].clone();
-//		System.err.println("points = \n"+Rn.toString(points4));
-//		System.err.println("reglines = \n"+Rn.toString(regLines));
-		planesSGC = new SceneGraphComponent[6];
-		Appearance regAp, leitAp;
-		regAp = new Appearance();
-		leitAp = new Appearance();
-		regAp.setAttribute("diffuseColor", Color.red);
-		leitAp.setAttribute("diffuseColor", Color.blue);
+		IndexedLineSet conicILS = IndexedLineSetUtility.createCurveFromPoints(conicPoints4, true);
+		conicSGC.setGeometry(conicILS);
+	}
+	private void updatePascalTriangle() {
+		// update the pascal triangle geometry
+		if (pascalTriFac == null)	{
+			pascalTriFac = new IndexedFaceSetFactory();
+			pascalTriFac.setVertexCount(points4.length);
+			pascalTriFac.setFaceCount(6);
+			pascalTriFac.setFaceIndices(new int[][] {
+				{12, 10, 11},
+				{15, 11, 10},
+				{13, 11, 9},
+				{16, 9, 11},
+				{14, 9, 10},
+				{17, 10, 9}
+			});
+			pascalTriFac.setFaceColors(new Color[]{ gr, gr, vi, vi, m, m});
+			pascalTriFac.setGenerateFaceNormals(true);
+		}
+		pascalTriFac.setVertexCoordinates(points4);
+		int count = 0;
+		for (int i = 0; i<6; ++i) {
+			if (showFaces[i]) count++;
+		}
+		int[][] inds = new int[count][];
+		Color[] fc = new Color[count];
+		count = 0;
+		for (int i = 0; i<6; ++i) {
+			if (showFaces[i]) {
+				inds[count] = pascalIndices[i];
+				fc[count] = pascalColors[i];
+				count++;
+			}
+		}
+		pascalTriFac.setFaceCount(count);
+		pascalTriFac.setFaceIndices(inds);
+		pascalTriFac.setFaceColors(fc);
+		
+		pascalTriFac.update();
+		pascalTriSGC.setGeometry(pascalTriFac.getGeometry());
+	}
+
+	private void updateReglines() {
+		double[][][] rawLines = {
+				{regLineAt(null, Math.PI*2/3.0),
+				regLineAt(null, 0),
+				regLineAt(null, -Math.PI*2/3.0)},
+				{leitLineAt(null,  Math.PI*2/3.0),
+				leitLineAt(null,0),
+				leitLineAt(null, -Math.PI*2/3.0)}};
+	
+		hexagon =  hexagonForPascalTriangle(hexagon, pascalTri);
 		for (int i = 0; i<6; ++i)	{
-			lineFactories[i] = new PointRangeFactory(); 
-			lineFactories[i].setFiniteSphere(true);
-			lineFactories[i].setSphereRadius(3);
-			lineFactories[i].setElement0(points4[i]);
-			lineFactories[i].setElement1(points4[(i+1)%6]);
-			lineFactories[i].update();
-			SceneGraphComponent child = new SceneGraphComponent("line"+i);
-			linesSGC.addChild(child);
-			child.setGeometry(lineFactories[i].getLine());
-			regLineFactories[i] = new PointRangeFactory(); 
-			regLineFactories[i].setFiniteSphere(true);
-			regLineFactories[i].setSphereRadius(sphereRadius);
+			int j = hexagon[i][0], k = hexagon[i][1];
+			regLines[i] = ((i%2)==0) ? rawLines[0][j] : rawLines[1][k]; 
+		}
+
+		// create the regulus
+		regFac.setElement0(rawLines[0][0]);
+		regFac.setElement1(rawLines[0][1]);
+		regFac.setElement2(rawLines[0][2]);
+		regFac.setNumberOfSamples(numRulings);
+		regFac.setSphereRadius(sphereRadius);
+		regFac.update();			
+		
+		// transform according to the scene graph
+		Matrix regM = new Matrix();
+		regM.assignFrom(pathToRegulus.getMatrix(null));
+		double[] lineTform = PlueckerLineGeometry.inducedP5ProjFromP3Proj(null, regM.getArray());
+//		System.err.println("tform = \n"+Rn.toString(lineTform));
+		// these lines (in world coords) are used to determine the conic in the fixed world plane z=1
+		for (int i =0; i<6; ++i)	{
+			regLinesW[i] = Rn.matrixTimesVector(regLinesW[i], lineTform, regLines[i]);
+		}
+		if (regLineFactories[0] == null) return;
+		for (int i =0; i<6; ++i)	{
 			regLineFactories[i].setPluckerLine(regLines[i]);
-			regLineFactories[i].update();
-//			regLineFactories[i].update();
-			child = new SceneGraphComponent("line"+i);
-			child.setAppearance( ((i%2) == 0) ? regAp : leitAp);
-			planesSGCParent.addChild(child);
-			child.setGeometry(regLineFactories[i].getLine());
+			regLineFactories[i].update();	
 		}
 	}
 	
 	private double[] regLineAt(double[] ret, double position) {
-		return regLineAt(ret, position, pitch, parameter);
+		return regLineAt(ret, position, pitch, lean);
 	}
+	
 	private double[] leitLineAt(double[] ret, double position) {
-		return regLineAt(ret, position, -pitch, -parameter);
+		return regLineAt(ret, position, -pitch, -lean);
 	}
 
 	private double[] regLineAt(double[] ret, double position, double p, double l) {
@@ -196,75 +493,137 @@ public class DandelinConfiguration extends Assignment {
 		Matrix m = new Matrix();
 		MatrixBuilder.euclidean().rotate(position, 0, 0, 1).assignTo(m);
 		direction = m.multiplyVector(direction);
-		direction = shearM.multiplyVector(direction);
-		ret = PlueckerLineGeometry.lineFromPoints(ret, point, direction);
+		ret = PlueckerLineGeometry.lineFromPoints(ret,  direction, point);
 		return ret;
 	}
-
-	Matrix shearM = new Matrix();
-	protected void update()	{
-		shearM = new Matrix(new double[]{
-				1,0,-shear,0,
-				0,1,0,0,
-				0,0,1,0,
-				0,0,0,1
-		});
-		regLines[0] = regLineAt(null, Math.PI*2*(0.0/6.0));
-		regLines[2] = regLineAt(null, Math.PI*2*(4.0/6.0));
-		regLines[4] = regLineAt(null, Math.PI*2*(5.0/6.0));
-		regLines[1] = leitLineAt(null, Math.PI*2*(2.0/6.0));
-		regLines[3] = leitLineAt(null, Math.PI*2*(1.0/6.0));
-		regLines[5] = leitLineAt(null, Math.PI*2*(3.0/6.0));
-		for (int i = 0; i<6; ++i)	{
-			regLineFactories[i].setPluckerLine(regLines[i]);
-			regLineFactories[i].update();	
+	
+	private int[][] hexagonForPascalTriangle(int[][] is, int[] p) {
+		if (is == null) is = new int[6][2];
+		int[][] used = new int[3][3];
+		for (int i = 0; i<3; ++i)	{
+			used[i][p[i]] = 1;
 		}
-
-//		points4[5] = Utility.promote(points4[5], conic.getValueAtTime(null, parameter));
-//		pointsFactory.setVertexCoordinates(points4);
-//		pointsFactory.update();
-//		lineFactories[4].setElement1(points4[5]);
-//		lineFactories[5].setElement0(points4[5]);
-//		lineFactories[4].update();
-//		lineFactories[5].update();
-//		// update the planes
-//		planes[4] = PlueckerLineGeometry.lineJoinPoint(planes[4], regLines[4], points4[5]);
-//		planes[5] = PlueckerLineGeometry.lineJoinPoint(planes[5], regLines[0], points4[5]);
-//		PlueckerLineGeometry.lineFromPlanes(regLines[5], planes[4], planes[5]);
-//		if (PlueckerLineGeometry.isValidLine(regLines[5])) {
-//			regLineFactories[5].setPluckerLine(regLines[5]);
-//			regLineFactories[5].update();
-//		}
+//		System.err.println("in hexagonForPT");
+//		m[0][(p[0]+1)%3] = 1;
+		boolean onRow = true;
+		int row=0, column = 0;
+		for (int i = 0; i<6; ++i)	{
+			if (onRow) {
+				while(used[row][column] == 1)
+					column = (column+1)%3;
+				used[row][column] = 1;
+				is[i][0] = row;
+				is[i][1] = column;
+			} else {
+				while(used[row][column] == 1)
+					row = (row+1)%3;
+				used[row][column] = 1;
+				is[i][0] = row;
+				is[i][1] = column;
+			}
+//			System.err.println("got entry "+is[i][0]+":"+is[i][1]);
+			onRow = !onRow;
+		}
+		return is;
 	}
-	
-//	protected double[] pointOnConicAtTime(double[] dst, double t)	{
-//		if (dst == null) dst = new double[3];
-//		double angle = Math.PI*t;
-//		double[] lineFromPencil = Rn.linearCombination(null, Math.cos(angle), lines3[0], Math.sin(angle), perpLine);
-//		cut1 = P2.pointFromLines(cut1,lines3[2], lineFromPencil);
-//		join1 = P2.lineFromPoints(join1, cut1, middlePoint);
-//		cut2 = P2.pointFromLines(cut2, lines3[1], join1);
-//		join2 = P2.lineFromPoints(join2, cut2, points3[4]);
-//		P2.pointFromLines(dst, lineFromPencil, join2);
-//		return Pn.dehomogenize(dst, dst);
-//	}
-	
-
-	private double[] leitLineAt(Object object, double d, double e, double parameter2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	int counter = 0;
 	@Override
 	public void display() {
 		// TODO Auto-generated method stub
 		super.display();
 		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, Color.white);
+		Camera cam = CameraUtility.getCamera(jrviewer.getViewer());
+		cam.setFar(50);
+		cam.setFocus(8.0);
+		cam.setEyeSeparation(0.5);
+		SceneGraphComponent camNode = CameraUtility.getCameraNode(jrviewer.getViewer());
+//		PointLight dl = new PointLight();
+//		dl.setIntensity(.5);
+//		camNode.setLight(dl);
+		Component comp = ((Component) jrviewer.getViewer().getViewingComponent());
+		comp.addKeyListener(new KeyAdapter() {
+				public void keyPressed(KeyEvent e)	{ 
+				switch(e.getKeyCode())	{
+					
+				case KeyEvent.VK_H:
+					System.err.println("	1: cycle types");
+					break;
+	
+				case KeyEvent.VK_1:
+					incrementCounter();
+					
+				}
+			}
+
+		});
 	}
 
+	private void incrementCounter() {
+		counter = (counter+1)%pascalTris.length;
+		pascalTri = pascalTris[counter];
+		update();
+	}
+
+	final String[] zigzagNames = {"0","0'","1","1'","2", "2'"};
 	@Override
 	public Component getInspector() {
+		if (bothSGC == null) getContent();
 		Box inspectionPanel = inspector;
+		Box vbox = Box.createVerticalBox();
+		inspector.add(vbox);
+		vbox.setBorder(new CompoundBorder(new EmptyBorder(5, 5, 5, 5),
+				BorderFactory.createTitledBorder(BorderFactory
+						.createEtchedBorder(), "3D")));
+		Box hbox = Box.createHorizontalBox();
+		vbox.add(hbox);
+		JCheckBox cb = new JCheckBox("show 3D");
+		hbox.add(cb);
+		cb.setSelected(regulusSGC.isVisible());
+		cb.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				show3D = ((JCheckBox) e.getSource()).isSelected();
+				update();
+			}
+		});	
+		cb = new JCheckBox("show regulus");
+		hbox.add(cb);
+		cb.setSelected(bothSGC.isVisible());
+		cb.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean b = ((JCheckBox) e.getSource()).isSelected();
+				bothSGC.setVisible(b);
+			}
+		});	
+		JButton cbut = new JButton("cycle pascal plane");
+		hbox.add(cbut);
+		cbut.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				incrementCounter();
+			}
+		});	
+		hbox = Box.createHorizontalBox();
+		vbox.add(hbox);
+		hbox.add(new JLabel("Show zigzag planes:"));
+		for (int i = 0; i<6; ++i)	{
+			cb = new JCheckBox(zigzagNames[i]);
+			hbox.add(cb);
+			cb.setSelected(showFaces[i]);
+			final int j = i;
+			cb.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					showFaces[j] = ((JCheckBox) e.getSource()).isSelected();
+					update();
+				}
+			});	
+		}
 		final TextSlider timeSlider = new TextSlider.Double("t",SwingConstants.HORIZONTAL, -1.0, 1.0, parameter);
 		timeSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
@@ -281,14 +640,24 @@ public class DandelinConfiguration extends Assignment {
 			}
 		});
 		inspectionPanel.add(rotateSlider);
-		final TextSlider shearSlider = new TextSlider.Double("shear",SwingConstants.HORIZONTAL, -2.0, 2.0, shear);
-		shearSlider.addActionListener(new ActionListener()	{
+		final TextSlider depthSlider = new TextSlider.Double("depth",SwingConstants.HORIZONTAL, -2.0, 5.0, depth);
+		depthSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
-				shear = shearSlider.getValue().doubleValue();
+				depth = depthSlider.getValue().doubleValue();
+				MatrixBuilder.euclidean().translate(0,0,depth).assignTo(regulusSGC);
+
 				update();
 			}
 		});
-		inspectionPanel.add(shearSlider);
+		inspectionPanel.add(depthSlider);
+		final TextSlider clipSlider = new TextSlider.Double("clip amount",SwingConstants.HORIZONTAL, 0.0, 2, epsilon);
+		clipSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				epsilon = clipSlider.getValue().doubleValue();
+				updateClippingPlanes();
+			}
+		});
+		inspectionPanel.add(clipSlider);
 		final TextSlider radiusSlider = new TextSlider.Double("radius",SwingConstants.HORIZONTAL, 2, 100, sphereRadius);
 		radiusSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
@@ -297,13 +666,54 @@ public class DandelinConfiguration extends Assignment {
 				for (int i = 0; i<6; ++i)	{
 					regLineFactories[i].setSphereRadius(sphereRadius);
 					regLineFactories[i].update();
+					lineFactories[i].setSphereRadius(sphereRadius);
+					lineFactories[i].update();
 				}
 			}
 		});
 		inspectionPanel.add(radiusSlider);
+		final TextSlider numRulingsSlider = new TextSlider.Integer("# rulings",SwingConstants.HORIZONTAL, 1,200, numRulings);
+		numRulingsSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				numRulings = numRulingsSlider.getValue().intValue();
+				update();
+			}
+		});
+		inspectionPanel.add(numRulingsSlider);
 		return inspectionPanel;
 	}
 	public static void main(String[] args) {
 		new DandelinConfiguration().display();
 	}
 }
+
+//regLines[0] = PlueckerLineGeometry.lineFromPoints(null, 
+//new double[]{1,0,0,1}, 
+//new double[]{0,c,s,0});
+//regLines[1] = PlueckerLineGeometry.lineFromPoints(null, P3.originP3, yaxis);
+//regLines[2] = PlueckerLineGeometry.lineFromPoints(null, 
+//new double[]{-asymmetry,0,0,1}, 
+//new double[]{0,c,-s,0});
+//regLines[4] = PlueckerLineGeometry.lineFromPoints(null, P3.originP3, xaxis);
+//double[] planeThruLine1 = new double[]{-s,0,c,0},
+//pointOnLine0 = PlueckerLineGeometry.lineIntersectPlane(null, regLines[0], planeThruLine1),
+//pointOnLine2 = PlueckerLineGeometry.lineIntersectPlane(null, regLines[2], planeThruLine1);
+//regLines[3] = PlueckerLineGeometry.lineFromPoints(null, pointOnLine0, pointOnLine2);
+//planeThruLine1 = new double[]{s,0,c,0};
+//pointOnLine0 = PlueckerLineGeometry.lineIntersectPlane(null, regLines[0], planeThruLine1);
+//pointOnLine2 = PlueckerLineGeometry.lineIntersectPlane(null, regLines[2], planeThruLine1);
+//regLines[5] = PlueckerLineGeometry.lineFromPoints(null, pointOnLine0, pointOnLine2);
+
+//double[][][]
+//regpts3x3 = new double[3][3][],	// array of 3x3 points on regulus
+//regpln3x3 = new double[3][3][];
+//
+//// find the intersection points and joining planes of the two sets of lines
+//for (int i = 0; i<3; ++i)	{
+//for (int j = 0; j<3; ++j)	{
+//regpts3x3[i][j] = PlueckerLineGeometry.intersectionPoint(null, rawLines[0][i], rawLines[1][j]);
+//regpln3x3[i][j] = PlueckerLineGeometry.intersectionPlane(null, rawLines[0][i], rawLines[1][j]);
+//}
+//regpts3x3[i] = Rn.matrixTimesVector(regpts3x3[i], regM.getArray(), regpts3x3[i]);
+//}
+

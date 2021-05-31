@@ -15,7 +15,7 @@ import javax.swing.JMenuBar;
 
 import charlesgunn.anim.plugin.AnimationPlugin;
 import charlesgunn.jreality.CameraUtilityOverflow;
-import charlesgunn.jreality.newtools.FlyTool;
+import charlesgunn.jreality.newtools.FlyTool2;
 import charlesgunn.jreality.plugin.BackgroundColorsTool;
 import charlesgunn.jreality.plugin.LoadableSceneMenu;
 import charlesgunn.jreality.plugin.TermesSpherePlugin;
@@ -184,7 +184,7 @@ public class PluginSceneLoader extends Plugin {
 		SceneGraphComponent ava = controller.getPlugin(Scene.class).getAvatarPath().getLastComponent();
 		MatrixBuilder.euclidean().assignTo(ava);
 		content = JRViewerUtility.getContentPlugin(controller);
-		FlyTool ft = new FlyTool();
+		FlyTool2 ft = new FlyTool2();
 		ft.setGain(.1);
 		CameraUtility.getCameraNode(viewer).addTool(ft);
 //		BackgroundColorsTool.addBackgroundColorsTool(viewer);

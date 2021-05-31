@@ -16,7 +16,7 @@ public class RegulusFactory extends Abstract1DExtentFactory {
 	double[][] pluckerLines, basisPlanes;
 	double[] element2;
 	double tolerance = 10E-8;
-	boolean finiteSphere = true;
+	boolean finiteSphere = false;
 	double sphereRadius = 10E2;
 	boolean isLeitSchar = false;
 	transient boolean isDegenerate = false;
@@ -40,6 +40,14 @@ public class RegulusFactory extends Abstract1DExtentFactory {
 		rf.leitSchar.isLeitSchar = true;
 		return rf;
 	}
+
+	
+	@Override
+	public void setElement1(double[] el1)	{
+		super.setElement1(el1);
+		basisPlanes = LineUtility.twoPlanesOnLine(null, element1);
+	}
+
 	public double[] getElement2() {
 		return element2;
 	}
@@ -75,7 +83,7 @@ public class RegulusFactory extends Abstract1DExtentFactory {
 	
 	@Override
 	public void update() {
-		System.err.println("Updating regelschar");
+//		System.err.println("Updating regelschar");
 		// check if the regelschar is degenerate
 		if (!isLeitSchar) {
 			checkDegeneracy();			
@@ -165,13 +173,7 @@ public class RegulusFactory extends Abstract1DExtentFactory {
 		leitSchar.setFiniteSphere(finiteSphere);
 		leitSchar.setSphereRadius(sphereRadius);
 		leitSchar.update();			
-		System.err.println("Updating leitschar");
-	}
-
-	@Override
-	public void setElement1(double[] el1)	{
-		super.setElement1(el1);
-		basisPlanes = LineUtility.twoPlanesOnLine(null, element1);
+//		System.err.println("Updating leitschar");
 	}
 
 	public double[] getValueAtTime(double t)	{
@@ -223,10 +225,6 @@ public class RegulusFactory extends Abstract1DExtentFactory {
 			start1 = i;
 			while (i < factories.length && factories[i].getLine() != null) i++;
 			end1 = i+1;
-//			while (i < factories.length && factories[i].getLine() == null) i++;
-//			start2 = i;
-//			while (i < factories.length && factories[i].getLine() != null) i++;
-//			end2 = i;
 		} else {
 			start1 = 0; end1 = factories.length;
 		}

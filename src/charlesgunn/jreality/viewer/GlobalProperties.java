@@ -2,6 +2,7 @@ package charlesgunn.jreality.viewer;
 
 import java.awt.Color;
 
+import charlesgunn.jreality.newtools.FlyTool;
 import de.jreality.math.P3;
 import de.jreality.portal.PortalCoordinateSystem;
 import de.jreality.scene.Appearance;
@@ -13,7 +14,6 @@ import de.jreality.scene.Transformation;
 import de.jreality.scene.Viewer;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.tools.RemotePortalHeadMoveTool;
-import de.jreality.tutorial.util.FlyTool;
 import de.jreality.util.SceneGraphUtility;
 import de.jreality.util.SystemProperties;
 

@@ -54,7 +54,6 @@ import de.jreality.util.SceneGraphUtility;
 public class InterpolatePolarity extends 	Assignment  {
 	private transient SceneGraphComponent c1, c2, ct, childList1, childList2, childListt, theWorld, sf, lines, strahlen, axen;
 	private transient SceneGraphComponent[] kids = null;
-	private transient Viewer viewer;
 	private transient int surfElementCount;
 	private transient boolean showFirst = true, 
 		showLast = false, 
@@ -399,7 +398,7 @@ public class InterpolatePolarity extends 	Assignment  {
 			double[] foo  = Rn.matrixTimesVector(null, skewMatricesForAxes[i], plane);
 			if (Rn.euclideanNorm(foo) > 10E-10)  
 				System.err.println("null point of interpolated plane is "+Rn.toString(foo));
-			SurfaceElement.surfaceElement(kids[i], point, plane, 0.3, Pn.PROJECTIVE);
+			SurfaceElement.surfaceElement(kids[i], point, plane, 0.3, Pn.EUCLIDEAN);
 		}
 		if (viewer != null) viewer.renderAsync();
 	}
@@ -435,7 +434,7 @@ public class InterpolatePolarity extends 	Assignment  {
 		CameraUtility.getCamera(viewer).setFar(500.0);
 		CameraUtility.getCameraNode(viewer).addTool(new CameraFlyTool());
 	}
-	TextSlider timeSlider = null, diskSizeSlider=null, testLineCoordSlider = null;
+	TextSlider<Double> timeSlider = null, diskSizeSlider=null, testLineCoordSlider = null;
 	@Override
 	public Component getInspector() {
 		Box container = inspector; //Box.createVerticalBox();

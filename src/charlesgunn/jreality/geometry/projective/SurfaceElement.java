@@ -4,6 +4,9 @@
  */
 package charlesgunn.jreality.geometry.projective;
 
+import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
+import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
+
 import java.awt.Color;
 
 import de.jreality.geometry.IndexedFaceSetUtility;
@@ -23,13 +26,15 @@ public class SurfaceElement {
 	double[] point, plane;
 	Color pointColor, planeColor;
 	SceneGraphComponent theRepn = null;
-	static double diskRadius = .3;
+	static double diskRadiusDefault = .3;
+	double diskRadius = diskRadiusDefault;
+	int metric = Pn.EUCLIDEAN;
 	
 	public SurfaceElement(double[] pt, double[] pl)	{
 		super();
 		point = pt;
 		plane = pl;
-		theRepn = SurfaceElement.surfaceElement(theRepn, point, plane, diskRadius, Pn.PROJECTIVE);
+		theRepn = SurfaceElement.surfaceElement(theRepn, point, plane, diskRadiusDefault, Pn.PROJECTIVE);
 	}
 	/**
 	 * @return Returns the plane.
@@ -68,6 +73,20 @@ public class SurfaceElement {
 		this.pointColor = pointColor;
 	}
 	
+	
+	public double getDiskRadius() {
+		return diskRadius;
+	}
+	
+	public void setDiskRadius(double diskRadius) {
+		this.diskRadius = diskRadius;
+	}
+	
+	public static void setDiskRadiusDefault(double diskRadius) {
+		SurfaceElement.diskRadiusDefault = diskRadius;
+		setupDisk();
+	}
+	
 	public SurfaceElement polarize( int metric)	{
 		double[] polarPoint = Pn.polarize(null, plane, metric);
 		double[] polarPlane = Pn.polarize(null, point, metric);
@@ -85,19 +104,11 @@ public class SurfaceElement {
 	 */
 	public SceneGraphComponent getRepresentation() {
 		if (planeColor != null)
-			theRepn.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, planeColor );
+			theRepn.getAppearance().setAttribute(POLYGON_SHADER+"."+DIFFUSE_COLOR, planeColor );
 		else if (pointColor != null)
-			theRepn.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, pointColor );
+			theRepn.getAppearance().setAttribute(POLYGON_SHADER+"."+DIFFUSE_COLOR, pointColor );
 		return theRepn;
 	}
-	/**
-	 * @param diskRadius The diskRadius to set.
-	 */
-	public static void setDiskRadius(double diskRadius) {
-		SurfaceElement.diskRadius = diskRadius;
-		setupDisk();
-	}
-	
 	public String toString()	{
 		return "Plane: "+Rn.toString(plane)+"\nPoint: "+Rn.toString(point);
 	}
@@ -126,8 +137,8 @@ public class SurfaceElement {
 		double[][] coords = new double[sides][3];
 		for (int i = 0; i<sides; ++i)	{
 			double angle = i*2*Math.PI/sides;
-			coords[i][0] = diskRadius*Math.cos(angle);
-			coords[i][1] = diskRadius*Math.sin(angle);
+			coords[i][0] = diskRadiusDefault*Math.cos(angle);
+			coords[i][1] = diskRadiusDefault*Math.sin(angle);
 			coords[i][2] = 0.001;
 		}
 		disk = IndexedFaceSetUtility.constructPolygon(coords);
@@ -174,6 +185,10 @@ public class SurfaceElement {
 		Pn.normalize(point, point, Pn.HYPERBOLIC);
 		Pn.normalize(plane, plane, Pn.HYPERBOLIC);
 		return theDisk;
+	}
+	
+	public void update() {
+		
 	}
 	public static SurfaceElement[] getPlaneBundle(double c, int l)	{
 //		 now calculate the polar of this

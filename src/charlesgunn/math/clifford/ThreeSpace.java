@@ -151,11 +151,11 @@ public class ThreeSpace {
 	
 	static int[] oww = {3,0,1,2};
 	public double[] matrixForRotor(MultiVectorP3 rotor)	{
-		double[] mat = new double[4];
+		double[] mat = new double[16];
 		for (int i = 0; i < 4; ++i) {
 			MultiVectorP3 e = MultiVectorP3.pointBasis[i];
 			MultiVectorP3 f = sandwichProduct(rotor, e);
-			double[] fd = MultiVectorP3.gradeD(f, 2);
+			double[] fd = MultiVectorP3.gradeD(f, 3);
 			System.arraycopy(fd, 0, mat, 4*oww[i], 4);
 		}
 		mat = Rn.transpose(null, mat);
@@ -165,8 +165,8 @@ public class ThreeSpace {
 	
 	public  MultiVectorP3 exp(MultiVectorP3 dst, MultiVectorP3 c, double angle) {
 		boolean scalar = MultiVectorP3.isScalar(c);
-		boolean point = MultiVectorP3.isPoint(c);
-		if (!(scalar || point)) {
+		boolean bivector = MultiVectorP3.isLine(c);
+		if (!(scalar || bivector)) {
 			throw new IllegalStateException("Cannot exponentiate");
 		}
 		if (scalar)	

@@ -31,6 +31,7 @@ import javax.swing.plaf.metal.OceanTheme;
 
 import charlesgunn.anim.jreality.SceneGraphAnimator;
 import charlesgunn.anim.util.AnimationUtility;
+import charlesgunn.jreality.newtools.FlyTool;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -58,7 +59,6 @@ import de.jreality.shader.DefaultGeometryShader;
 import de.jreality.shader.ImplodePolygonShader;
 import de.jreality.shader.ShaderUtility;
 import de.jreality.tools.RotateTool;
-import de.jreality.tutorial.util.FlyTool;
 import de.jreality.ui.viewerapp.FileLoaderDialog;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;

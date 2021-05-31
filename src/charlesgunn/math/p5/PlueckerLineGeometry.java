@@ -1,9 +1,15 @@
 package charlesgunn.math.p5;
 
+import charlesgunn.jreality.geometry.projective.LineUtility;
+import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.math.clifford.MultiVectorP3;
+import charlesgunn.math.clifford.ThreeSpace;
+import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.math.Matrix;
 import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
+import de.jreality.scene.IndexedFaceSet;
 
 // TODO: implement method which computes homogeneous coordinates of the plane in P3
 // which is spanned by two intersecting plueckerLines
@@ -242,7 +248,6 @@ public class PlueckerLineGeometry {
 		return Rn.matrixTimesVector(dst, lineToSkewMatrix(null, plueckerLine), point); 
 	}
 	
-	// TODO get rid of the 245 crap!  
 	public static double[] normalize(double[] dst, double[] src)	{
 		if (dst == null) dst = new double[6];
 		double x = src[2]*src[2] + src[4]*src[4] + src[5]*src[5];
@@ -372,4 +377,94 @@ public class PlueckerLineGeometry {
 		return ret;
 	}
 	
+//	public static double[] permuteCoordinates(double[] dst, double[] src, int[] perm) {
+//		double[] permM = Rn.permutationMatrix(null, perm);
+//		double[] induced = PlueckerLineGeometry.inducedP5ProjFromP3Proj(null, permM);
+//		return Rn.matrixTimesVector(dst, induced, src);
+//	}
+	// calculate the set of lines defining the Clifford torus centered on
+	// axis of radius angle.
+	public static double[][] cliffordTorus(double[][] dst, double[] axis, double angle, int n)	{
+		double[][] cliffordParallels = dst == null ?  new double[n][] : dst;
+		double[] polarAxis = PlueckerLineGeometry.polarize(null, axis, Pn.ELLIPTIC);
+		double[][] pointOnA = LineUtility.twoPointsOnLine(null, axis);
+		double[][] pointOnPA = LineUtility.twoPointsOnLine(null, polarAxis);
+		// make sure second point is orthogonal to the first
+		pointOnPA[1] = PlueckerLineGeometry.lineIntersectPlane(null, 
+				polarAxis, 
+				Pn.polarize(null, pointOnPA[0], Pn.ELLIPTIC));
+		for (int i = 0; i<n; ++i)	{
+			double pangle = 2*Math.PI*(i/(n-1.0));
+			double[] P = Rn.add(null, 
+					Rn.times(null, Math.cos(pangle), pointOnPA[0]), 
+					Rn.times(null, Math.sin(pangle), pointOnPA[1]));
+			P = Pn.normalize(null, P, Pn.ELLIPTIC);
+			double[] Q = Rn.add(null, 
+					Rn.times(null, Math.cos(angle), pointOnA[0]), 
+					Rn.times(null, Math.sin(angle), P));
+			double[] iso = P3.makeScrewMotionMatrix(null, P, Q, angle, Pn.ELLIPTIC);
+			double[] isoP5 = PlueckerLineGeometry.inducedP5ProjFromP3Proj(null, iso);
+			cliffordParallels[i] = Rn.matrixTimesVector(null, isoP5, axis);
+		}
+		return cliffordParallels;
+	}
+	
+	public static IndexedFaceSet equidistantSurface(double[] axis, double angle, int n)	{
+		double[] polarAxis = PlueckerLineGeometry.polarize(null, axis, Pn.ELLIPTIC);
+		double[][] pointOnA = LineUtility.twoPointsOnLine(null, axis);
+		double[][] pointOnPA = LineUtility.twoPointsOnLine(null, polarAxis);
+		// make sure second point is orthogonal to the first
+		pointOnPA[1] = PlueckerLineGeometry.lineIntersectPlane(null, 
+				polarAxis, 
+				Pn.polarize(null, pointOnPA[0], Pn.ELLIPTIC));
+		Pn.normalize(pointOnA, pointOnA, Pn.ELLIPTIC);
+		Pn.normalize(pointOnPA, pointOnPA, Pn.ELLIPTIC);
+		double[] Q = Rn.add(null, 
+				Rn.times(null, Math.cos(angle), pointOnA[0]), 
+				Rn.times(null, Math.sin(angle), pointOnPA[0]));
+		double[] iso = P3.makeScrewMotionMatrix(null, pointOnA[0]	, Q, angle, Pn.ELLIPTIC);
+		double[] isoP5 = PlueckerLineGeometry.inducedP5ProjFromP3Proj(null, iso);
+		double[] cliffordParallel = Rn.matrixTimesVector(null, isoP5, axis);
+	
+		PointRangeFactory prf = new PointRangeFactory();
+		prf.setPluckerLine(cliffordParallel);
+		prf.setNumberOfSamples(6 );
+		prf.setFiniteSphere(false);
+		prf.update();
+		double[][] tmp = prf.getSamples();
+		double[][] pointsOnCP = new double[tmp.length+1][];
+		for (int i = 0; i<tmp.length; ++i)	{
+			pointsOnCP[i] = tmp[i];
+		}
+		pointsOnCP[tmp.length] = tmp[0];
+		
+		double[][][] tubePoints = new double[n][][];
+		ThreeSpace ts = new ThreeSpace(Pn.ELLIPTIC);
+		double[] axisNewCoords = dualizeLine(null, permuteCoordinates(null, axis, new int[]{1,2,3,0}));
+		MultiVectorP3 axisMV = MultiVectorP3.line(axisNewCoords);
+		for (int i = 0; i<n; ++i)	{
+			double pangle = (2*Math.PI*i)/(n-1);
+			MultiVectorP3 rotor = ts.exp(null, axisMV, pangle/2);
+//			MultiVectorP3 clifParallel2MV = ts.sandwichProduct(rotor, clifParallelMV);
+			double[] M = P3.makeRotationMatrix(null, pointOnA[0], pointOnA[1], pangle, Pn.ELLIPTIC);
+			double[] M2 = ts.matrixForRotor(rotor);
+//			System.err.println("matrix LA= \n"+Rn.matrixToString(M, "%6.2f"));
+//			System.err.println("matrix CA= \n"+Rn.matrixToString(M2, "%6.2f"));
+			tubePoints[i] = Rn.matrixTimesVector(null, M2, pointsOnCP);
+		}
+//		System.err.println("quad mesh = \n"+Rn.toString(tubePoints));
+		QuadMeshFactory qmf = new QuadMeshFactory();
+		qmf.setMetric(Pn.ELLIPTIC);
+		qmf.setULineCount(tubePoints[0].length);
+		qmf.setVLineCount(tubePoints.length);
+		qmf.setClosedInUDirection(false);		
+		qmf.setClosedInVDirection(false);
+		qmf.setVertexCoordinates(tubePoints);
+		qmf.setGenerateEdgesFromFaces(true);
+		qmf.setGenerateFaceNormals(true);
+		qmf.setGenerateVertexNormals(true);
+		qmf.update();
+		IndexedFaceSet qms = qmf.getIndexedFaceSet();
+		return qms;
+	}
 }
