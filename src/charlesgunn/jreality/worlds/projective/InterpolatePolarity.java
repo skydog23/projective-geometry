@@ -24,6 +24,7 @@ import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.geometry.projective.Abstract1DExtentFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.geometry.projective.SurfaceElement;
+import charlesgunn.jreality.newtools.FlyTool;
 import charlesgunn.jreality.tools.CameraFlyTool;
 import charlesgunn.jreality.tools.CameraTool;
 import charlesgunn.jreality.viewer.Assignment;
@@ -84,12 +85,12 @@ public class InterpolatePolarity extends 	Assignment  {
 		lines.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+"."+"polygonShader.diffuseColor", java.awt.Color.WHITE);
 		strahlen = SceneGraphUtility.createFullSceneGraphComponent("strahlen");
 		strahlen.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+".diffuseColor", java.awt.Color.YELLOW);
-		strahlen.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
 		axen = SceneGraphUtility.createFullSceneGraphComponent("axen");
 		axen.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+".diffuseColor", java.awt.Color.WHITE);
 		axen.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
 		lines.addChild(strahlen);
 		lines.addChild(axen);
+		lines.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 		
 		childList1 = SceneGraphUtility.createFullSceneGraphComponent("c1");
 		childList2 = new SceneGraphComponent();
@@ -101,8 +102,8 @@ public class InterpolatePolarity extends 	Assignment  {
 		theWorld.addChild(c2);
 		theWorld.addChild(ct);
 		theWorld.addChild(lines);
-		Rectangle3D bbox = new Rectangle3D(7,7,7);
-		theWorld.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, bbox);
+//		Rectangle3D bbox = new Rectangle3D(7,7,7);
+//		theWorld.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, bbox);
 		
 		c1.setVisible(showFirst);
 		c2.setVisible(showLast);
@@ -433,6 +434,10 @@ public class InterpolatePolarity extends 	Assignment  {
 //		CameraUtility.getCamera(viewer).setNear(.01);
 		CameraUtility.getCamera(viewer).setFar(500.0);
 		CameraUtility.getCameraNode(viewer).addTool(new CameraFlyTool());
+		SceneGraphComponent cameraNode = CameraUtility.getCameraNode(viewer);
+	    FlyTool flytool = new FlyTool();
+	    flytool.setGain(.15);
+		cameraNode.addTool(flytool);
 	}
 	TextSlider<Double> timeSlider = null, diskSizeSlider=null, testLineCoordSlider = null;
 	@Override

@@ -13,7 +13,6 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.math.clifford"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.gui"/>
-        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.applet"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.test"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.worlds.projective"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.mandelbrot"/>
@@ -22,7 +21,6 @@
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.resources"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.tools"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.pathcurve"/>
-        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.jogl"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.plugin"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.geometry"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.math"/>
@@ -39,8 +37,7 @@
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.video"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.plugin.help"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.util"/>
-        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.worlds.resources"/>
-        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality.examples.jogl"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.math.p5"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src&lt;charlesgunn.jreality"/>
     </selectedElements>
 </jardesc>

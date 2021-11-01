@@ -2,7 +2,7 @@
  * Created on 25.09.2018
  *
  */
-package charlesgunn.jreality.worlds.projective;
+package charlesgunn.jreality.worlds.rugr2d;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -10,56 +10,67 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.SwingConstants;
+import javax.xml.ws.Endpoint;
 
+import charlesgunn.anim.jreality.SceneGraphAnimator;
+import charlesgunn.anim.plugin.AnimationPlugin;
 import charlesgunn.anim.util.AnimationUtility;
-import charlesgunn.jreality.geometry.GeometryUtilityOverflow;
-import charlesgunn.jreality.geometry.InterpolatedILS;
 import charlesgunn.jreality.geometry.projective.DualizeSceneGraph;
-import charlesgunn.jreality.geometry.projective.LinePencilFactory;
-import charlesgunn.jreality.geometry.projective.LineUtility;
-import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
-import charlesgunn.util.doubleLong;
-import de.jreality.geometry.GeometryAttributeListSet;
+import de.jreality.geometry.BoundingBoxTraversal;
+import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.GeometryUtility;
-import de.jreality.geometry.IndexedLineSetFactory;
-import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
-import de.jreality.geometry.PointSetUtility;
-import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
-import de.jreality.math.P3;
+import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
-import de.jreality.scene.IndexedLineSet;
+import de.jreality.scene.Camera;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.scene.Viewer;
 import de.jreality.shader.CommonAttributes;
+import de.jreality.util.CameraUtility;
+import de.jreality.util.Input;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
 public class DualPointLineCurve extends Assignment {
 
 	private transient SceneGraphComponent world,
-	eucSGC,
+		eucSGC,
 		pointSGC,
 		lineSGC,
 		fakeLineSGC;
-	int num = 100;		// -2,-1: degenerate motion 0: generate circle,  1: generate center,  2: show inside, 3: outside
-	double time = 0;
-	boolean 
+	protected int numberOfSegments = 100;		// -2,-1: degenerate motion 0: generate circle,  1: generate center,  2: show inside, 3: outside
+	private double time = 0;
+	private boolean 
 			showEuc = true,
 			showPolar = true;
+	protected boolean encompass = true;
 	private transient PointSetFactory psf = new PointSetFactory(), lsf = new PointSetFactory();
-    private double[] point = new double[]{1,0,0,1};
-	private double[] line = PlueckerLineGeometry.lineFromPoints(null, point, new double[]{1,0,0,0});
-	double scale = 1.0, tscale = .07, ascale = .1510, phase = -.17, ascale2 = .92;
+    protected double 
+			scale = 1.0, 
+			tscale = .07, 
+			ascale = .1510, 
+			phase = -.17, 
+			ascale3 = .321, 
+			ascale2 = .92,
+			ascale4 = 1.0,
+			pointRadius = .055,
+			lineRadius = .008;
+	protected double[] startPoint = {0,0,0,1}, 
+			startLine = {1,0,0,0};
+	protected Color pointColor = new Color(255, 196, 29), //new Color(255, 140, 40), //50, 50), //(255,255,50),
+//			lineColor =  new Color(255,255,255),
+			lineColor =  new Color(182, 250, 250),
+			backgroundColor =  new Color(0,0,0,0);
+
 	@Override
 	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
@@ -74,42 +85,80 @@ public class DualPointLineCurve extends Assignment {
 		fakeLineSGC.setGeometry(lsf.getGeometry());
 		
 		Appearance ap = pointSGC.getAppearance();
-		ap.setAttribute("pointShader.diffuseColor", new Color(255,255,204));
+		ap.setAttribute("pointShader.diffuseColor", pointColor);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, false);
-//		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .006);
+		ap.setAttribute("pointShader."+CommonAttributes.POINT_RADIUS, pointRadius);
 		
 		ap = lineSGC.getAppearance();
-		ap.setAttribute("lineShader.diffuseColor", new Color(255,255,204));
+		ap.setAttribute("lineShader.diffuseColor", lineColor);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, true);
-		ap.setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
+		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, lineRadius);
 		// ??
-		MatrixBuilder.euclidean().rotateZ(Math.PI).assignTo(lineSGC);
+//		MatrixBuilder.euclidean().rotateZ(Math.PI).assignTo(lineSGC);
 		
 		ap = world.getAppearance();
 		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
 		ap.setAttribute(CommonAttributes.TUBES_DRAW, true);
-		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .005);
 		ap.setAttribute(CommonAttributes.SPHERES_DRAW, true);
-		ap.setAttribute("pointShader."+CommonAttributes.POINT_RADIUS, .02);
-				
+		ap.setAttribute(SceneGraphAnimator.ANIMATED, false);
+		getWorldTform().assignTo(eucSGC);		
 		time = 1.0;
 		update();
 
-		update();
+//		update();
+		// this is a hack to get the bounding boxes to work even when the points aren't
+		// being drawn
+		lineSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, 
+				BoundingBoxUtility.calculateBoundingBox(psf.getPointSet()));
 
 		return world;
+	}
+
+	@Override
+	public String getPropertyFileName() {
+		// TODO Auto-generated method stub
+		return "RuGR2D.xml";
+	}
+
+	protected Matrix getWorldTform() {
+		return MatrixBuilder.euclidean().translate(0,0,0).getMatrix();
+	}
+	
+	public boolean isShowEuc() {
+		return showEuc;
+	}
+
+	public void setShowEuc(boolean showEuc) {
+		this.showEuc = showEuc;
+	}
+
+	public boolean isShowPolar() {
+		return showPolar;
+	}
+
+	public void setShowPolar(boolean showPolar) {
+		this.showPolar = showPolar;
 	}
 
 	@Override
 	public void display() {
 		// TODO Auto-generated method stub
 		super.display();
-		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, new Color(0,0,0,0));
-		animationPlugin.getAnimationPanel().setResourceDir("src/charlesgunn/jreality/worlds/projective/");
+		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR,backgroundColor);
+		animationPlugin.getAnimationPanel().setResourceDir("src/charlesgunn/jreality/worlds/rugr2d");
 		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/gunn_local/Movies/RuGR/");
+		animationPlugin.setAnimateCamera(true);
+		animationPlugin.setAnimateSceneGraph(true);
+	
+		Camera cam = CameraUtility.getCamera(jrviewer.getViewer());
+		cam.setPerspective(false);
+		if (encompass) {
+			CameraUtility.encompass(jrviewer.getViewer());
+		}
 
+	
 		Component comp = ((Component) jrviewer.getViewer().getViewingComponent());
 		comp.addKeyListener(new KeyAdapter() {
  				public void keyPressed(KeyEvent e)	{ 
@@ -151,66 +200,73 @@ public class DualPointLineCurve extends Assignment {
 		
 		lineSGC.removeAllChildren();
 		
+		DualizeSceneGraph.setMetric(Pn.ELLIPTIC);
 		SceneGraphComponent dualize = DualizeSceneGraph.dualize(fakeLineSGC);
-		dualize.getChildComponent(0).setVisible(showPolar);	
+//		dualize.getChildComponent(0).setVisible(showPolar);	
 		
 		lineSGC.addChild(dualize);
 		
 		updateVisibility();
 	}
 
-	double oldtime = -1.0;
+	private double oldtime = -1.0;
+	private Matrix zrotM = MatrixBuilder.euclidean().rotateZ(Math.PI).getMatrix();
 	private boolean generateCurve() {
-		double localtime = time;
-//		if (oldtime == localtime) return false;
-		int num2 =  num;
-		int limit = ((int) (localtime * num2))+1;
-		double fraction = (1+localtime*num2) - limit;
-		double[][] points = new double[limit+((time == 1.0) ? 0:1)][4];
+//		double localtime = time;
+		if (oldtime == time) return false;
+		int steps = ((int) (time * numberOfSegments));
+		double fraction = (time*numberOfSegments) - steps;
+		double[][] points = new double[steps+2][4];
 		double[][] lines = new double[points.length][4];
 		double[] dparms = new double[2];
 		Matrix M = new Matrix(), dM = new Matrix(), iM = new Matrix();
-		points[0] = new double[]{0,0,0,1}; // origin
-		lines[0] = new double[]{1,0,0,0};	// x = 0
-		double delta = 1.0/num2;
-		for (int i = 1; i<limit; ++i) {
+		double delta = 1.0/(numberOfSegments);
+		points[0] = M.multiplyVector(startPoint);
+		lines[0] = iM.multiplyVector(startLine);
+		for (int i = 1; i<=steps; ++i) {
 			getParms(dparms, delta*i);
+//			System.err.println(i +" parms = "+Rn.toString(dparms));
 			MatrixBuilder.euclidean().rotateZ(dparms[1]).translate(0, dparms[0], 0).assignTo(dM);
 			M.multiplyOnRight(dM);
-			points[i] = M.multiplyVector(points[0]);
+			points[i] = M.multiplyVector(startPoint);
 			iM = M.getInverse();
 			iM.transpose();
-			lines[i] = iM.multiplyVector(lines[0]);
+			lines[i] = iM.multiplyVector(startLine);
+//			System.err.println("dot: "+Rn.innerProduct(points[i], lines[i]));
 		}
-		if (localtime != 1.0)  {
-			getParms(dparms, localtime);
+//		if (time != 1.0)  {
+			getParms(dparms, time);
 			MatrixBuilder.euclidean().rotateZ(fraction*dparms[1]).translate(0, fraction* dparms[0], 0).assignTo(dM);
 			M.multiplyOnRight(dM);
-			points[limit] = M.multiplyVector(points[0]);
+			points[steps+1] = M.multiplyVector(startPoint);
 			iM = M.getInverse();
 			iM.transpose();
-			lines[limit] = iM.multiplyVector(lines[0]);
-			System.err.println("n-1 Line "+Rn.toString(lines[limit-1]));
-			System.err.println("n   Line "+Rn.toString(lines[limit]));
-		}
+			lines[steps+1] = iM.multiplyVector(startLine);
+//			System.err.println("n-1 Line "+Rn.toString(lines[limit-1]));
+//			System.err.println("n   Line "+Rn.toString(lines[limit]));
+//		}
 
+//		System.err.println("Points = "+Rn.toString(points));
+//		System.err.println("Lines = "+Rn.toString(lines));
 		psf.setVertexCount(points.length);
 		psf.setVertexCoordinates(points);
 		psf.update();
 		lsf.setVertexCount(lines.length);
 		lsf.setVertexCoordinates(lines);
 		lsf.update();
-		oldtime = localtime;
+		oldtime = time;
 		return true;
 	}
 
-	private void getParms(double[] dparms, double t) {
-		dparms[0] = scale * tscale;
-		dparms[1] = scale * ascale * Math.cos(phase + ascale2*Math.PI*2*t);
+	protected void getParms(double[] dparms, double t) {
+		dparms[0] = .1;
+		dparms[1] = .1;
 	}
+	
 	
 	@Override
 	public Component getInspector() {
+		System.err.println("In get inspector");
 		Box container = Box.createVerticalBox();
 		final TextSlider cSlider = new TextSlider.Double("translate",  SwingConstants.HORIZONTAL, 0, .1, tscale);
 		cSlider.addActionListener(new ActionListener()	{
@@ -220,6 +276,16 @@ public class DualPointLineCurve extends Assignment {
 			}
 		});
 		container.add(cSlider);
+		{
+		final TextSlider aSlider = new TextSlider.Double("phase",  SwingConstants.HORIZONTAL, 0, 1, phase);
+		aSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				phase = aSlider.getValue().doubleValue();
+				update();
+			}
+		});
+		container.add(aSlider);
+		}
 		{
 		final TextSlider aSlider = new TextSlider.Double("rotate",  SwingConstants.HORIZONTAL, 0, 1, ascale);
 		aSlider.addActionListener(new ActionListener()	{
@@ -231,7 +297,7 @@ public class DualPointLineCurve extends Assignment {
 		container.add(aSlider);
 		}
 		{
-		final TextSlider aSlider = new TextSlider.Double("angle scale",  SwingConstants.HORIZONTAL, 0, 1, ascale2);
+		final TextSlider aSlider = new TextSlider.Double("ascale2",  SwingConstants.HORIZONTAL, 0, 1, ascale2);
 		aSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
 				ascale2 = aSlider.getValue().doubleValue();
@@ -241,10 +307,20 @@ public class DualPointLineCurve extends Assignment {
 		container.add(aSlider);
 		}
 		{
-		final TextSlider aSlider = new TextSlider.Double("phase",  SwingConstants.HORIZONTAL, 0, 1, phase);
+		final TextSlider aSlider = new TextSlider.Double("ascale3",  SwingConstants.HORIZONTAL, 0, 1, ascale3);
 		aSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
-				phase = aSlider.getValue().doubleValue();
+				ascale3 = aSlider.getValue().doubleValue();
+				update();
+			}
+		});
+		container.add(aSlider);
+		}
+		{
+		final TextSlider aSlider = new TextSlider.Double("ascale4",  SwingConstants.HORIZONTAL, 0, 1, ascale4);
+		aSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				ascale4 = aSlider.getValue().doubleValue();
 				update();
 			}
 		});

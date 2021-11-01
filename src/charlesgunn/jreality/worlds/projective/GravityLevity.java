@@ -29,6 +29,7 @@ import charlesgunn.jreality.geometry.projective.DualizeSceneGraph;
 import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.tools.TranslateShapeTool;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.jreality.viewer.PluginSceneLoader;
 import charlesgunn.math.p5.PlueckerLineGeometry;
@@ -44,6 +45,7 @@ import de.jreality.scene.Camera;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.SceneGraphPath;
+import de.jreality.scene.Viewer;
 import de.jreality.scene.data.Attribute;
 import de.jreality.scene.event.TransformationEvent;
 import de.jreality.scene.event.TransformationListener;
@@ -52,7 +54,7 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
-public class GravityLevity extends LoadableScene {
+public class GravityLevity extends Assignment {
 
 	private static final double K1 = Math.sqrt(3)/2.0;
 	private double[][] 
@@ -81,7 +83,7 @@ public class GravityLevity extends LoadableScene {
 	boolean euclideanFans = true;
 	double xshift = 0; //.1;
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		eucSGC = SceneGraphUtility.createFullSceneGraphComponent("euc");
 		faceSGC = SceneGraphUtility.createFullSceneGraphComponent("face");
@@ -237,20 +239,21 @@ public class GravityLevity extends LoadableScene {
 	Color[] dotColors;
 	private SceneGraphComponent dualize;
 	@Override
-	public void customize(JMenuBar menuBar, PluginSceneLoader psl) {
-		psl.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, Color.white);
-		psl.getAnimationPlugin().setAnimateCamera(true);
-		psl.getAnimationPlugin().setAnimateSceneGraph(true);
-		psl.getAnimationPlugin().setDefaultInterp(InterpolationTypes.CUBIC_HERMITE);
-		Camera cam = CameraUtility.getCamera(psl.getViewer());
+	public void display() {
+		super.display();
+		Viewer v = jrviewer.getViewer();
+		v.getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, Color.white);
+		animationPlugin.setAnimateCamera(true);
+		animationPlugin.setAnimateSceneGraph(true);
+		animationPlugin.setDefaultInterp(InterpolationTypes.CUBIC_HERMITE);
+		CameraUtility.encompass(v);
+		Camera cam = CameraUtility.getCamera(v);
 		cam.setFieldOfView(1.25 * cam.getFieldOfView());
 		cam.setFar(-.05);
 //		cam.setPerspective(false);
 	}
 
-	
-	@Override
-	public boolean isEncompass() {
-		return true;
+	public static void main(String[] args) {
+		new GravityLevity().display();
 	}
 }

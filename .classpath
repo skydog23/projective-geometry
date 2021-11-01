@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry combineaccessrules="false" kind="src" path="/jrworkspace"/>
-	<classpathentry excluding="charlesgunn/video/VideoTexture.java|charlesgunn/jreality/oldtools/|charlesgunn/jreality/worlds/AnimatedTexture.java|charlesgunn/jreality/worlds/TestKernelHull.java|mathvisws12/|charlesgunn/bicycle/BicycleVR.java|charlesgunn/jreality/geometry/MarchingCubesTest.java|charlesgunn/jreality/worlds/projective/StrahlUndAchse (original).java|charlesgunn/jreality/worlds/projective/HopfFibrationAssignment.java" kind="src" path="src">
+	<classpathentry excluding="charlesgunn/video/VideoTexture.java|charlesgunn/jreality/oldtools/|charlesgunn/jreality/worlds/AnimatedTexture.java|charlesgunn/jreality/worlds/TestKernelHull.java|mathvisws12/|charlesgunn/bicycle/BicycleVR.java|charlesgunn/jreality/geometry/MarchingCubesTest.java|charlesgunn/jreality/worlds/projective/StrahlUndAchse (original).java|charlesgunn/jreality/worlds/projective/HopfFibrationAssignment.java|charlesgunn/jreality/worlds/projective/DualPointLineCurve.java" kind="src" path="src">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jreality/jni/macosx"/>
 		</attributes>
@@ -28,8 +27,9 @@
 	<classpathentry kind="lib" path="/jreality/lib/beans.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/bsh.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/jterm.jar"/>
-	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all-noawt-natives-macosx-universal.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all.jar"/>
 	<classpathentry kind="lib" path="/lib/discretegroupCGG.jar"/>
+	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="/lib/jrworkspace.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

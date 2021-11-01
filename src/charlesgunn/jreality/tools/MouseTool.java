@@ -104,6 +104,9 @@ public abstract class MouseTool extends AbstractTool implements DocumentedTool {
 		currentNDC[1] = anchorNDC[1] = cc[1];
 		mouseDisplacement = 0.0;
 //		addCurrentSlot(InputSlot.getDevice("PointerNDC"));
+		// 15.9.2021: removed this slot since it seems to interfere with 
+		// using the scroll wheel, didn't notice any difference with 
+		// rotate and translate tools.  Also in deactivate().
 		addCurrentSlot(InputSlot.getDevice("PointerTransformation"));
 	}
 	
@@ -111,7 +114,7 @@ public abstract class MouseTool extends AbstractTool implements DocumentedTool {
 		diffNDC = Rn.subtract(diffNDC, currentNDC, anchorNDC);
 		mouseDisplacement = Rn.euclideanNorm(diffNDC);
 //		removeCurrentSlot(InputSlot.getDevice("PointerNDC"));
-		removeCurrentSlot(InputSlot.getDevice("PointerTransformation"));
+//		removeCurrentSlot(InputSlot.getDevice("PointerTransformation"));
 	}
 	static double tol = 10E-8;
 	public void perform(ToolContext tc) {

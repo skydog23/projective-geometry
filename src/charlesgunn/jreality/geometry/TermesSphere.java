@@ -9,6 +9,7 @@ import java.util.EventObject;
 
 import charlesgunn.anim.core.FramedCurve;
 import charlesgunn.anim.jreality.SceneGraphAnimator;
+import charlesgunn.jreality.newtools.RotateTool;
 import charlesgunn.jreality.tools.RotateShapeTool;
 import charlesgunn.jreality.viewer.GlobalProperties;
 import de.jreality.backends.label.LabelUtility;

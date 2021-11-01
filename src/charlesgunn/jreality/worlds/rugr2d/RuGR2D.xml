@@ -13,7 +13,7 @@
   </entry>
   <entry>
     <string>charlesgunn.anim.plugin.AnimationPlugin:shrinked</string>
-    <boolean>false</boolean>
+    <boolean>true</boolean>
   </entry>
   <entry>
     <string>de.jreality.plugin.content.ContentTools:pickFaces</string>

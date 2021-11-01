@@ -42,7 +42,10 @@ public class LineUtility {
 		pts[1] = row;
 		return pts;
 	}
-	public static double lineCoordOffset = 0.0;
+	// [28.10.21) believe it or not, the line (1,0,0,0,1,0) (vertical line through (1,0,0,1)
+	// doesn't render correctly in euclidean space unless this offset is non-zero
+	// (but in spherical space it does work. Also turning on "render 3-sphere" doesn't help
+	public static double lineCoordOffset = 0.000001;
 
 	public static double[][] twoPointsOnLine(double[][] pts, double[] pluckerLine)	{
 		return twoPlanesOnLine(pts, PlueckerLineGeometry.dualizeLine(null, pluckerLine));

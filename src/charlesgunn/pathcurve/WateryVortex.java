@@ -15,6 +15,8 @@ import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 
 import charlesgunn.jreality.geometry.projective.CurveCollector;
 import charlesgunn.math.Complex;
@@ -94,6 +96,7 @@ public class WateryVortex {
 			}
 		});
 		Appearance ap = wateryVortexSGC.getAppearance();
+		ap.setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
 		ap.setAttribute(CommonAttributes.FACE_DRAW, false);
 		ap.setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.white);
 		ap.setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.TUBES_DRAW, false);
@@ -103,25 +106,23 @@ public class WateryVortex {
 	public void initializePlanes() {
 		
 		Complex[] eigen = {
-				new Complex(0,0),
-				new Complex(0,0),
+				new Complex(0,1),
+				new Complex(.3,0),
 				new Complex(wateryVortexLambda,0),
 				new Complex(1,0)
 		};
 		wateryVortexPCF.setEigenvalues(eigen);
 		wateryVortexPCF.setTmin(wvTmin);
 		wateryVortexPCF.setTmax(wvTmax);
-		wateryVortexPCF.setNumberSteps(dimu+1);
+		wateryVortexPCF.setNumberSteps(dimv+2);
 		wvCoord[11] = wvZtlate;
 		wateryVortexPCF.setCoordinateSystem(wvCoord);
 		wateryVortexPCF.setInitialPoint(new double[]{wvInit,0,-wvInit+wvZtlate,1});
 		wateryVortexPCF.update();
 		double[][] oneCurve = wateryVortexPCF.getCurvePoints();
-		double diff = xmax - xmin;
 		for (int i = 0; i<dimv; ++i)	{
-			double x = xmin + i * (diff/(dimv-1.0));
 			double[] pointy = oneCurve[i],
-					planey = P3.planeFromPoints(null, oneCurve[i], oneCurve[i+1], ydir); //{1,0, -x*x,-2*x+b*x*x};
+					planey = wateryVortexPCF.getOsculatingPlane(null,oneCurve[i]);
 			for (int j = 0; j<dimu; ++j)	{
 				double angle = j*Math.PI * 2.0/(dimu-1.0);
 				double[] m = MatrixBuilder.euclidean().rotateZ(angle).getArray();
@@ -129,8 +130,8 @@ public class WateryVortex {
 				pointForm[i][j] = Rn.matrixTimesVector(null, m, pointy);
 			}
 		}
-//		System.err.println("one curve = \n"+Rn.toString(oneCurve));
-//		System.err.println("planes = \n"+Rn.toString(planeForm));
+		System.err.println("one curve = \n"+Rn.toString(oneCurve));
+		System.err.println("planes = \n"+Rn.toString(planeForm));
 		wateryVortexFac = new QuadMeshFactory();
 		wateryVortexFac.setULineCount(dimu);
 		wateryVortexFac.setVLineCount(dimv);
@@ -158,8 +159,9 @@ public class WateryVortex {
 	
 	public Component getInspector()	{
 		JPanel inspectionJPanel = new JPanel();
-		inspectionJPanel.setBorder(BorderFactory.createTitledBorder(
-                null, "watery vortex"));
+		inspectionJPanel.setBorder(new CompoundBorder(new EmptyBorder(5, 5, 5, 5),
+				BorderFactory.createTitledBorder(BorderFactory
+						.createEtchedBorder(),"watery vortex")));
 		Box inspectionPanel = Box.createVerticalBox();
 		inspectionJPanel.add(inspectionPanel);
 

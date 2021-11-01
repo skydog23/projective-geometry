@@ -97,7 +97,6 @@ public class PointRangeFactory extends Abstract1DExtentFactory{
 					}
 //					System.err.println("points = "+Rn.toString(new double[][]{element0, element1}));
 //					System.err.println("cut points = \n"+Rn.toString(cutpoints));
-//					System.err.println("samples = \n"+Rn.toString(samples));
 				}
 			} else  {
 				LoggingSystem.getLogger(this).info("Lies outside sphere.");
@@ -105,6 +104,7 @@ public class PointRangeFactory extends Abstract1DExtentFactory{
 		}
 		else 
 			samples = LineUtility.samplesOn1DExtent(samples, offset, numSegs, element0, element1, doubled);
+//		System.err.println("samples = \n"+Rn.toString(samples));
 		//ilsDirty = true;
 //		System.err.println("num segs = "+samples.length);
 		if (isValid && numSegs > 0) {

@@ -110,6 +110,8 @@ public class PathCurveDemo extends Assignment  {
 		curveHolder = SceneGraphUtility.createFullSceneGraphComponent("curve holder");
 		pivotForm = SceneGraphUtility.createFullSceneGraphComponent("pivot");
 		pivotForm.setVisible(false);
+		Appearance ap = pivotForm.getAppearance();
+		ap.setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
 		double d = Math.log(1.4);
 		double e = Math.log(.8);
 		double alpha = 1; //Math.PI/8;
@@ -143,7 +145,7 @@ public class PathCurveDemo extends Assignment  {
 		tetra.setGeometry(axs);
 		axs.setGeometryAttributes(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
 		world.addChildren(curveHolder, pivotForm, wateryVortex.getSGC(), tetra);
-		Appearance ap = world.getAppearance();
+		ap = world.getAppearance();
 		ap.setAttribute(POLYGON_SHADER+"."+DIFFUSE_COLOR, Color.YELLOW);
 		ap.setAttribute(FACE_DRAW,true);
 		ap.setAttribute(LINE_SHADER+"."+DIFFUSE_COLOR, Color.WHITE);

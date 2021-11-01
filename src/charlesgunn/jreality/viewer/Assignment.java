@@ -26,6 +26,9 @@ import java.util.Vector;
 import javax.swing.Box;
 
 import charlesgunn.anim.core.Animated;
+import charlesgunn.anim.gui.AnimationPanel;
+import charlesgunn.anim.gui.AnimationPanelEvent;
+import charlesgunn.anim.gui.AnimationPanelListener;
 import charlesgunn.anim.plugin.AnimationPlugin;
 import charlesgunn.jreality.plugin.TermesSpherePlugin;
 import de.jreality.plugin.JRViewer;
@@ -43,6 +46,7 @@ import de.jreality.scene.Appearance;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Viewer;
 import de.jreality.shader.CommonAttributes;
+import de.jreality.util.Input;
 import de.jreality.util.Secure;
 import de.jtem.beans.InspectorPanel;
 import de.jtem.jrworkspace.plugin.Controller;
@@ -126,8 +130,8 @@ public abstract class Assignment extends Plugin implements Animated {
 	transient protected ShrinkPanel shrinkPanel = shrinkPanelPlugin.getShrinkPanel();
 
 	public Assignment()	{
-    	String cp = ((String)System.getProperty("java.class.path")).replace(':', '\n'); //split(":");
-    	System.err.println("cp = "+cp);
+    		String cp = ((String)System.getProperty("java.class.path")).replace(':', '\n'); //split(":");
+    		System.err.println("cp = "+cp);
 		Scene.defaultZTranslation = 0.0;
 		jrviewer = new JRViewer();
 		jrviewer.registerPlugin(this);
@@ -200,12 +204,16 @@ public abstract class Assignment extends Plugin implements Animated {
 		if (pf != null) 
 			v.getController().setStaticPropertiesFile(pf);
 		else {
-			String defaultPropName = this.getClass().getSimpleName()+".xml";
-			String begin = defaultPropName.substring(0, 1),
-					lcbegin = begin.toLowerCase();
-			defaultPropName = defaultPropName.replaceFirst(begin, lcbegin);
-			System.err.println("name = "+defaultPropName);
-			InputStream is = this.getClass().getResourceAsStream(defaultPropName);
+			String prn = getPropertyFileName();
+			if (prn == null)	{
+				String defaultPropName = this.getClass().getSimpleName()+".xml";
+				String begin = defaultPropName.substring(0, 1),
+						lcbegin = begin.toLowerCase();
+				defaultPropName = defaultPropName.replaceFirst(begin, lcbegin);
+				prn = defaultPropName;
+			}
+			System.err.println("name = "+prn);
+			InputStream is = this.getClass().getResourceAsStream(prn);
             if (is != null) {
             		v.getController().setPropertiesMode(PropertiesMode.UserPropertiesFile);
 //            		v.getController().setPropertiesInputStream(is);
@@ -235,12 +243,67 @@ public abstract class Assignment extends Plugin implements Animated {
 		return null;
 	}
 	
+	public String getPropertyFileName() {
+		return null;
+	}
 	/**
 	 * the returned String should be a html file in the same directory as your main java class
 	 * @return
 	 */
 	public String getDocumentationFile() { return null; }
 	
+	private boolean finished = false;
+	private void setFinished(boolean b) {
+		finished = b;
+	}
+	public void runAnimationFile(String file) {
+		AnimationPanel ap = animationPlugin.getAnimationPanel();
+		ap.addAnimationPanelListener(new AnimationPanelListener() {
+			@Override
+			public void actionPerformed(AnimationPanelEvent e) {
+				switch (e.type)	{
+				case PLAYBACK_COMPLETED:
+					setFinished(true);
+				}
+			}
+			@Override
+			public String getName() {
+				return null;
+			}
+			@Override
+			public void printState() {
+			}
+			@Override
+			public Object getState() {
+				return null;
+			}
+			@Override
+			public void setState(Object o) {
+			}
+		});
+		
+		ap.setPaused(true);
+		try {
+			ap.read(
+				new Input(this.getClass().getResource(file)));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ap.setRecording(true);
+		System.err.println("starting playback");
+		finished = false;
+		ap.startPlayback();
+		do {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} while (!finished);
+		System.err.println(this.getClass().getCanonicalName()+" animation finished");
+	}
 	/**
 	 * This is called once to activate the application
 	 */

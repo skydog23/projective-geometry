@@ -477,6 +477,7 @@ public class RuGR2D extends Assignment {
 	}
 
 	private transient double oldtime = -1.0;
+	// generate the geometry
 	private boolean generateCircles(double time, PointSetFactory psf) {
 		double localtime = ( phase < 1) ? time : 1.0;
 		if (oldtime == localtime) return false;

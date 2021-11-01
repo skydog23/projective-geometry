@@ -224,6 +224,7 @@ public class DualizeSceneGraph {
 			for (int i = 0; i<numVerts; ++i)	{
 				dualLines[i] = dualizePoint2Line(dualLines[i], verts[i]); //new double[]{ theVerts[i][3], 0, -theVerts[i][1], 0, -theVerts[i][0], 0};
 			}
+//			System.err.println("dual lines = \n"+Rn.toString(dualLines));
 			if (!eap.getAttribute(DUALIZE_POINTS, true)) return;
 			for (int i = 0; i<numVerts; ++i)	{
 				PointRangeFactory prf = new PointRangeFactory();

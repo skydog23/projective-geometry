@@ -276,11 +276,6 @@ public class IscadorMachine extends Assignment {
 	double lastStoppedD = 0;
 	double maxR = 2.00, // speed of iscador machine
 			minR=0.001, still = .1;
-	@Override
-	public File getPropertyFile() {
-		// TODO Auto-generated method stub
-		return super.getPropertyFile();
-	}
 
 	@Override
 	public void setValueAtTime(double d) {
