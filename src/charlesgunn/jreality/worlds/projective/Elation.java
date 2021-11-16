@@ -22,11 +22,13 @@ import de.jreality.util.SceneGraphUtility;
 public class Elation extends Assignment {
 
 	SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("world");
-	SceneGraphComponent tworld = SceneGraphUtility.createFullSceneGraphComponent("world");
+	SceneGraphComponent tworld = SceneGraphUtility.createFullSceneGraphComponent("tworld");
+	SceneGraphComponent tworld2 = SceneGraphUtility.createFullSceneGraphComponent("tworld2");
 	@Override
 	public SceneGraphComponent getContent() {
 		LinePencilFactory lpf1 = new LinePencilFactory(),
 				lpf2 = new LinePencilFactory();
+		// create the line pencil in the plane z=1 in the point (0,0,1,1)
 		lpf1.setPoint(new double[]{0,0,1,1});
 		lpf1.setPlane(new double[]{0,0,1,-1});
 		lpf1.setFan(false);
@@ -35,8 +37,9 @@ public class Elation extends Assignment {
 		lpf1.setSphereRadius(10);
 		lpf1.setNumLines(10);
 		lpf1.update();
-		world.getAppearance().setAttribute("lineShader.diffuseColor", color.black);
-		world.addChild(lpf1.getPencil());
+		tworld.getAppearance().setAttribute("lineShader.diffuseColor", color.black);
+		tworld.addChild(lpf1.getPencil());
+		// create the line pencil in the plane z=1 in the ideal point in the x-direction
 		lpf2.setPoint(new double[]{1,0,0,0});
 		lpf2.setPlane(new double[]{0,0,1,-1});
 		lpf2.setFan(false);
@@ -44,22 +47,37 @@ public class Elation extends Assignment {
 		lpf2.setNumberJoints(12);
 		lpf2.setNumLines(10);
 		lpf2.update();
-		world.addChild(lpf2.getPencil());
+		// put the second pencil into the world
+		tworld.addChild(lpf2.getPencil());
 		tworld.getAppearance().setAttribute("lineShader.diffuseColor", Color.blue);
 		world.getAppearance().setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, false);
-		tworld.addChildren(lpf1.getPencil(), lpf2.getPencil());
+		// put both pencils into the sgc tworld
+		tworld2.addChildren(lpf1.getPencil(), lpf2.getPencil());
+		setupSkew(1);
+		
+		world.addChildren(tworld, tworld2);
+		return world;
+	}
+
+	private void setupSkew(double t) {
 		double[] skew = {
-				1,1,0,0,
+				1,t,0,0,
 				0,1,0,0,
 				0,0,1,0,
 				0,0,0,1
 		};
 		Matrix mskew = new Matrix();
 		mskew.assignFrom(skew);
-		mskew.assignTo(tworld);
+		// transform tworld by (x,y)->(x+y,y): skew to the right
+		mskew.assignTo(tworld2);
+	}
+
+	@Override
+	public void setValueAtTime(double d) {
+		super.setValueAtTime(d);
+		setupSkew(d);
 		
-		world.addChild(tworld);
-		return world;
+		
 	}
 
 	@Override

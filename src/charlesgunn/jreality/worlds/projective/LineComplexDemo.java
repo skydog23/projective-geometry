@@ -24,6 +24,7 @@ import charlesgunn.jreality.geometry.projective.RegulusFactory;
 import charlesgunn.jreality.newtools.SelectLineTool;
 import charlesgunn.jreality.newtools.SelectLineTool.LineSelectionEvent;
 import charlesgunn.jreality.tools.ToolManager;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.math.p5.P5;
 import charlesgunn.math.p5.PlueckerLineGeometry;
@@ -45,7 +46,7 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
-public class LineComplexDemo extends LoadableScene implements SelectLineTool.LineSelectionListener {
+public class LineComplexDemo extends Assignment implements SelectLineTool.LineSelectionListener {
 	SceneGraphComponent nullPencil, 
 		redComplexLine, 
 		whiteComplexLine, 
@@ -85,7 +86,8 @@ public class LineComplexDemo extends LoadableScene implements SelectLineTool.Lin
 		randomLineFactory = new PointRangeFactory(),
 		randomLineConjFactory = new PointRangeFactory();
 	
-	public SceneGraphComponent makeWorld()	{
+	@Override
+	public SceneGraphComponent getContent()	{
 		theWorld = SceneGraphUtility.createFullSceneGraphComponent("world");
 //		theWorld.getAppearance().setAttribute("lineShader.polygonShader.diffuseColor", Color.white);
 		theWorld.getAppearance().setAttribute("lineShader.polygonShader.ambientColor", Color.white);
@@ -205,12 +207,9 @@ public class LineComplexDemo extends LoadableScene implements SelectLineTool.Lin
 		return theWorld;
 	}
 
-	public boolean isEncompass() {
-			return false;
-		}
 
-
-	public void customize(JMenuBar menuBar, final Viewer viewer) {
+	public void display() {
+		super.display();
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, 
 				new Color(20,20,20)); //Color.black);
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.FOG_DENSITY, .14);
@@ -229,38 +228,38 @@ public class LineComplexDemo extends LoadableScene implements SelectLineTool.Lin
 		updateRandomLine();
 		updateNullPencil();
 		
-		JMenu actions = new JMenu("Actions");
-		JMenuItem jmi = new JMenuItem("Toggle congruence");
-		jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0));
-		jmi.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e)	{
-				congruence.setVisible(!congruence.isVisible());
-				viewer.renderAsync();
-			}
-		});
-		actions.add(jmi);
-		
-		jmi = new JMenuItem("Toggle congruence regulus");
-		jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0));
-		jmi.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e)	{
-				congruenceRegulus.getRegulus().setVisible(!congruenceRegulus.getRegulus().isVisible());
-				viewer.renderAsync();
-			}
-		});
-		actions.add(jmi);
-		
-		jmi = new JMenuItem("Toggle pencil regulus");
-		jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, 0));
-		jmi.addActionListener( new ActionListener() {
-			public void actionPerformed(ActionEvent e)	{
-				lineComplexPencilRegulus.getRegulus().setVisible(!lineComplexPencilRegulus.getRegulus().isVisible());
-				viewer.renderAsync();
-			}
-		});
-		actions.add(jmi);
-		
-		menuBar.add(actions);
+//		JMenu actions = new JMenu("Actions");
+//		JMenuItem jmi = new JMenuItem("Toggle congruence");
+//		jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, 0));
+//		jmi.addActionListener( new ActionListener() {
+//			public void actionPerformed(ActionEvent e)	{
+//				congruence.setVisible(!congruence.isVisible());
+//				viewer.renderAsync();
+//			}
+//		});
+//		actions.add(jmi);
+//		
+//		jmi = new JMenuItem("Toggle congruence regulus");
+//		jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, 0));
+//		jmi.addActionListener( new ActionListener() {
+//			public void actionPerformed(ActionEvent e)	{
+//				congruenceRegulus.getRegulus().setVisible(!congruenceRegulus.getRegulus().isVisible());
+//				viewer.renderAsync();
+//			}
+//		});
+//		actions.add(jmi);
+//		
+//		jmi = new JMenuItem("Toggle pencil regulus");
+//		jmi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, 0));
+//		jmi.addActionListener( new ActionListener() {
+//			public void actionPerformed(ActionEvent e)	{
+//				lineComplexPencilRegulus.getRegulus().setVisible(!lineComplexPencilRegulus.getRegulus().isVisible());
+//				viewer.renderAsync();
+//			}
+//		});
+//		actions.add(jmi);
+//		
+//		menuBar.add(actions);
 		
 		
 	}
@@ -352,9 +351,9 @@ public class LineComplexDemo extends LoadableScene implements SelectLineTool.Lin
 		nullPencilFactory.setPlane(gi);
 		nullPencilFactory.update();
 	}
-	public boolean hasInspector() {return true; }
-	public Component getInspector(final Viewer viewer) {	
-		Box inspectionPanel =  Box.createVerticalBox();
+	@Override
+	public Component getInspector() {	
+		Box inspectionPanel =  inspector;
 		final TextSlider timeSlider = new TextSlider.Double("t",SwingConstants.HORIZONTAL,0.0,1.0,0.75);
 		timeSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
@@ -398,5 +397,9 @@ public class LineComplexDemo extends LoadableScene implements SelectLineTool.Lin
 		
 		
 		return lightNode;
+	}
+	
+	public static void main(String[] args) {
+		new LineComplexDemo().display();
 	}
 }

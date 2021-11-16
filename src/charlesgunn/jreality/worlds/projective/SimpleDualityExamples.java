@@ -1,5 +1,5 @@
 /*
- * Created on Mar 24, 2014
+Ø * Created on Mar 24, 2014
  *
  */
 package charlesgunn.jreality.worlds.projective;
@@ -27,9 +27,7 @@ public class SimpleDualityExamples extends Assignment {
 		lineSGC,
 		segmentSGC,
 		debugSGC,
-	polarSGC,
-		pointSGC,
-		fanSGC;
+	polarSGC;
 	@Override
 	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
@@ -37,8 +35,8 @@ public class SimpleDualityExamples extends Assignment {
 		lineSGC = SceneGraphUtility.createFullSceneGraphComponent("line");
 		segmentSGC = SceneGraphUtility.createFullSceneGraphComponent("segment");
 		polarSGC = SceneGraphUtility.createFullSceneGraphComponent("polar");
-		pointSGC = SceneGraphUtility.createFullSceneGraphComponent("point");
-		fanSGC = SceneGraphUtility.createFullSceneGraphComponent("fan");
+		SceneGraphUtility.createFullSceneGraphComponent("point");
+		SceneGraphUtility.createFullSceneGraphComponent("fan");
 		debugSGC = SceneGraphUtility.createFullSceneGraphComponent("debug");
 		world.addChildren(eucSGC);
 		eucSGC.addChildren(lineSGC, segmentSGC, debugSGC);
@@ -46,7 +44,6 @@ public class SimpleDualityExamples extends Assignment {
 //		PointSetFactory segment = DualizeSceneGraph.segmentFactory(p1, p2, 10, Pn.EUCLIDEAN);
 //		segmentSGC.setGeometry(segment.getPointSet());
 		PointRangeFactory prf = new PointRangeFactory();
-		double[] p14 = {-1.01, 1,  0,1}, p24 = {.98,1,0, 1};
 		prf.setElement0(p1);
 		prf.setElement1(p2);
 		prf.setFiniteSphere(false);

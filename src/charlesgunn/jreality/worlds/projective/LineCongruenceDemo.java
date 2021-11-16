@@ -26,6 +26,7 @@ import charlesgunn.jreality.geometry.projective.RegulusFactory;
 import charlesgunn.jreality.newtools.SelectLineTool;
 import charlesgunn.jreality.newtools.SelectLineTool.LineSelectionEvent;
 import charlesgunn.jreality.tools.ToolManager;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
@@ -47,7 +48,7 @@ import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
 
-public class LineCongruenceDemo extends LoadableScene implements SelectLineTool.LineSelectionListener {
+public class LineCongruenceDemo extends Assignment implements SelectLineTool.LineSelectionListener {
 	SceneGraphComponent nullPencil, redComplexLine, whiteComplexLine;
 	boolean tryFlatten = true;
 	protected boolean showCongruence = true,
@@ -74,7 +75,8 @@ public class LineCongruenceDemo extends LoadableScene implements SelectLineTool.
 	private PointRangeFactory redFactory = new PointRangeFactory(),
 		whiteFactory = new PointRangeFactory();
 	
-	public SceneGraphComponent makeWorld()	{
+	@Override
+	public SceneGraphComponent getContent()	{
 		theWorld = SceneGraphUtility.createFullSceneGraphComponent("world");
 		theWorld.getAppearance().setAttribute("lineShader.polygonShader.diffuseColor", Color.white);
 		theWorld.getAppearance().setAttribute("lineShader.polygonShader.ambientColor", Color.white);
@@ -149,12 +151,9 @@ public class LineCongruenceDemo extends LoadableScene implements SelectLineTool.
 		return theWorld;
 	}
 
-	public boolean isEncompass() {
-			return false;
-		}
-
-
-	public void customize(JMenuBar menuBar, final Viewer viewer) {
+	@Override
+	public void display() {
+		super.display();
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, 
 				new Color(20,20,20)); //Color.black);
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.FOG_DENSITY, .14);
@@ -329,5 +328,9 @@ public class LineCongruenceDemo extends LoadableScene implements SelectLineTool.
 		
 		
 		return lightNode;
+	}
+	
+	public static void main(String[] args) {
+		new LineCongruenceDemo().display();
 	}
 }

@@ -22,6 +22,7 @@ import javax.swing.JMenuBar;
 import javax.swing.SwingConstants;
 
 import android.view.animation.Transformation;
+import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.anim.util.AnimationUtility.InterpolationTypes;
 import charlesgunn.jreality.GeometryCollector;
 import charlesgunn.jreality.geometry.projective.LinePencilFactory;
@@ -50,7 +51,12 @@ import de.jreality.util.SceneGraphUtility;
 
 public class CubicCurve extends Assignment {
 
-	private double[] tform = {1,.5,0,1, -1,.5,0,1, 0,0,1,0,  0,-.5,0,1};
+	private double[] tform = {
+			 1,.5,0,1, 
+			-1,.5,0,1, 
+			0,  0,1,0,  
+			0,-.5,0,1},
+		id = Rn.identityMatrix(4);
 	private SceneGraphComponent world,
 		cubicCurveSGC,		
 		coordSysSGC;
@@ -75,7 +81,7 @@ public class CubicCurve extends Assignment {
 		ap.setAttribute(BOUNDING_BOX, Rectangle3D.unitCube);
 		ap.setAttribute("lineShader.diffuseColor", new Color(0, 50,50));
 		world.addChildren(cubicCurveSGC, coordSysSGC);
-		Matrix mm = new Matrix(tform);
+		Matrix mm = new Matrix(tform.clone());
 		mm.transpose();
 		mm.assignTo(world.getTransformation());;
 		
@@ -132,6 +138,22 @@ public class CubicCurve extends Assignment {
 		cubicCurveSGC.setGeometry(pc.getCurve());
 		MatrixBuilder.euclidean().translate(0, 0, .01).assignTo(cubicCurveSGC);
 	}
+	
+	
+	@Override
+	public void setValueAtTime(double d) {
+		super.setValueAtTime(d);
+		double[] atform = new double[16];
+		for (int i = 0; i<16; ++i)	{
+			atform[i] = AnimationUtility.linearInterpolation( id[i], tform[i], d);
+			
+		}
+		Matrix mm = new Matrix(atform);
+		mm.transpose();
+		mm.assignTo(world.getTransformation());;
+	}
+
+
 	@Override
 	public void display() {
 		super.display();

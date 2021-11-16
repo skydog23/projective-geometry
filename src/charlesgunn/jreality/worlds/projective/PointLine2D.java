@@ -36,7 +36,7 @@ public class PointLine2D extends AbstractDualGeometry {
 
 	{
 		dim = 2;
-		tt3 = new double[]{1.9,.1};
+//		tt3 = new double[]{1.9,.1};
 	}
 	SceneGraphComponent 
 	    elements1D,
@@ -104,7 +104,7 @@ public class PointLine2D extends AbstractDualGeometry {
 	
 	@Override
 	protected void constructPoint(SceneGraphComponent sgc) {
-		sgc.setGeometry(Primitives.point(new double[]{0,0,0,1}, "P"));
+		sgc.setGeometry(Primitives.point(new double[]{0,0,0,1})); //, "P"));
 		Appearance ap = sgc.getAppearance();
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 		ap.setAttribute("pointShader.polygonShader.diffuseColor", Color.black);
@@ -116,13 +116,13 @@ public class PointLine2D extends AbstractDualGeometry {
 		MatrixBuilder.euclidean().translate(0, 0.2, 0).assignTo(sgc);
 	}
 
-	@Override
-	protected void constructAbstractAxisOrientation(SceneGraphComponent sgc) {
-		SceneGraphComponent rot1 = new SceneGraphComponent();
-		rot1.addChild(circularArrow3);
-		MatrixBuilder.euclidean().scale(1.5).assignTo(rot1);
-		sgc.addChildren(rot1);
-	}
+//	@Override
+//	protected void constructAbstractAxisOrientation(SceneGraphComponent sgc) {
+//		SceneGraphComponent rot1 = new SceneGraphComponent();
+//		rot1.addChild(circularArrow3);
+//		MatrixBuilder.euclidean().scale(1.5).assignTo(rot1);
+//		sgc.addChildren(rot1);
+//	}
 
 
 	@Override

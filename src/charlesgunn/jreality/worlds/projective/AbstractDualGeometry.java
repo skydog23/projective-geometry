@@ -14,6 +14,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
@@ -45,18 +48,20 @@ import de.jreality.util.SceneGraphUtility;
 
 public abstract class AbstractDualGeometry extends Assignment {
 
-	protected boolean showSpear = true;
-	protected boolean showLine = true;
-	protected boolean showAxis = true;
-	protected boolean showOrientation = true;
-	protected boolean showAbstractOrientation = true;
-	protected double stickRadius = .02;
-	protected double arrowScale = .1;
-	protected double arrowSlope = 1.5;
-	protected double arrowPosition = .83;
-	protected Color ballC = new Color(80,80,80);
-	protected Color arrowC = new Color(60,60,255);
-	protected Color stickC = arrowC;
+	protected boolean showSpear = true,
+			showLine = true,
+			showAxis = true,
+			showOrientation = true,
+			showAbstractOrientation = true,
+			showBothDirections = false,
+			showReverse = false;
+	protected double stickRadius = .02,
+			arrowScale = .1,
+			arrowSlope = 1.5,
+			arrowPosition = .83;
+	protected Color ballC = new Color(80,80,80),
+			arrowC = new Color(60,60,180),
+			stickC = arrowC;
 	protected int n = 50;
 	double globalScale = 2.25;
 	protected double[][] axisCurve = new double[n][];
@@ -69,7 +74,7 @@ public abstract class AbstractDualGeometry extends Assignment {
 	protected double extent = 5;
 	double[] tt = new double[] { .3, .6 };
 	double[] tt2 = new double[] { 1.3, .6 };
-	double[] tt3 = new double[] { 0, 1 };
+	double[] tt3 = new double[] { 0.05, .95 };
 	double[] offset = new double[]{.05,0,0.02};
 	int dim = -1;
 	SceneGraphComponent line = SceneGraphUtility.createFullSceneGraphComponent("line");
@@ -80,8 +85,11 @@ public abstract class AbstractDualGeometry extends Assignment {
 	SceneGraphComponent axisLabels = SceneGraphUtility.createFullSceneGraphComponent("axis labels");
 	SceneGraphComponent achseAbstractOrientation = SceneGraphUtility.createFullSceneGraphComponent("achseAO");
 	SceneGraphComponent strahlAbstractOrientation = SceneGraphUtility.createFullSceneGraphComponent("strahlAO");
+	SceneGraphComponent strahlAbstractOrientation2 = SceneGraphUtility.createFullSceneGraphComponent("strahlAO2");
 	SceneGraphComponent strahlArrow = SceneGraphUtility.createFullSceneGraphComponent("spear arrow");
-	SceneGraphComponent circularArrow1, circularArrow2, circularArrow3;
+	SceneGraphComponent circularArrow1 = SceneGraphUtility.createFullSceneGraphComponent("circ arrow 1");
+	SceneGraphComponent circularArrow2 = SceneGraphUtility.createFullSceneGraphComponent("circ arrow 2");
+	SceneGraphComponent circularArrow3 = SceneGraphUtility.createFullSceneGraphComponent("circ arrow 3");
 	SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("world");
 	SceneGraphComponent worldSpear = SceneGraphUtility.createFullSceneGraphComponent("world spear");
 	SceneGraphComponent worldAxis = SceneGraphUtility.createFullSceneGraphComponent("world axis");
@@ -123,7 +131,26 @@ public abstract class AbstractDualGeometry extends Assignment {
 		worldAxis.addChild(achseAbstractOrientation);
 		
 		world.addChildren(worldAxis, worldSpear);
+		
+		update();
 		return world;
+	}
+
+
+	private void update() {
+		circularArrow2.setVisible(showBothDirections);
+		if (showReverse) {
+			System.err.println("reflecting");
+			MatrixBuilder.euclidean().translate(0,0,-.5).reflect(new double[] {0,0,1,-.5}).assignTo(strahlAbstractOrientation2);
+			double angle = Math.PI*(tt[0] + tt[1])/2.0;
+			MatrixBuilder.euclidean().reflect(new double[] {Math.sin(angle),0,-Math.cos(angle),0}).assignTo(circularArrow1);
+			MatrixBuilder.euclidean().reflect(new double[]{1,0,0,0}).translate(0, 1.14, 0).scale(.2).assignTo(circularArrow3);
+			
+		} else {
+			 MatrixBuilder.euclidean().assignTo(strahlAbstractOrientation2);
+			MatrixBuilder.euclidean().assignTo(circularArrow1);
+			MatrixBuilder.euclidean().translate(0, 1.14, 0).scale(.2).assignTo(circularArrow3);
+		}
 	}
 
 
@@ -132,6 +159,23 @@ public abstract class AbstractDualGeometry extends Assignment {
 		// TODO Auto-generated method stub
 		super.display();
 		viewer.getSceneRoot().getAppearance().setAttribute("backgroundColor", new Color(200,255,200));
+		((Component) viewer.getViewingComponent()).addKeyListener(new KeyAdapter() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+					switch(e.getKeyCode())	{
+				
+					case KeyEvent.VK_1:
+						showBothDirections = !showBothDirections;
+						update();
+						break;
+					case KeyEvent.VK_2:
+						showReverse = !showReverse;
+						update();
+						break;
+					}
+			}
+		});
 	}
 
 
@@ -143,10 +187,16 @@ public abstract class AbstractDualGeometry extends Assignment {
 		ap.setAttribute("lineShader.diffuseColor", ballC);
 		ap.setAttribute(VERTEX_DRAW, false);
 		ap.setAttribute(EDGE_DRAW, false);
-		circularArrow.setGeometry(
+		SceneGraphComponent tmp = SceneGraphUtility.createFullSceneGraphComponent("tmp");
+		tmp.setGeometry(
 				makeCircularArrow(tt));
-		MatrixBuilder.euclidean().translate(0,1.125,0).scale(.65).assignTo(circularArrow);
-	
+		MatrixBuilder.euclidean().translate(0,1.125,0).scale(.65).assignTo(tmp);
+	    SceneGraphComponent sgc0 =SceneGraphUtility.createFullSceneGraphComponent("ca"),
+	    		sgc1 = SceneGraphUtility.createFullSceneGraphComponent("ca180");
+	    sgc0.addChild(tmp);
+	    sgc1.addChild(tmp);
+	    MatrixBuilder.euclidean().rotateY(Math.PI).assignTo(sgc1);
+	    circularArrow.addChildren(sgc0, sgc1);
 		return circularArrow;
 	}
 
@@ -158,7 +208,7 @@ public abstract class AbstractDualGeometry extends Assignment {
 			axisCurve[i] = foo;
 			double arrowFactor = t < arrowPosition ? 0.0 : 
 				AnimationUtility.linearInterpolation(
-					t, arrowPosition, 1.0, stickRadius*2.0, 0.0);
+					t, arrowPosition, 1.0, 2*stickRadius*1.0, 0.0);
 			rad[i] = globalScale * (t < arrowPosition ? stickRadius : arrowFactor);
 		}
 		rad[0] = 0.0;
@@ -228,12 +278,12 @@ public abstract class AbstractDualGeometry extends Assignment {
 
 	protected void constructCircularArrows() {
 		//  construct 3 circular arrows
-		circularArrow1 = constructCircularArrow(tt);
+		circularArrow1.addChild(constructCircularArrow(tt));
 		arrowPosition = .85;
-		circularArrow2 = constructCircularArrow(tt2);
-		arrowPosition = .75;
-		stickRadius = .1;
-		circularArrow3 = constructCircularArrow(tt3);
+		circularArrow2.addChild(constructCircularArrow(tt2));
+		arrowPosition = .85;
+		stickRadius = .08;
+		circularArrow3.addChild(constructCircularArrow(tt3));
 		MatrixBuilder.euclidean().translate(0, 1.14, 0).scale(.2).assignTo(circularArrow3);
 	}
 
@@ -286,8 +336,8 @@ public abstract class AbstractDualGeometry extends Assignment {
 	}
 
 	protected void constructAbstractAxisOrientation(SceneGraphComponent sgc) {
-		SceneGraphComponent rot1 = new SceneGraphComponent(), 
-				rot2 = new SceneGraphComponent();
+		SceneGraphComponent rot1 = new SceneGraphComponent("rot1"), 
+				rot2 = new SceneGraphComponent("rot2");
 		rot1.addChild(circularArrow3);
 		rot2.addChild(circularArrow3);
 		MatrixBuilder.euclidean().rotateY(Math.PI).assignTo(rot2);
@@ -296,12 +346,13 @@ public abstract class AbstractDualGeometry extends Assignment {
 
 	protected void constructAbstractStraightOrientation(SceneGraphComponent sgc) {
 		Appearance ap;
-		strahlAbstractOrientation.setGeometry(Primitives.cone(50, 1.0, true));
+		strahlAbstractOrientation2.setGeometry(Primitives.cone(50, 1.0, true));
+		strahlAbstractOrientation.addChild(strahlAbstractOrientation2);
 		ap = sgc.getAppearance();
 		ap.setAttribute("polygonShader.diffuseColor", arrowC);
 		ap.setAttribute(VERTEX_DRAW, false);
 		ap.setAttribute(EDGE_DRAW, false);
-		MatrixBuilder.euclidean().scale(.1, .3, .1).rotateX(-Math.PI / 2).assignTo(sgc);
+		MatrixBuilder.euclidean().scale(.1, .2, .1).rotateX(-Math.PI / 2).assignTo(sgc);
 	}
 
 	protected void constructStraightArrowWLabels(SceneGraphComponent sgc) {
@@ -319,7 +370,7 @@ public abstract class AbstractDualGeometry extends Assignment {
 		basf.setArrowPosition(arrowPosition);
 		basf.setArrowColor(arrowC);
 		basf.update();
-		strahlArrow.addChild(basf.getSceneGraphComponent());
+		strahlArrow.addChild(strahlAbstractOrientation); //basf.getSceneGraphComponent());
 		Appearance ap = strahlArrow.getAppearance();
 		ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, false);
 
@@ -337,6 +388,12 @@ public abstract class AbstractDualGeometry extends Assignment {
 		pts1.setScale(.005);
 		pts1.setOffset(offset);
 		pts1.setAlignment(SwingConstants.EAST);
+		DefaultPointShader dps = ((DefaultPointShader) dgs.getPointShader());
+		dps.setPointRadius(.05);
+		dps.setDiffuseColor(Color.gray);
+		ap.setAttribute("pointShader.polygonShader.diffuseColor", Color.gray);
+		ap.setAttribute("pointShader.textShader.diffuseColor", Color.black);
+		dps.setSpheresDraw(true);
 		labels.setGeometry(arrow1.getIndexedLineSet());
 		arrow1.setVertexLabels(new String[] { "A", "B" });
 		arrow1.update();
