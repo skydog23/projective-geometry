@@ -51,6 +51,8 @@ public class BezierCurve {
 			}
 			factor *= .5;
 		}
+		System.err.println("u0split = "+Rn.matrixToString(u0Split));
+		System.err.println("u1split = "+Rn.matrixToString(u1Split));
 
 	}
 	
@@ -100,4 +102,7 @@ public class BezierCurve {
 		return polygonPoints;
 	}
 
+//	public static void main(String[] args) {
+//		BezierCurv
+//	}
 }

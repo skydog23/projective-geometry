@@ -968,6 +968,46 @@ public class GeometryUtilityOverflow {
 		return d33;
 	}
 	
+	public static double[] convert33To44(double[] d) {
+		double[] d44 = new double[16];
+		d44[0] = d[0];
+		d44[1] = d[1];
+		d44[3] = d[2];
+		d44[4] = d[3];
+		d44[5] = d[4];
+		d44[7] = d[5];
+		d44[12] = d[7];
+		d44[13] = d[7];
+		d44[15] = d[8];
+		return d44;
+	}
+	
+	public static double[] convert3To4(double[] v4, double[] d3)	{
+		if (v4 == null) v4 = new double[4];
+		v4[0] = d3[0];
+		v4[1] = d3[1];
+		v4[2] = 0.0;
+		v4[3] = d3[2];
+		return v4;
+	}
+	
+	public static double[] convert4To3(double[] v3, double[] d4)	{
+		if (v3 == null) v3 = new double[3];
+		v3[0] = d4[0];
+		v3[1] = d4[1];
+		v3[2] = d4[3];
+		return v3;
+	}
+	
+	public static double[] convert2dLineTo3d(double[] line3, double[] line2)	{
+		
+		if (line3 == null || line3.length != 6) line3 = new double[6];
+		line3[2] = line2[2];
+		line3[4] = line2[0];
+		line3[5] = line2[1];
+		return line3;
+	}
+	
 	public static IndexedFaceSet sphericalPatch(double cU, double cV, double uSize, double vSize, int xDetail, int yDetail, double radius)	{
 		return sphericalPatchFactory(cU,cV,uSize,vSize,xDetail,yDetail,radius, true).getIndexedFaceSet();
 	}

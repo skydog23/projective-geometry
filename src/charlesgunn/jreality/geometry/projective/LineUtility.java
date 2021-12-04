@@ -124,7 +124,7 @@ public class LineUtility {
 		if (exists == null) exists = new SceneGraphComponent();
 		PointRangeFactory prf = new PointRangeFactory();
 		prf.setPluckerLine(line);
-		if (point == null) point = new double[4];
+		if (point == null) point = new double[]{0,0,0,1};
 		prf.setCenter(point);
 		prf.setSphereRadius(scale);
 		prf.setFiniteSphere(finite);

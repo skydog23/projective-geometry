@@ -210,7 +210,7 @@ public class PointRangeFactory extends Abstract1DExtentFactory{
 	}
 	
 	public void set2DLine(double[] abc)	{
-		double[] pc = {abc[2], 0, -abc[1], 0, -abc[0], 0, 0};
+		double[] pc = {abc[2], 0, -abc[1], 0, -abc[0], 0};
 //		double[] pc = {0,0, abc[2],  0,  abc[1],abc[0]};
 		double[][] pts = LineUtility.twoPointsOnLine(null, pc);
 //		System.err.println("points = "+Rn.toString(pts));
