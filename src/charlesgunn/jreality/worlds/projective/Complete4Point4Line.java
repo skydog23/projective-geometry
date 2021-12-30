@@ -50,7 +50,7 @@ import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.jrworkspace.plugin.Plugin;
 
-public class Complete4Point4Side extends Assignment {
+public class Complete4Point4Line extends Assignment {
 
 	transient double[] tform = {1,.5,0,1, -1,.5,0,1, 0,0,1,0,  0,-.5,0,1};
 	double t = .3333;
@@ -379,7 +379,7 @@ public class Complete4Point4Side extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new Complete4Point4Side().display();
+		new Complete4Point4Line().display();
 	}
 	
 	transient Tool editTool = new AbstractTool(InputSlot.LEFT_BUTTON, InputSlot.SHIFT_LEFT_BUTTON) {

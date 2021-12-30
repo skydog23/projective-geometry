@@ -11,6 +11,7 @@ import javax.swing.JMenuBar;
 import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.geometry.projective.PointCollector;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.jreality.viewer.PluginSceneLoader;
 import charlesgunn.math.Biquaternion;
@@ -29,7 +30,7 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 
-public class ScrewMotionDemo extends LoadableScene {
+public class ScrewMotionIllustration extends Assignment {
 
 	double a = Math.PI/2, pitch = .5, b = pitch*a;
 	double ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
@@ -51,10 +52,10 @@ public class ScrewMotionDemo extends LoadableScene {
 		maxR = .5;
 	int numPoints = 15;
 	int numCircles = 1;
-	int metric = Pn.ELLIPTIC;
+	int metric = Pn.EUCLIDEAN;
 	boolean debug = false;
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		double[] xx = {1,0,0,0}, yy = {0,1,0,0};
 		Matrix mm = new Matrix();
 		if (metric != 0) MatrixBuilder.init(mm, metric).rotateZ(a).rotate(xx,yy,b);
@@ -126,17 +127,21 @@ public class ScrewMotionDemo extends LoadableScene {
 		return sgc;
 	}
 	@Override
-	public void customize(JMenuBar menuBar, PluginSceneLoader psl) {
-		psl.getViewer().getSceneRoot().getAppearance().setAttribute("metric", metric);
-		psl.getViewer().getSceneRoot().getAppearance().setAttribute("backgroundColor", Color.white);
-		CameraUtility.getCamera(psl.getViewer()).setNear(.01);
-		CameraUtility.getCamera(psl.getViewer()).setFar(metric == Pn.ELLIPTIC ? -.05 : 10.0);
-		CameraUtility.getCamera(psl.getViewer()).setFieldOfView(90);
+	public void display() {
+		super.display();
+		viewer.getSceneRoot().getAppearance().setAttribute("metric", metric);
+		viewer.getSceneRoot().getAppearance().setAttribute("backgroundColor", Color.white);
+		CameraUtility.getCamera(viewer).setNear(.01);
+		CameraUtility.getCamera(viewer).setFar(metric == Pn.ELLIPTIC ? -.05 : 10.0);
+		CameraUtility.getCamera(viewer).setFieldOfView(90);
 	}
-	@Override
+	
 	public int getMetric() {
 		// TODO Auto-generated method stub
 		return metric;
 	}
 
+	public static void main(String[] args) {
+		new ScrewMotionIllustration().display();
+	}
 }

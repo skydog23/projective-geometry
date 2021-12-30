@@ -15,6 +15,7 @@ import javax.swing.JMenuBar;
 import javax.swing.SwingConstants;
 
 import charlesgunn.jreality.texture.SimpleTextureFactory;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.IndexedFaceSetUtility;
@@ -37,14 +38,15 @@ import de.jreality.util.SceneGraphUtility;
  * @author gunn
  *
  */
-public class EllipticCongruence extends LoadableScene {
+public class EllipticCongruence3DModel extends Assignment {
 	SceneGraphComponent[][] levels = new SceneGraphComponent[1][2];
 	protected boolean showTubes = true, showLevel[] = {true, true, false, false};
 	SceneGraphComponent leftLines = new SceneGraphComponent("curves");
 	SceneGraphComponent rightLines = new SceneGraphComponent("tubes");
 	Appearance noTex1 = new Appearance(), noTex2 = new Appearance();
 	//double[] c1 = {1,.8, 0,1}, c2 = {.4,1,0, 1};
-	public SceneGraphComponent makeWorld()	{
+	@Override
+	public SceneGraphComponent getContent()	{
 		
 		SceneGraphComponent theWorld = SceneGraphUtility.createFullSceneGraphComponent("world");
 		theWorld.addChild(leftLines);
@@ -215,13 +217,6 @@ public class EllipticCongruence extends LoadableScene {
 		public int getMetric()	{
 			return Pn.EUCLIDEAN;
 		}
-		public boolean addBackPlane()	{
-			return false;
-		}
-		public boolean isEncompass()	{
-			return true;
-		}
-		public boolean hasInspector() {return true; }
 		int profileSize = 13;
 		int numSegs = 20;
 		int beginLevel = 7, endLevel = 16;
@@ -230,8 +225,9 @@ public class EllipticCongruence extends LoadableScene {
 		double density =.7,
 			overThickenFactor = 1.2;
 		boolean constantSamples = true;
-		public Component getInspector(final Viewer viewer) {	
-			Box inspectionPanel =  Box.createVerticalBox();
+		@Override
+		public Component getInspector() {	
+			Box inspectionPanel =  inspector;
 			final JCheckBox constantSB = new JCheckBox("constant samples");
 			constantSB.addActionListener(new ActionListener() {
 
@@ -311,4 +307,7 @@ public class EllipticCongruence extends LoadableScene {
 			return inspectionPanel;
 		}
 		
+		public static void main(String[] args) {
+			new EllipticCongruence3DModel().display();
+		}
 	}

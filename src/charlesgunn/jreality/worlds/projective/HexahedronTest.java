@@ -35,7 +35,7 @@ import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController.PropertiesMode;
 
-public class Hexahedron extends Assignment {
+public class HexahedronTest extends Assignment {
 
 	double alpha = Math.PI/2,
 			projcoord = .5;
@@ -189,7 +189,7 @@ public class Hexahedron extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new Hexahedron().display();
+		new HexahedronTest().display();
 	}
 
 	@Override

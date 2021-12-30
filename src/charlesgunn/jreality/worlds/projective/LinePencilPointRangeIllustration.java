@@ -6,6 +6,7 @@ import javax.swing.JMenuBar;
 
 import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.jreality.viewer.PluginSceneLoader;
 import de.jreality.geometry.Primitives;
@@ -18,7 +19,7 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 
-public class PerfectPartnership extends LoadableScene {
+public class LinePencilPointRangeIllustration extends Assignment {
 	SceneGraphComponent  
 		theRealWorld,
 			pointRangeSGC,
@@ -26,7 +27,7 @@ public class PerfectPartnership extends LoadableScene {
 				centerSGC;
 
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		theRealWorld = SceneGraphUtility.createFullSceneGraphComponent("theWorld");
 		pointRangeSGC = SceneGraphUtility.createFullSceneGraphComponent("pointRange");
 		linePencilSGC = SceneGraphUtility.createFullSceneGraphComponent("linePencil");
@@ -68,9 +69,13 @@ public class PerfectPartnership extends LoadableScene {
 	}
 
 	@Override
-	public void customize(JMenuBar menuBar, PluginSceneLoader psl) {
-		psl.getViewer().getSceneRoot().getAppearance().setAttribute("backgroundColor", new Color(200,200,200));
-		MatrixBuilder.euclidean().translate(0,0,2).assignTo(CameraUtility.getCameraNode(psl.getViewer()));
+	public void display() {
+		super.display();
+		viewer.getSceneRoot().getAppearance().setAttribute("backgroundColor", new Color(200,200,200));
+		MatrixBuilder.euclidean().translate(0,0,2).assignTo(CameraUtility.getCameraNode(viewer));
 	}
 
+	public static void main(String[] args) {
+		new LinePencilPointRangeIllustration().display();
+	}
 }

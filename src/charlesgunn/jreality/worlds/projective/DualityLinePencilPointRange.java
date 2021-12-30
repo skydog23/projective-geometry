@@ -32,7 +32,7 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.SceneGraphUtility;
 
-public class PointLine2D extends AbstractDualGeometry {
+public class DualityLinePencilPointRange extends AbstractDualGeometry {
 
 	{
 		dim = 2;
@@ -184,7 +184,7 @@ public class PointLine2D extends AbstractDualGeometry {
 	}
 
 	public static void main(String[] args) {
-		new PointLine2D().display();
+		new DualityLinePencilPointRange().display();
 	}
 
 }

@@ -57,7 +57,7 @@ public class PlanePencilFactory extends Abstract1DExtentFactory {
 
 	public void setPluckerLine(double[] pc)	{
 		double[][] pts = LineUtility.twoPlanesOnLine(null, pc);
-//		System.err.println("points = "+Rn.toString(pts));
+		System.err.println("two planes = \n"+Rn.toString(pts));
 		setElement0(pts[0]);
 		setElement1(pts[1]);
 		return;

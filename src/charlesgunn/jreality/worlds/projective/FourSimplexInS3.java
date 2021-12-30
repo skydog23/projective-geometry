@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JMenuBar;
 import javax.swing.SwingConstants;
 
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.jogl.JOGLRenderer;
@@ -23,14 +24,15 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 
-public class FourSimplex extends LoadableScene {
+public class FourSimplexInS3 extends Assignment {
 
 	private double[][] verts;
 	private Graphics3D gc;
 	private SceneGraphComponent world;
 
 	@Override
-	public void customize(JMenuBar menuBar, Viewer viewer) {
+	public void display() {
+		super.display();
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.METRIC, Pn.ELLIPTIC);
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.RENDER_S3, true);
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.USE_GLSL, true);
@@ -65,7 +67,7 @@ public class FourSimplex extends LoadableScene {
 	}
 
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		world.getAppearance().setAttribute(CommonAttributes.METRIC, Pn.ELLIPTIC);
 		world.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, true);
@@ -106,4 +108,7 @@ public class FourSimplex extends LoadableScene {
 		return world;
 	}
 
+	public static void main(String[] args) {
+		new FourSimplexInS3().display();
+	}
 }

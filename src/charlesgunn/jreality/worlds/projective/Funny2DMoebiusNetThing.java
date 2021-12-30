@@ -48,7 +48,7 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
-public class PathCurve2D extends Assignment {
+public class Funny2DMoebiusNetThing extends Assignment {
 
 	private double[] tform = {1,.7,0,1, -1,.5,0,1, 0,0,1,0,  .15,-.5,0,1};
 //	private double[] tform = {0,.5,0,1, 0,-.5,0,1, 0,0,1,0,  1,0,0,0};
@@ -204,6 +204,6 @@ public class PathCurve2D extends Assignment {
 //	}
 
 	public static void main(String[] args) {
-		new PathCurve2D().display();
+		new Funny2DMoebiusNetThing().display();
 	}
 }

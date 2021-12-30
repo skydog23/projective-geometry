@@ -18,7 +18,7 @@ import de.jreality.scene.DirectionalLight;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.util.CameraUtility;
 
-public class StrahlUndAchse extends AbstractDualGeometry {
+public class DualityPlanePencilPointRange extends AbstractDualGeometry {
 
 	{
 		dim = 3;
@@ -73,6 +73,6 @@ public class StrahlUndAchse extends AbstractDualGeometry {
 	}
 
 	public static void main(String[] args) {
-		new StrahlUndAchse().display();
+		new DualityPlanePencilPointRange().display();
 	}
 }

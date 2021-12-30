@@ -78,7 +78,7 @@ public class CounterSpacePlanets extends Assignment {
 	
 	String[] names = {"mercury","venus","earth","mars","jupiter","saturn","uranus","neptune"};
 	
-	boolean stPr = true;
+	boolean stPr = false;
 	SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("planet");
 	SceneGraphComponent worldFlat = SceneGraphUtility.createFullSceneGraphComponent("planetFlat");
 	SceneGraphComponent worldSphere = SceneGraphUtility.createFullSceneGraphComponent("planetSphere");

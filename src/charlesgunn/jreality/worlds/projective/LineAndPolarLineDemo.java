@@ -10,6 +10,7 @@ import javax.swing.SwingConstants;
 
 import charlesgunn.jreality.geometry.projective.LineUtility;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
@@ -18,14 +19,14 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Viewer;
 import de.jreality.util.SceneGraphUtility;
 
-public class PolarizeLineDemo extends LoadableScene{
+public class LineAndPolarLineDemo extends Assignment{
 	
 	SceneGraphComponent world, line, polarline;
 	double a=0, b=0, c=1;
 	PointRangeFactory[] prf = new PointRangeFactory[2];
 		
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent();
 		line = SceneGraphUtility.createFullSceneGraphComponent();
 		polarline = SceneGraphUtility.createFullSceneGraphComponent();
@@ -39,7 +40,7 @@ public class PolarizeLineDemo extends LoadableScene{
 			prf[i].setSphereRadius(10E1);
 		}
 		update();
-		MatrixBuilder.euclidean().rotateX(Math.PI/2).assignTo(world);
+		MatrixBuilder.euclidean().translate(0,0,-4).rotateX(Math.PI/2).assignTo(world);
 		return world;
 	}
 	
@@ -61,9 +62,9 @@ public class PolarizeLineDemo extends LoadableScene{
 			polarline.setGeometry(prf[1].getLine());
 	}
 	
-	public boolean hasInspector() {return true; }
-	public Component getInspector(final Viewer viewer) {	
-		Box inspectionPanel =  Box.createVerticalBox();
+	@Override
+	public Component getInspector() {	
+		Box inspectionPanel =  inspector;
 		final TextSlider aSlider = new TextSlider.Double("a",SwingConstants.HORIZONTAL,-2.0, 2.0,a);
 		aSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
@@ -94,4 +95,7 @@ public class PolarizeLineDemo extends LoadableScene{
 		return inspectionPanel;
 	}
 
+	public static void main(String[] args) {
+		new LineAndPolarLineDemo().display();
+	}
 }

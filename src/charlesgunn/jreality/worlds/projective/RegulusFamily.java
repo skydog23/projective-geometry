@@ -36,6 +36,7 @@ import charlesgunn.anim.plugin.AnimationPlugin;
 import charlesgunn.anim.util.AnimationUtility.InterpolationTypes;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.geometry.projective.SkewQuad;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.jreality.viewer.PluginSceneLoader;
 import charlesgunn.math.p5.PlueckerLineGeometry;
@@ -58,7 +59,7 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 
-public class RegulusFamily extends LoadableScene {
+public class RegulusFamily extends Assignment {
 
 	double[][] points = {{1,1,1,1},{1,-1,-1,1},{-1,1,-1,1},{-1,-1,1,1}};
 	double[][] parameterLines = {PlueckerLineGeometry.lineFromPoints(null, points[0], points[1]),
@@ -89,7 +90,7 @@ public class RegulusFamily extends LoadableScene {
 			tetraSGC,
 			surfaceRep;
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		lSGC  = SceneGraphUtility.createFullSceneGraphComponent("leitschar");
 		rSGC = SceneGraphUtility.createFullSceneGraphComponent("regelschar");
@@ -244,11 +245,9 @@ public class RegulusFamily extends LoadableScene {
 //		System.err.println("In update "+count++);
 		if (viewer != null) viewer.renderAsync();
 	}
-	Viewer viewer;
-	public boolean hasInspector() {return true; }
-	public Component getInspector(final Viewer v) {	
-		if (v != null) viewer = v;
-		Box inspectionPanel =  Box.createVerticalBox();
+	@Override
+	public Component getInspector() {	
+		Box inspectionPanel =  inspector;
 		timeSlider = new TextSlider.Double("t",SwingConstants.HORIZONTAL, -1.0, 1.0, time);
 		timeSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
@@ -317,10 +316,11 @@ public class RegulusFamily extends LoadableScene {
 	}
 
 	@Override
-	public void customize(JMenuBar menuBar, PluginSceneLoader psl) {
+	public void display() {
+		super.display();
 		MatrixBuilder.euclidean().translate(0,0,5).assignTo(CameraUtility.getCameraNode(viewer));
 		viewer.getSceneRoot().getAppearance().setAttribute(BACKGROUND_COLOR, new Color(20,20,40));
-		AnimationPlugin ap = psl.getAnimationPlugin();
+		AnimationPlugin ap = animationPlugin;
 		ap.setAnimateSceneGraph(true);
 		ap.setDefaultInterp(InterpolationTypes.CUBIC_HERMITE);
 		ap.update();
@@ -359,10 +359,6 @@ public class RegulusFamily extends LoadableScene {
 				update();
 			}
 			
-	}
-	@Override
-	public boolean isEncompass() {
-		return false;
 	}
 
 	List<Animated> animated = new ArrayList<Animated>();
@@ -411,4 +407,7 @@ public class RegulusFamily extends LoadableScene {
 		pointsl3[1] = parameterLineF[1].getValueAtTime(time2);
 	}
 
+	public static void main(String[] args) {
+		new RegulusFamily().display();
+	}
 }

@@ -48,7 +48,7 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
-public class FocalPointDemo extends Assignment {
+public class FocalPointReyesDemo extends Assignment {
 
 	boolean showApollonian = true,
 			traceOneKind = true;
@@ -335,6 +335,6 @@ public class FocalPointDemo extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new FocalPointDemo().display();
+		new FocalPointReyesDemo().display();
 	}
 }

@@ -54,7 +54,7 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
-public class GravityLevity extends Assignment {
+public class GravityLevity2DIllustration extends Assignment {
 
 	private static final double K1 = Math.sqrt(3)/2.0;
 	private double[][] 
@@ -254,6 +254,6 @@ public class GravityLevity extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new GravityLevity().display();
+		new GravityLevity2DIllustration().display();
 	}
 }

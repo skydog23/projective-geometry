@@ -173,13 +173,6 @@ public class LemniscateSunEarth extends Assignment {
 		sphericalPatch = SphereUtility.sphericalPatch(0.0, 0.0, 360.0, 179.999, 180, 90, 1.0);
 		celestialSphereSGC.setGeometry(sphericalPatch);
 		
-//		try {
-//			starmapID = ImageData.load(Input.getInput("src/charlesgunn/jreality/resources/constell-2K.jpg"));
-//			System.err.println("star map loaded "+starmapID.getWidth());
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-
 		ap = celestialSphereSGC.getAppearance();
 		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
 		MatrixBuilder.euclidean().scale(100).assignTo(celestialSphereSGC);

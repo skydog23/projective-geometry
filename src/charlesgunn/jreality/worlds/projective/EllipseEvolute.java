@@ -24,7 +24,7 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.SceneGraphUtility;
 
-public class EllipseDiffGeom extends Assignment {
+public class EllipseEvolute extends Assignment {
 
 	int size = 101;
 	@Override
@@ -127,6 +127,6 @@ public class EllipseDiffGeom extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new EllipseDiffGeom().display();
+		new EllipseEvolute().display();
 	}
 }

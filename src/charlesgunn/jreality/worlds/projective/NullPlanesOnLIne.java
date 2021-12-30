@@ -10,6 +10,7 @@ import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.geometry.projective.PlanePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.scene.Appearance;
@@ -88,8 +89,8 @@ public class NullPlanesOnLIne extends Assignment {
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, true);
 		PlanePencilFactory ppf = new PlanePencilFactory();
 		ppf.setNumberOfSamples(10);
-		ppf.setElement0(verts[0]);
-		ppf.setElement1(verts[1]);
+		double[] pl = PlueckerLineGeometry.lineFromPoints(null, verts[0], verts[1]);
+		ppf.setPluckerLine(pl);
 		ppf.update();
 		achse.addChild(ppf.getPlanePencil());
 

@@ -8,7 +8,7 @@ import java.awt.Color;
 
 import charlesgunn.jreality.texture.SimpleTextureFactory;
 import charlesgunn.jreality.texture.SimpleTextureFactory.TextureType;
-import charlesgunn.jreality.viewer.LoadableScene;
+import charlesgunn.jreality.viewer.Assignment;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
@@ -27,7 +27,7 @@ import de.jreality.shader.TextureUtility;
 import de.jreality.util.PickUtility;
 import de.jreality.util.SceneGraphUtility;
 
-public class PlanarProjectivity extends LoadableScene {
+public class PlanarProjectivity extends Assignment {
 
 	SceneGraphComponent world, planeContain, plane, points, pickingPlane;
 	double w = 8.0;
@@ -36,7 +36,7 @@ public class PlanarProjectivity extends LoadableScene {
 	int[][] edges = {{0,1},{0,3},{1,3}};
 	private IndexedLineSetFactory lineSetFactory;
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		plane = SceneGraphUtility.createFullSceneGraphComponent("plane");
 		planeContain = SceneGraphUtility.createFullSceneGraphComponent("planeContain");
@@ -163,4 +163,7 @@ public class PlanarProjectivity extends LoadableScene {
 		return Rn.transpose(dst, mat);
 	}
 
+	public static void main(String[] args) {
+		new PlanarProjectivity().display();
+	}
 }

@@ -10,6 +10,7 @@ import javax.swing.JMenuBar;
 
 import charlesgunn.jreality.geometry.projective.NullPlaneFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import de.jreality.geometry.BallAndStickFactory;
 import de.jreality.geometry.IndexedFaceSetFactory;
@@ -23,10 +24,10 @@ import de.jreality.scene.Viewer;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.SceneGraphUtility;
 
-public class NullLines extends LoadableScene {
+public class NullLines extends Assignment {
 
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		MatrixBuilder.euclidean().translate(0, 0, -4).assignTo(world);
 		Appearance ap = world.getAppearance();
@@ -111,8 +112,12 @@ public class NullLines extends LoadableScene {
 	}
 
 	@Override
-	public void customize(JMenuBar menuBar, Viewer viewer) {
+	public void display() {
+		super.display();
 		viewer.getSceneRoot().getAppearance().setAttribute("backgroundColor", Color.white);
 	}
 
+	public static void main(String[] args) {
+		new NullLines().display();
+	}
 }

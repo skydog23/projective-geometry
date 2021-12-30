@@ -38,7 +38,7 @@ import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.jrworkspace.plugin.Plugin;
 
-public class ProductTwoLines extends Assignment {
+public class ProductTwoLinesIllustration extends Assignment {
 
 	double alpha = Math.PI/10, d = 1.0, farAway = 4;
 	transient double[][] pts = {
@@ -144,6 +144,6 @@ public class ProductTwoLines extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new ProductTwoLines().display();
+		new ProductTwoLinesIllustration().display();
 	}
 }
