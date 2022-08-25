@@ -100,7 +100,7 @@ public class CounterSpacePlanets extends Assignment {
 			}			
 		}
 		starSGC.setGeometry(GeometryUtilityOverflow.starPoint(16, .01, .03));
-		MatrixBuilder.euclidean().translate(0,0,stPr ? -1 : 0).scale(.3).assignTo(starSGC);
+		MatrixBuilder.euclidean().translate(0,0,stPr ? -1 : 0).scale(.1).assignTo(starSGC);
 		Appearance ap = starSGC.getAppearance();
 		ap.setAttribute("lineShader.diffuseColor", Color.yellow);
 		ap.setAttribute(CommonAttributes.TUBES_DRAW, false);
@@ -181,14 +181,14 @@ public class CounterSpacePlanets extends Assignment {
 		f2SGC.setGeometry(f2);
 		f2SGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, true);
 		if (stPr)	{
-			CircleFactory cf = CircleFactory.circleFactoryForCircle(new double[]{1, 0, -2*a*a/f, 0});
+			CircleFactory cf = CircleFactory.circleFactoryForCircle(new double[]{1, 0, 2*a*a/f, 0});
 			cf.update();
 			SceneGraphComponent flattened = SceneGraphUtility.flatten(cf.getSphereSGC());
 			midlineSGC.addChild(flattened);
 		} else {
 			// add the "middle line" of the counter-space circle
 			double[] p1 = {0,1,0,0};		// y-direction
-			double[] p2 = {-a*a/f,0,0,1};
+			double[] p2 = {a*a/f,0,0,1};
 			PointRangeFactory midline = new PointRangeFactory();
 			midline.setElement0(p1);
 			midline.setElement1(p2);

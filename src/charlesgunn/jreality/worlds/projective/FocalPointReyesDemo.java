@@ -4,9 +4,7 @@
  */
 package charlesgunn.jreality.worlds.projective;
 
-import static de.jreality.geometry.GeometryUtility.BOUNDING_BOX;
 import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
-import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
 import static de.jreality.shader.CommonAttributes.LIGHTING_ENABLED;
 import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
 import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
@@ -24,20 +22,14 @@ import javax.swing.SwingConstants;
 
 import charlesgunn.anim.util.AnimationUtility.InterpolationTypes;
 import charlesgunn.jreality.GeometryCollector;
-import charlesgunn.jreality.geometry.projective.LinePencilFactory;
-import charlesgunn.jreality.geometry.projective.LineUtility;
 import charlesgunn.jreality.geometry.projective.PointCollector;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
-import charlesgunn.math.Biquaternion;
-import charlesgunn.math.Utility;
 import charlesgunn.util.TextSlider;
-import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.P2;
-import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
@@ -45,7 +37,6 @@ import de.jreality.scene.Camera;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
-import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
 public class FocalPointReyesDemo extends Assignment {
