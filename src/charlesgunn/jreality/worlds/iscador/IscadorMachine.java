@@ -10,7 +10,6 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.Box;
@@ -18,11 +17,8 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
 
-import org.omg.CORBA.OMGVMCID;
-
 import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.geometry.projective.PointCollector;
-import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.util.TextSlider;
 import de.jreality.backends.label.LabelUtility;

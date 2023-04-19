@@ -44,7 +44,7 @@ import de.jtem.jrworkspace.plugin.Plugin;
 public class ConformalPhotoSphereRender extends Assignment {
 
 	private TermesSpherePlugin termes;
-//	protected String searchDir = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/", 
+//	protected String searchDir = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/", 
 //			imageName = "Horeshoe-Bend-PS.jpg";
 	protected String searchDir = "/Users/gunn/Downloads/", 
 			imageName = "mars-perseverence-2.png";

@@ -22,6 +22,9 @@ public class DualityPlanePencilPointRange extends AbstractDualGeometry {
 
 	{
 		dim = 3;
+		arrowC = new Color(50, 50, 250);
+		stickC = arrowC;
+		pencilC = new Color(250,0,0);
 	}
 	
 	@Override
@@ -67,7 +70,7 @@ public class DualityPlanePencilPointRange extends AbstractDualGeometry {
 		l2sgc.setLight(d2);
 		DirectionalLight d3 = new DirectionalLight();
 		d2.setIntensity(.75);
-		d2.setColor(new Color(225,255,225));
+		d2.setColor(new Color(255,255,255)); // Color(225,255,225)); //
 		MatrixBuilder.euclidean().rotateX(-Math.PI/2).assignTo(l3sgc);
 		l3sgc.setLight(d3);
 	}
