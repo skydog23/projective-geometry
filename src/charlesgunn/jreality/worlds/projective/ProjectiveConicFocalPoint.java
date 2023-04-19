@@ -39,7 +39,7 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 
-public class FocalPointReyesDemo extends Assignment {
+public class ProjectiveConicFocalPoint extends Assignment {
 
 	boolean showApollonian = true,
 			traceOneKind = true;
@@ -326,6 +326,6 @@ public class FocalPointReyesDemo extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new FocalPointReyesDemo().display();
+		new ProjectiveConicFocalPoint().display();
 	}
 }

@@ -148,7 +148,7 @@ public class DualPointLineCurve extends Assignment {
 		super.display();
 		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR,backgroundColor);
 		animationPlugin.getAnimationPanel().setResourceDir("src/charlesgunn/jreality/worlds/rugr2d");
-		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/gunn_local/Movies/RuGR/");
+		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/Volumes/SamsungSSD1T/gunn_local/Movies/RuGR/");
 		animationPlugin.setAnimateCamera(true);
 		animationPlugin.setAnimateSceneGraph(true);
 	

@@ -257,7 +257,7 @@ public class SudaneseMoebius extends Assignment {
 		sgp = SceneGraphUtility.getPathsToNamedNodes(jrviewer.getViewer().getSceneRoot(), "world").get(0);
 		sgp.pop();
 		animationPlugin.getAnimationPanel().setResourceDir("src/charlesgunn/jreality/worlds/");
-		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/gunn_local/Movies/sudaneseMoebius");
+		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/Volumes/SamsungSSD1T/gunn_local/Movies/sudaneseMoebius");
 //		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.METRIC, Pn.ELLIPTIC);
 	}
 

@@ -185,8 +185,8 @@ public class SimpleManiview  {
 		ap.setAnimateSceneGraph(true);
 //		ImportExport.readInto(ap.getAnimationPanel(), 
 //				this.getClass().getResourceAsStream("simpleManiviewAnim-02.xml"));
-		ap.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/gunn_local/Movies/conformal/stereographproj");
-		ap.getAnimationPanel().setResourceDir("/gunn_local/workspace/ProjectiveGeometry/src/charlesgunn/jreality/plugin//");
+		ap.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/Volumes/SamsungSSD1T/gunn_local/Movies/conformal/stereographproj");
+		ap.getAnimationPanel().setResourceDir("/Volumes/SamsungSSD1T/gunn_local/workspace/ProjectiveGeometry/src/charlesgunn/jreality/plugin//");
 
 		// following is now optional; without it uses trivial group
 		dg = getGroup();

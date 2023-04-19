@@ -307,6 +307,7 @@ public abstract class Assignment extends Plugin implements Animated {
 	/**
 	 * This is called once to activate the application
 	 */
+	protected boolean useContent = true;
 	public void display()	{
 		setupJRViewer(jrviewer);
 		jrviewer.startup();
@@ -316,9 +317,10 @@ public abstract class Assignment extends Plugin implements Animated {
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		ap.setAttribute("backgroundColors", Appearance.INHERITED);
 		ap.setAttribute("backgroundColor", new Color(0,0,0,0));
-		SceneGraphComponent content = getContent();
-//		DefaultMatrixSupport.getSharedInstance().storeDefaultMatrices(jrviewer.getViewer().getSceneRoot());
-		contentPlugin.setContent(content);
+		if (useContent) {
+			SceneGraphComponent content = getContent();
+			contentPlugin.setContent(content);			
+		}
 		// add keyboard listener
 		Component comp = ((Component) jrviewer.getViewer().getViewingComponent());
 		comp.addKeyListener(new KeyAdapter() {

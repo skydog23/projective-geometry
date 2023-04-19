@@ -77,10 +77,10 @@ public class CircleDemo extends LoadableScene{
 	private IndexedFaceSet[] sphericalPatch = new IndexedFaceSet[2];
 	IndexedFaceSet currentSphericalPatch;
 	IndexedLineSet currentStar;
-	String gridTextureName = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/grid256.jpg"; //
-	String earthBetterTextureName = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048-XXX.jpg"; //grid256.jpg")); //
-	String earthTextureName = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048.jpg"; //grid256.jpg")); //
-	String marsTextureName = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/mars2048.jpg"; //http://www.math.tu-berlin.de/~gunn/Pictures/textures/mars2048.jpg"; //grid256.jpg")); //
+	String gridTextureName = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/grid256.jpg"; //
+	String earthBetterTextureName = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048-XXX.jpg"; //grid256.jpg")); //
+	String earthTextureName = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048.jpg"; //grid256.jpg")); //
+	String marsTextureName = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/mars2048.jpg"; //http://www.math.tu-berlin.de/~gunn/Pictures/textures/mars2048.jpg"; //grid256.jpg")); //
 	private ImageData earthImage, marsImage, earthBetterImage;
 	boolean correctTextures = false, 
 		needsCorrection = false,

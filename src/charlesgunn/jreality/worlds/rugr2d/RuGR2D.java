@@ -361,7 +361,7 @@ public class RuGR2D extends Assignment {
 		super.display();
 		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, new Color(0,0,0,0));
 		animationPlugin.getAnimationPanel().setResourceDir("src/charlesgunn/jreality/worlds/rugr2d/");
-		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/gunn_local/Movies/RuGR/");
+		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/Volumes/SamsungSSD1T/gunn_local/Movies/RuGR/");
 		animationPlugin.setAnimateSceneGraph(!doTriangle);
 		animationPlugin.setAnimateCamera(true);
 		List<Animated> animated = animationPlugin.getAnimated();

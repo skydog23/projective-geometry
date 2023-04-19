@@ -5,7 +5,6 @@
 package charlesgunn.jreality.worlds.projective;
 
 import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
-import static de.jreality.shader.CommonAttributes.POINT_RADIUS;
 import static de.jreality.shader.CommonAttributes.TRANSPARENCY;
 import static de.jreality.shader.CommonAttributes.TRANSPARENCY_ENABLED;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
@@ -16,18 +15,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
 
 import charlesgunn.anim.util.AnimationUtility;
-import charlesgunn.jreality.geometry.projective.PlanePencilFactory;
 import charlesgunn.jreality.geometry.projective.PlanePencilFactoryOld;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
-import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.geometry.BallAndStickFactory;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -53,16 +49,22 @@ public abstract class AbstractDualGeometry extends Assignment {
 			showAxis = true,
 			showOrientation = true,
 			showAbstractOrientation = true,
-			showBothDirections = false,
+			showDirection1 = true,
+			showDirection2 = false,
 			showReverse = false;
 	protected double stickRadius = .02,
 			arrowScale = .1,
 			arrowSlope = 1.5,
-			arrowPosition = .83;
+			arrowPosition = .83,
+			pencilR = .0025;
 	protected Color ballC = new Color(80,80,80),
-			arrowC = new Color(60,60,180),
-			stickC = arrowC;
-	protected int n = 50;
+			arrowC = new Color(100, 100, 250),
+			stickC = arrowC,
+			pencilC = new Color(250,50,50),
+			rangeC = Color.red,
+			backgroundC = new Color(250,255,250); // new Color(255,255,245); //
+	protected int n = 50,
+			nEls = 20;
 	double globalScale = 2.25;
 	protected double[][] axisCurve = new double[n][];
 	protected double[][] verts = {
@@ -93,7 +95,6 @@ public abstract class AbstractDualGeometry extends Assignment {
 	SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("world");
 	SceneGraphComponent worldSpear = SceneGraphUtility.createFullSceneGraphComponent("world spear");
 	SceneGraphComponent worldAxis = SceneGraphUtility.createFullSceneGraphComponent("world axis");
-	protected int nEls = 10;
 
 	public AbstractDualGeometry() {
 		super();
@@ -138,17 +139,20 @@ public abstract class AbstractDualGeometry extends Assignment {
 
 
 	private void update() {
-		circularArrow2.setVisible(showBothDirections);
+		circularArrow1.setVisible(showDirection1);
+		circularArrow2.setVisible(showDirection2);
 		if (showReverse) {
 			System.err.println("reflecting");
 			MatrixBuilder.euclidean().translate(0,0,-.5).reflect(new double[] {0,0,1,-.5}).assignTo(strahlAbstractOrientation2);
 			double angle = Math.PI*(tt[0] + tt[1])/2.0;
 			MatrixBuilder.euclidean().reflect(new double[] {Math.sin(angle),0,-Math.cos(angle),0}).assignTo(circularArrow1);
+			MatrixBuilder.euclidean().reflect(new double[] {Math.cos(angle),0,Math.sin(angle),0}).assignTo(circularArrow2);
 			MatrixBuilder.euclidean().reflect(new double[]{1,0,0,0}).translate(0, 1.14, 0).scale(.2).assignTo(circularArrow3);
 			
 		} else {
-			 MatrixBuilder.euclidean().assignTo(strahlAbstractOrientation2);
+			MatrixBuilder.euclidean().assignTo(strahlAbstractOrientation2);
 			MatrixBuilder.euclidean().assignTo(circularArrow1);
+			MatrixBuilder.euclidean().assignTo(circularArrow2);
 			MatrixBuilder.euclidean().translate(0, 1.14, 0).scale(.2).assignTo(circularArrow3);
 		}
 	}
@@ -158,7 +162,7 @@ public abstract class AbstractDualGeometry extends Assignment {
 	public void display() {
 		// TODO Auto-generated method stub
 		super.display();
-		viewer.getSceneRoot().getAppearance().setAttribute("backgroundColor", new Color(200,255,200));
+		viewer.getSceneRoot().getAppearance().setAttribute("backgroundColor", backgroundC);
 		((Component) viewer.getViewingComponent()).addKeyListener(new KeyAdapter() {
 
 			@Override
@@ -166,10 +170,14 @@ public abstract class AbstractDualGeometry extends Assignment {
 					switch(e.getKeyCode())	{
 				
 					case KeyEvent.VK_1:
-						showBothDirections = !showBothDirections;
+						showDirection1 = !showDirection1;
 						update();
 						break;
 					case KeyEvent.VK_2:
+						showDirection2 = !showDirection2;
+						update();
+						break;
+					case KeyEvent.VK_3:
 						showReverse = !showReverse;
 						update();
 						break;
@@ -248,7 +256,7 @@ public abstract class AbstractDualGeometry extends Assignment {
 	protected void constructPointRange(SceneGraphComponent sgc) {
 		Appearance ap = sgc.getAppearance();
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
-		ap.setAttribute("pointShader.polygonShader.diffuseColor", Color.red);
+		ap.setAttribute("pointShader.polygonShader.diffuseColor", rangeC);
 		ap.setAttribute("pointShader.pointRadius", .02);
 		int numSpheres = 250;
 		double[][] pts = new double[numSpheres][3];
@@ -267,10 +275,10 @@ public abstract class AbstractDualGeometry extends Assignment {
 		Appearance ap = sgc.getAppearance();
 		// ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, true);
 		ap.setAttribute("polygonShader.diffuseColor", Color.white);
-		ap.setAttribute("lineShader.polygonShader.diffuseColor", Color.red);
-		ap.setAttribute("pointShader.polygonShader.diffuseColor", Color.red);
-		ap.setAttribute("pointShader.pointRadius", .005);
-		ap.setAttribute("lineShader.tubeRadius", .005);
+		ap.setAttribute("lineShader.polygonShader.diffuseColor", pencilC);
+		ap.setAttribute("pointShader.polygonShader.diffuseColor", pencilC);
+		ap.setAttribute("pointShader.pointRadius", pencilR);
+		ap.setAttribute("lineShader.tubeRadius", pencilR);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, true);
 
@@ -370,7 +378,7 @@ public abstract class AbstractDualGeometry extends Assignment {
 		basf.setArrowPosition(arrowPosition);
 		basf.setArrowColor(arrowC);
 		basf.update();
-		strahlArrow.addChild(strahlAbstractOrientation); //basf.getSceneGraphComponent());
+		strahlArrow.addChild(basf.getSceneGraphComponent()); //strahlAbstractOrientation); //
 		Appearance ap = strahlArrow.getAppearance();
 		ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, false);
 

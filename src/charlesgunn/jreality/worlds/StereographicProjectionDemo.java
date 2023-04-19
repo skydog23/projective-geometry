@@ -113,9 +113,9 @@ import de.jreality.util.SceneGraphUtility;
 	int[][] currentSphereInds;
 	IndexedLineSet currentStar;
 	IndexedFaceSetFactory stPrFac[] = new IndexedFaceSetFactory[2];
-	String earthBetterTextureName = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048-XXX.jpg"; //grid256.jpg")); //
-	String earthTextureName = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048Light.jpg"; //grid256.jpg")); //
-	String marsTextureName = "/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/mars2048.jpg"; //grid256.jpg")); //
+	String earthBetterTextureName = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048-XXX.jpg"; //grid256.jpg")); //
+	String earthTextureName = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/Earth2048Light.jpg"; //grid256.jpg")); //
+	String marsTextureName = "/Volumes/SamsungSSD1T/gunn_local/TUB-HomepageOct19/WWW/Pictures/textures/mars2048.jpg"; //grid256.jpg")); //
 	private ImageData earthImage, marsImage, earthBetterImage;
 	boolean correctTextures = false, 	// fix a texturing problem? have time only when not moving
 		projectSphere = true,			// create planar image by really projecting sphere geometry, not just using texture coordinate tricks

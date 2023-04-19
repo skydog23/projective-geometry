@@ -27,7 +27,6 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.plaf.metal.OceanTheme;
 
 import charlesgunn.anim.jreality.SceneGraphAnimator;
 import charlesgunn.anim.util.AnimationUtility;
@@ -64,7 +63,6 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 import de.jtem.discretegroup.core.DirichletDomain;
 import de.jtem.discretegroup.core.DiscreteGroup;
-import de.jtem.discretegroup.core.DiscreteGroupElement;
 import de.jtem.discretegroup.core.DiscreteGroupSceneGraphRepresentation;
 import de.jtem.discretegroup.util.WingedEdge;
 
@@ -72,7 +70,7 @@ import de.jtem.discretegroup.util.WingedEdge;
  * @author gunn
  *
  */
-public class HopfFibrationAssg extends Assignment {
+public class HopfFibration extends Assignment {
 	Hashtable<Appearance, Color> colors = new Hashtable<Appearance, Color>();
 	int numLevels = 5;
 	protected boolean 
@@ -573,7 +571,7 @@ public class HopfFibrationAssg extends Assignment {
 		animationPlugin.setAnimateCamera(true);
 		animationPlugin.setAnimateSceneGraph(true);
 		animationPlugin.getAnimationPanel().setResourceDir("src/charlesgunn/jreality/worlds/projective/");
-		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/gunn_local/Movies/hopfFibration/");
+		animationPlugin.getAnimationPanel().getRecordPrefs().setCurrentDirectoryPath("/Volumes/SamsungSSD1T/gunn_local/Movies/hopfFibration/");
 //		viewer.getSceneRoot().getAppearance().setAttribute(RENDER_S3, true);
 		Camera cam = CameraUtility.getCamera(viewer);
 		cam.setNear(.02);
@@ -1010,7 +1008,7 @@ public class HopfFibrationAssg extends Assignment {
 	}
 
 	public static void main(String[] args) {
-		new HopfFibrationAssg().display();
+		new HopfFibration().display();
 	}
 	
 	double[] dkeyframes, acc;
