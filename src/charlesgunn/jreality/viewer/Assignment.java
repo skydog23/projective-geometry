@@ -67,6 +67,7 @@ public abstract class Assignment extends Plugin implements Animated {
 
 		// for examples of use of these methods, see gunn.Assignment2
 		transient protected boolean isAnimating = false;
+		transient protected Scene scene = null;
 		transient protected JRViewer jrviewer = new JRViewer();
 		transient protected Viewer viewer = null;
 		transient protected Content contentPlugin = new DirectContent();	// give subclasses chance to change this instance
@@ -141,6 +142,7 @@ public abstract class Assignment extends Plugin implements Animated {
 	@Override
 	public void install(Controller con) throws Exception {
 		super.install(con);
+		scene = con.getPlugin(Scene.class);
 		animationPlugin = con.getPlugin(AnimationPlugin.class);
 		animationPlugin.setAnimateSceneGraph(false);
 		animationPlugin.getAnimated().add(this);
