@@ -28,9 +28,9 @@
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.math"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.jreality.renderman"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.projective"/>
+        <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.jreality.worlds.misc"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.tensegrity"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.pcl4"/>
-        <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.jreality.worlds.misc"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.jreality.worlds.projective.help"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.jreality.worlds"/>
         <javaElement handleIdentifier="=ProjectiveGeometry/src=/org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY=/jreality\/jni\/macosx=/&lt;charlesgunn.jreality.portal"/>
