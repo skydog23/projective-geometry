@@ -9,61 +9,46 @@ import charlesgunn.math.Biquaternion.Metric;
 import charlesgunn.math.IsometryAxis;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
-import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Transformation;
-import discreteGroup.tools.MidiSoundEffects;
 
 public class AnimatedIsometry {
 
-	double[] isom, 
-		orig = Rn.identityMatrix(4),
+	double[] isom = Rn.identityMatrix(4),
+		src = Rn.identityMatrix(4),
 		target = Rn.identityMatrix(4);
 	int metric = Pn.EUCLIDEAN;
-	IsometryAxis ia;
-	SceneGraphComponent targetSGC;
+	private IsometryAxis ia;
 	Transformation origT;
 	String name = null;
 	double turn = 1.0;   // this is a half-turn
-	MidiSoundEffects mse = new MidiSoundEffects();
-
+	boolean overwriteOriginal = false;
  
-	public AnimatedIsometry(double[] isom, int metric, 
-			SceneGraphComponent sgc)	{
-		this.isom = isom;
+	// interpolate between the two isometries src and target
+	// animation runs between t-values of 0 and 1
+	public AnimatedIsometry(double[] src, double[] target, int metric)	{
 		this.metric = metric;
+		this.src = src;
+		this.target = target;
+		
+		isom = Rn.times(null, target,  Rn.inverse(null, src));
 		Biquaternion biq = Biquaternion.biquaternionFromDirectIsometry(null, 
 				isom, Metric.metricForCurvature(metric));
-//		System.err.println("targetsgc ="+sgc.getName());
-//		System.err.println("isom = "+isom);
-//		System.err.println("biq = "+biq);
 		ia = new IsometryAxis(biq);
-		targetSGC = sgc;
-		origT = targetSGC.getTransformation();
-		if (origT == null) 
-			targetSGC.setTransformation(new Transformation());
-		orig = origT.getMatrix();
-		mse.setDoSound(true);
+		System.err.println("ia.axis = "+ia.getAxis()+" angle = "+ia.getAngle());
 	}
-	
-	public void reset() {
-		origT.setMatrix(orig);
+		
+	public void setIsometryAxis(IsometryAxis ia) {
+		this.ia = ia;
 	}
-	
-	public void startAnimation() {
-		mse.initMoving();
-	}
-	public void setValueAtTime(double xt) {
-		double t = xt*(turn);
+	// t should be in the range [0,1]
+	public double[] getValueAtTime(double t) {
+		if (t < 0.0) t = 0.0;
+		if (t > 1.0) t = 1.0;
+		System.err.println("AsimIsom t = "+t);
 		Biquaternion bq = ia.exp(t);
 		double[] mat = Biquaternion.matrixFromBiquaternion(null, bq);
-		Rn.times(target, orig, mat); // newFM.getArray()));
-		origT.setMatrix(target);
-		mse.playMoving(xt);
-//		System.err.println("setting tform " + Rn.matrixToString(target));
-	}
-	
-	public void endAnimation() {
-		mse.playEnd();
+		isom = Rn.times(null, mat, src); // newFM.getArray()));
+		return isom ;
 	}
 	
 }

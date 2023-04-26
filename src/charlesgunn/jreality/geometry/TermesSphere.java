@@ -108,6 +108,7 @@ public class TermesSphere {
 	protected void initialize()	{
 		termesSphereSGC = SceneGraphUtility.createFullSceneGraphComponent("termes sphere");
 		Appearance ap = termesSphereSGC.getAppearance();
+		ap.setAttribute(CommonAttributes.FACE_DRAW, true);
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, false);
 		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
@@ -276,6 +277,7 @@ public class TermesSphere {
 		Appearance ap = termesSphereSGC.getAppearance();
 		ap.setAttribute("useGLSL", doFullDome && whichPlace == 0);
 		ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, doFullDome && whichPlace == 0);
+		ap.setAttribute(CommonAttributes.FACE_DRAW, true);
 	}
 	
 	public SceneGraphComponent getSceneGraphComponent() {
@@ -408,7 +410,6 @@ public class TermesSphere {
 
 	public void setDoFullDome(boolean doFullDome) {
 		this.doFullDome = doFullDome;
-		Appearance ap = termesSphereSGC.getAppearance();
 		updateTermesShader();
 	}
 

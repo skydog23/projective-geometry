@@ -11,7 +11,7 @@ import de.jreality.math.Pn;
 import de.jreality.math.Quaternion;
 import de.jreality.math.Rn;
 
-public class IsometryAxis {
+public class IsometryAxis2 {
 
 	Biquaternion 
 		isometry, 	// the isometry, normalized to have norm 1
@@ -29,17 +29,17 @@ public class IsometryAxis {
 
 	private static Level logLevel = Level.FINE;
 	
-	public IsometryAxis(double[] matrix, Metric m)	{
+	public IsometryAxis2(double[] matrix, Metric m)	{
 		this(Biquaternion.biquaternionFromDirectIsometry(null, matrix, m));
 	}
 	
-	public IsometryAxis(Biquaternion isom)	{
+	public IsometryAxis2(Biquaternion isom)	{
 		isometry = isom;
 		metric = isometry.metric;
 		init();
 	}
 	
-	public IsometryAxis(Biquaternion axis, Biquaternion angle, Metric m) {
+	public IsometryAxis2(Biquaternion axis, Biquaternion angle, Metric m) {
 		this.axis = axis;
 		this.angle = angle;
 		this.metric = m;
@@ -166,7 +166,6 @@ public class IsometryAxis {
 					break;
 			}
 		}
-		if (theta1 > Math.PI/2) theta1 = -(Math.PI - theta1);
 		angle.qr.re = theta1;
 		angle.qd.re = theta2;
 		Biquaternion.logger.log(logLevel,"thetas = "+theta1+" "+theta2);
