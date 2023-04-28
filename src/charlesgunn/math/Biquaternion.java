@@ -954,7 +954,9 @@ public class Biquaternion {
 //		P3.orthonormalizeMatrix(null, m, 10E-10, sig);
 //		printDots(mm, sig);
 //		if (true || mm[15] >= 0) 
+        if (mm[15] != 0) Rn.times(mm, 1.0/mm[15], mm);
 		System.arraycopy(mm, 0, m, 0, 16);
+//        System.err.println("biq matrix = \n"+Rn.matrixToString(mm));
 //		else Rn.times(m, -1, mm);
 		return m;
 	}

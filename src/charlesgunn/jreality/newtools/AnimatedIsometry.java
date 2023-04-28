@@ -10,6 +10,7 @@ import charlesgunn.math.IsometryAxis;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Transformation;
+import discreteGroup.parser.ComplexListParserTokenTypes;
 
 public class AnimatedIsometry {
 
@@ -22,6 +23,7 @@ public class AnimatedIsometry {
 	String name = null;
 	double turn = 1.0;   // this is a half-turn
 	boolean overwriteOriginal = false;
+	boolean clipTime = true;
  
 	// interpolate between the two isometries src and target
 	// animation runs between t-values of 0 and 1
@@ -34,17 +36,22 @@ public class AnimatedIsometry {
 		Biquaternion biq = Biquaternion.biquaternionFromDirectIsometry(null, 
 				isom, Metric.metricForCurvature(metric));
 		ia = new IsometryAxis(biq);
-		System.err.println("ia.axis = "+ia.getAxis()+" angle = "+ia.getAngle());
+//		System.err.println("ia.axis = "+ia.getAxis()+" angle = "+ia.getAngle());
 	}
-		
+	
+	public void setClipTime(boolean b) {
+		clipTime = b;
+	}
 	public void setIsometryAxis(IsometryAxis ia) {
 		this.ia = ia;
 	}
 	// t should be in the range [0,1]
 	public double[] getValueAtTime(double t) {
-		if (t < 0.0) t = 0.0;
-		if (t > 1.0) t = 1.0;
-		System.err.println("AsimIsom t = "+t);
+		if (clipTime) {
+			if (t < 0.0) t = 0.0;
+			if (t > 1.0) t = 1.0;			
+		}
+//		System.err.println("AsimIsom t = "+t);
 		Biquaternion bq = ia.exp(t);
 		double[] mat = Biquaternion.matrixFromBiquaternion(null, bq);
 		isom = Rn.times(null, mat, src); // newFM.getArray()));
