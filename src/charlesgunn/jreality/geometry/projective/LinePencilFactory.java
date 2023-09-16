@@ -95,7 +95,7 @@ public class LinePencilFactory {
 		plane = PlueckerLineGeometry.lineJoinPoint(null, line, point);
 	}
 	public void update()	{
-		if (Rn.innerProduct(point, plane) >= tolerance)	{
+		if ((pluckerLinesSet==null) && Rn.innerProduct(point, plane) >= tolerance)	{
 			throw new IllegalStateException("Point and plane must be incident");
 		}
 		int[][] indices = new int[numLines][numberJoints+(finiteSphere ? 0 : 1)];

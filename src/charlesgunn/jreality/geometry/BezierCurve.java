@@ -4,6 +4,7 @@
  */
 package charlesgunn.jreality.geometry;
 
+import charlesgunn.math.p5.PlueckerLineGeometry;
 import de.jreality.math.Rn;
 
 /**
@@ -30,9 +31,6 @@ public class BezierCurve {
 	public BezierCurve(int d,  double[][] cp)	{
 		super();
 		this.degree = d;
-		int foo = cp.length;
-		int bar = cp[0].length;
-
 		if (degree > 1 && cp.length % (degree) != 1)	{
 			throw new IllegalArgumentException("Array length must be for form degree*n + 1");
 		}
@@ -92,6 +90,48 @@ public class BezierCurve {
 		return degree;
 	}
 
+    public double[] getValueAtTime(double at)	{
+    	if (degree != 2) {
+    		System.err.println("only allowed for degree = 2");
+    		return null;
+    	}
+    	if (at < 0) at = 0;
+    	if (at > 1) at = 1;
+    	int numsegs = (controlPoints.length-1)/2;
+    	if (at == 1) return controlPoints[controlPoints.length-1];
+    	
+    	int segment = (int) (at * numsegs);
+    	double t = numsegs * at - segment;
+    	int i0 = 2*segment, i1 = i0+1, i2 = i0+2;
+    	double[] p0 = Rn.times(null, (1-t)*(1-t), controlPoints[i0]),
+    			p1 = Rn.times(null, (1-t)*t*2, controlPoints[i1]),
+    			p2 = Rn.times(null, t*t, controlPoints[i2]);
+    	double[] ret = Rn.add(null, Rn.add(null, p0, p1), p2);
+//    	System.err.println("value at time "+at+"= "+Rn.toString(ret));
+    	return ret;
+    }
+    
+    public double[] getTangentAtTime(double at)	{
+    	if (degree != 2) {
+    		System.err.println("only allowed for degree = 2");
+    		return null;
+    	}
+    	int numsegs = (controlPoints.length-1)/2;
+//    	if (at == 1) return controlPoints[controlPoints.length-1];
+    	
+    	int segment = (int) (at * numsegs);
+    	double t = numsegs * at - segment;
+    	if (t==0 && segment > 0) { t = 1; segment = segment-1;}
+    	int i0 = 2*segment, i1 = i0+1, i2 = i0+2;
+    	double[] p0 = Rn.add(null,
+    				Rn.times(null, (1-t), controlPoints[i0]),
+    				Rn.times(null, t, controlPoints[i1])),
+    			 p1 = Rn.add(null,
+        				Rn.times(null, (1-t), controlPoints[i1]),
+        				Rn.times(null, t, controlPoints[i2])),
+    			 line = PlueckerLineGeometry.lineFromPoints(null, p0, p1);
+     	return line;
+    }
 
 	public double[][] getPolygonPoints() {
 		int ifoo = 1+(controlPoints.length-1)/(degree+1);

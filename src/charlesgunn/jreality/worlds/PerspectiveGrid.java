@@ -61,8 +61,8 @@ public class PerspectiveGrid extends Assignment {
 						quad,
 						pinf;
 		protected boolean showTubes = true;
-		int lineCount = 40;
-		Timer rotate = null, translate = null, goPersp = null;
+		int lineCount = 60;
+		Timer rotate = null, ytranslate = null, xtranslate = null, goPersp = null;
 		boolean labels = false,
 			tlating = true;
 		double w = .0001,
@@ -110,8 +110,8 @@ public class PerspectiveGrid extends Assignment {
 			quad = new SceneGraphComponent();
 			quad.setAppearance(new Appearance());
 			quad.getAppearance().setAttribute(CommonAttributes.EDGE_DRAW, false);
-			quad.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, true);
-			quad.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+"."+"diffuseColor",new Color(.1f, .2f, .1f));
+//			quad.getAppearance().setAttribute(CommonAttributes.FACE_DRAW, true);
+			quad.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+"."+"diffuseColor", Color.black); //new Color(.1f, .2f, .1f));
 			quad.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+"."+CommonAttributes.SPECULAR_COEFFICIENT,0.1);
 			MatrixBuilder.euclidean().translate(0,0,-.02).scale(1000).assignTo(quad);
 			quad.setGeometry(Primitives.regularPolygon(4));
@@ -189,8 +189,10 @@ public class PerspectiveGrid extends Assignment {
 			((Component) viewer.getViewingComponent()).addKeyListener(getKeyAdapter());
 			rotate = new Timer(20, new ActionListener()	{
 				double dangle = .005;
-				final double[] zRotateM = P3.makeScrewMotionMatrix(
-						null, P3.originP3, new double[]{1,0,0,1}, .01, Pn.ELLIPTIC);
+				final double[] zRotateM = P3.makeRotationMatrix(
+						null, P3.originP3, new double[]{0,0,1,0}, .005, Pn.ELLIPTIC);
+//				final double[] zRotateM = P3.makeScrewMotionMatrix(
+//						null, P3.originP3, new double[]{1,0,0,1}, .01, Pn.ELLIPTIC);
 
 				public void actionPerformed(ActionEvent e) {
 					theRealWorldTranslate.getTransformation().multiplyOnRight(zRotateM); //zRotateM);
@@ -198,12 +200,22 @@ public class PerspectiveGrid extends Assignment {
 				}
 				
 			});
-			translate = new Timer(20, new ActionListener()	{
+			xtranslate = new Timer(20, new ActionListener()	{
 				double step = .015;
 //				final double[] zRotateM = P3.makeRotationMatrixZ(null, dangle);
 				final double[] xtrans = P3.makeTranslationMatrix(null, new double[]{step, 0, 0}, 0);
 				public void actionPerformed(ActionEvent e) {
 					theRealWorldTranslate.getTransformation().multiplyOnRight(xtrans); //zRotateM);
+					viewer.renderAsync();
+				}
+				
+			});
+			ytranslate = new Timer(20, new ActionListener()	{
+				double step = .015;
+//				final double[] zRotateM = P3.makeRotationMatrixZ(null, dangle);
+				final double[] ytrans = P3.makeTranslationMatrix(null, new double[]{0,-step, 0}, 0);
+				public void actionPerformed(ActionEvent e) {
+					theRealWorldTranslate.getTransformation().multiplyOnRight(ytrans); //zRotateM);
 					viewer.renderAsync();
 				}
 				
@@ -219,12 +231,12 @@ public class PerspectiveGrid extends Assignment {
 			});
 		}
 
-		KeyAdapter ka = null;
 		private PointSetFactory psf;
+		KeyAdapter ka = null;
 		public KeyAdapter getKeyAdapter() {
 			if (ka == null)	{
 				ka = new KeyAdapter()	{
-					boolean rotating = false, translating = false, xroting = false;
+					boolean rotating = false, xtranslating = false, ytranslating = false, xroting = false;
 					boolean beyondInfinity = false;
 					public void keyPressed(KeyEvent e)	{ 
 						switch(e.getKeyCode())	{
@@ -232,12 +244,11 @@ public class PerspectiveGrid extends Assignment {
 						case KeyEvent.VK_H:
 							System.out.println("	1: toggle rotate");
 							System.out.println("	2: toggle translate");
-							System.out.println("	3: toggle beyond infinity");
-							System.out.println("	4: toggle tool");
+							System.out.println("	3: toggle x-rotate");
+							System.out.println("	4: toggle beyond infinity");
 							System.out.println("	5: toggle labels");
 							System.out.println("	6: reset content tform");
 							System.out.println("	7: reset tlate/rotate tforms");
-							System.out.println("	7: toggle x-rotate");
 							break;
 			
 						case KeyEvent.VK_1:
@@ -247,32 +258,38 @@ public class PerspectiveGrid extends Assignment {
 							break;
 
 						case KeyEvent.VK_2:
-							translating = !translating;
-							if (translating) translate.start();
-							else translate.stop();
+							xtranslating = !xtranslating;
+							if (xtranslating) xtranslate.start();
+							else xtranslate.stop();
 							break;
 							
 						case KeyEvent.VK_8:
+							ytranslating = !ytranslating;
+							if (ytranslating) ytranslate.start();
+							else ytranslate.stop();
+							break;
+							
+						case KeyEvent.VK_3:
 							xroting = !xroting;
 							if (xroting) goPersp.start();
 							else goPersp.stop();
 							break;
 							
-						case KeyEvent.VK_3:
+						case KeyEvent.VK_4:
 							beyondInfinity = !beyondInfinity;
 							if (beyondInfinity) CameraUtility.getCamera(viewer).setFar(-1.0);
 							else CameraUtility.getCamera(viewer).setFar(-10000);
 							viewer.renderAsync();
 							break;
 
-						case KeyEvent.VK_4:
-							tlating = !tlating;
-							contentWorld.removeTool(tlating ? rotTool : transTool);
-							contentWorld.addTool(tlating ? transTool : rotTool);
-//							ToolManager.toolManagerForViewer(viewer).activateTool(
-//									tlating? ToolManager.TRANSLATION_TOOL : ToolManager.ROTATION_TOOL);
-							viewer.renderAsync();
-							break;
+//						case KeyEvent.VK_4:
+//							tlating = !tlating;
+//							contentWorld.removeTool(tlating ? rotTool : transTool);
+//							contentWorld.addTool(tlating ? transTool : rotTool);
+////							ToolManager.toolManagerForViewer(viewer).activateTool(
+////									tlating? ToolManager.TRANSLATION_TOOL : ToolManager.ROTATION_TOOL);
+//							viewer.renderAsync();
+//							break;
 
 						case KeyEvent.VK_5:
 							labels = !labels;
@@ -283,21 +300,22 @@ public class PerspectiveGrid extends Assignment {
 							break;
 							
 						case KeyEvent.VK_6:
-							tlating = true;
-							contentWorld.removeTool(tlating ? rotTool : transTool);
-							contentWorld.addTool(tlating ? transTool : rotTool);
+//							tlating = true;
+//							contentWorld.removeTool(tlating ? rotTool : transTool);
+//							contentWorld.addTool(tlating ? transTool : rotTool);
 							contentWorld.getTransformation().setMatrix(Rn.identityMatrix(4));
-//							ToolManager.toolManagerForViewer(viewer).activateTool(
-//									tlating? ToolManager.TRANSLATION_TOOL : ToolManager.ROTATION_TOOL);
+////							ToolManager.toolManagerForViewer(viewer).activateTool(
+////									tlating? ToolManager.TRANSLATION_TOOL : ToolManager.ROTATION_TOOL);
 							viewer.renderAsync();
 							break;
 							
 						case KeyEvent.VK_7:
 							rotate.stop();
-							translate.stop();
+							xtranslate.stop();
 							theRealWorldTranslate.getTransformation().setMatrix(Rn.identityMatrix(4));
 							theRealWorldRotate.getTransformation().setMatrix(Rn.identityMatrix(4));
 							break;
+
 
 
 					}
@@ -319,16 +337,9 @@ public class PerspectiveGrid extends Assignment {
 					"It starts with a bird's eye view \n"+
 					"Use the rotate tool to rotate the \n"+
 					"grid until the horizon can be seen. \n\n"+
-					"The following key strokes are active:\n"+
-					"    '1':    toggle automatic rotation.\n"+
-					"    '2':    toggle labels on infinity.\n"+
-					"    '3':    toggle display beyond infinity.\n"+
-					"    '4':    toggle translate/rotate tool.\n"+
-					"    '5':    reset to orthographic projection.\n"+
-					"    'h':    display help overlay.\n"+
+					"Type 'h' to display other keyboard shortcuts.\n"+
 					"Shift-cntl-f:  toggles fullscreen mode.\n"+
-					"\nAuthor: Charles Gunn\n"+
-					"    gunn at math.tu-berlin.de\n");
+					"\nAuthor: Charles Gunn\n");
 			mypanel.add(textarea);
 			return mypanel;
 		}

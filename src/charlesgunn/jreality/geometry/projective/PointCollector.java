@@ -22,6 +22,7 @@ public class PointCollector {
 		points = new double[length][f];
 		curve = new Snake(points);
 		curve.setName("PCSnake");
+		reset();
 //		System.err.println("PC constructor, class = "+curve.getClass().getName());
 	}
 	

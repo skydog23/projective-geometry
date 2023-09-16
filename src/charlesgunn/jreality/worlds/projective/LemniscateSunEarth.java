@@ -13,7 +13,6 @@ import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Event;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -21,12 +20,10 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
-import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
+import javax.swing.Timer;
 
 import charlesgunn.anim.jreality.SceneGraphAnimator;
 import charlesgunn.anim.util.AnimationUtility;
@@ -43,6 +40,7 @@ import de.jreality.geometry.QuadMeshFactory;
 import de.jreality.geometry.SphereUtility;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
+import de.jreality.math.P3;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Camera;
 import de.jreality.scene.IndexedFaceSet;
@@ -76,6 +74,7 @@ import de.jreality.util.SceneGraphUtility;
 public class LemniscateSunEarth extends Assignment {
 
 	private transient SceneGraphComponent 
+	    coordSys,
 	    fixSGC,
 	    world,
 		lemniscate1SGC,	
@@ -85,6 +84,7 @@ public class LemniscateSunEarth extends Assignment {
 		surfaceSGC,
 		lineGeomSGC,
 		stickGeomSGC,
+		earthPathSGC,
 		celestialSphereSGC;
 	private transient int numPoints = 500;		// damn texture map jaggies! Why?
 	private transient GeometryCollector geomCollector = new GeometryCollector(numPoints);
@@ -93,16 +93,23 @@ public class LemniscateSunEarth extends Assignment {
 	private IndexedFaceSet sphericalPatch;
 	private transient IndexedLineSetFactory stick;
 	
-	private transient PointCollector pc1 = new PointCollector(numPoints, 4),
-			pc2 = new PointCollector(numPoints, 4);
+	private transient PointCollector 
+			earthPathC = new PointCollector(numPoints, 4);
 	private transient boolean debug = false;
 	private transient Color[] stickColors = new Color[2];
 	private CubeMap constellationMap;
-	private transient boolean fixSun = true, fixEarth=false, showSurface = false;
+	private transient boolean 
+		fixSun = false, 
+		fixEarth=false, 
+		showSurface = false,
+		collectEarth = false;
+	SceneGraphPath fix2Lem;
 	@Override
 	public SceneGraphComponent getContent() {
-		fixSGC = SceneGraphUtility.createFullSceneGraphComponent("superworld");
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
+		coordSys = SceneGraphUtility.createFullSceneGraphComponent("coord sys");
+		earthPathSGC = SceneGraphUtility.createFullSceneGraphComponent("earth path");
+		fixSGC = SceneGraphUtility.createFullSceneGraphComponent("superworld");
 		lemniscate1SGC = SceneGraphUtility.createFullSceneGraphComponent("lem1");
 		lem1FramesSGC = SceneGraphUtility.createFullSceneGraphComponent("lem1");
 		lemniscate2SGC = SceneGraphUtility.createFullSceneGraphComponent("lem2");
@@ -201,10 +208,18 @@ public class LemniscateSunEarth extends Assignment {
 		ap.setAttribute(CommonAttributes.TUBES_DRAW, false);
 		ap.setAttribute(BOUNDING_BOX, Rectangle3D.unitCube);
 		ap.setAttribute("lineShader.diffuseColor", new Color(0, 50,50));
-		SceneGraphComponent coordSys = SceneGraphUtility.createFullSceneGraphComponent("coord sys");
 		MatrixBuilder.euclidean().rotateX(-Math.toRadians(23.5)).rotateZ(Math.PI/2).assignTo(coordSys);
 		lemniscate1SGC.addChild(lem1FramesSGC);
 		coordSys.addChild(fixSGC);
+		ap = earthPathSGC.getAppearance();
+		ap.setAttribute("lineShader.diffuseColor", new Color(50,200,50));
+		ap.setAttribute(LINE_SHADER+"."+TUBES_DRAW, true);
+		ap.setAttribute(LINE_SHADER+"."+CommonAttributes.TUBE_RADIUS, tubeR); 
+		ap.setAttribute(VERTEX_DRAW, false);
+
+		coordSys.addChild(earthPathSGC);
+		earthPathSGC.setGeometry(earthPathC.getCurve());
+		earthPathSGC.setVisible(false);
 		fixSGC.getAppearance().setAttribute(SceneGraphAnimator.LOCAL_ANIMATED, false);
 		fixSGC.addChildren(lemniscate1SGC, lemniscate2SGC, linesSGC, surfaceSGC, lineGeomSGC, stickGeomSGC);
 		world.addChild(coordSys);
@@ -254,7 +269,13 @@ public class LemniscateSunEarth extends Assignment {
 	}
 	@Override
 	public void setValueAtTime(double d) {
-		double angle = AnimationUtility.linearInterpolation(d, margin, 1.0-margin, 0, repeat*2*Math.PI),
+		System.err.println("svat "+d);
+		double angle = AnimationUtility.linearInterpolation(d, margin, 1.0-margin, 0, repeat*2*Math.PI);
+		setValueAtAbsoluteTime(angle);
+	}
+		
+	protected void setValueAtAbsoluteTime(double d) {
+		double angle = d,
 		
 		c = Math.cos(angle-Math.PI/2),
 		s = Math.sin(angle-Math.PI/2),
@@ -269,9 +290,16 @@ public class LemniscateSunEarth extends Assignment {
 		lineGeom.update();
 		
 		if (fixSun || fixEarth)	{
-			Matrix m = MatrixBuilder.euclidean().translate(fixSun ? curvepoint : curvepoint2).getMatrix();
+			double[] fixed = fixSun ? curvepoint2 : curvepoint;
+			double[] moving = fixSun ? curvepoint : curvepoint2;
+			Matrix m = MatrixBuilder.euclidean().translate(fixed).getMatrix();
 			m.invert();
 			m.assignTo(fixSGC);
+			cnt++;
+			if (collectEarth && (cnt % 4 == 0)) {
+				earthPathC.addPoint(m.multiplyVector(moving));
+				earthPathSGC.setVisible(earthPathC.getCount() > 1);
+			}
 		}
 
 	}
@@ -282,14 +310,12 @@ public class LemniscateSunEarth extends Assignment {
 	private void update() {
 		
 		geomCollector.reset();
-		pc1.reset();
-		pc2.reset();
 		double[][] lem1 = new double[numPoints][], lem2 = new double[numPoints][];
 		double[][][] surfP = new double[numPoints][2][];
 		for (int i = 0; i<numPoints; ++i)	{
 			double angle = (2* Math.PI *i)/ (numPoints-1.0),
-					c = Math.cos(angle),
-					s = Math.sin(angle),
+					c = Math.cos(angle-Math.PI/2),
+					s = Math.sin(angle-Math.PI/2),
 					s2 = .5 * Math.sin(2*angle);
 			double[] curvepoint = {0, s,s2,1 };
 			lem1[i] = curvepoint;
@@ -307,7 +333,6 @@ public class LemniscateSunEarth extends Assignment {
 			localVelFactory.setElement1(curvepoint2);
 			localVelFactory.update();
 			geomCollector.addGeometry(localVelFactory.getLine());
-
 		}
 		surface.setClosedInUDirection(false);
 		surface.setClosedInVDirection(true);
@@ -332,6 +357,9 @@ public class LemniscateSunEarth extends Assignment {
 	}
 	
 	Transformation constellT=new Transformation();
+	double t = 0;
+	boolean isRunning = false;
+	int cnt  = 0;
 	@Override
 	public void display() {
 		super.display();
@@ -391,18 +419,35 @@ public class LemniscateSunEarth extends Assignment {
 //		Camera cam = CameraUtility.getCamera(jrviewer.getViewer());
 //		cam.setFieldOfView(1.25 * cam.getFieldOfView());
 //		cam.setPerspective(false);
+		final Timer timer = new Timer(10, new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				setValueAtAbsoluteTime(t);
+				t += .005;
+			}
+		});
+		
 		((Component) jrviewer.getViewer().getViewingComponent()).addKeyListener( new KeyAdapter()	{
 			public void keyPressed(KeyEvent e) {
 				switch(e.getKeyCode())	{
 				
 				case KeyEvent.VK_H:
-					System.err.println(" 1: toggle animate");
+					System.err.println(" 3: toggle animate");
 					break;
 				case KeyEvent.VK_1:
 					surfaceSGC.setVisible(!surfaceSGC.isVisible());
 					break;
 				case KeyEvent.VK_2:
 					linesSGC.setVisible(!linesSGC.isVisible());
+					break;
+				case KeyEvent.VK_3:
+					isRunning = !isRunning;
+					if (isRunning) {
+						earthPathC.reset();
+						timer.start();
+					}
+					else timer.stop();
 					break;
 				}
 			}	
@@ -448,6 +493,19 @@ public class LemniscateSunEarth extends Assignment {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				showSurface =  showSurfaceB.isSelected();
+				surfaceSGC.setVisible(showSurface);
+			}
+		});
+		
+		final JCheckBox collectEB = new JCheckBox("Collect earth");
+		collectEB.setSelected(collectEarth);
+		hbox.add(collectEB);
+		collectEB.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				collectEarth =  collectEB.isSelected();
+				earthPathSGC.setVisible(collectEarth && earthPathC.getCount()>1);
 			}
 		});
 		
