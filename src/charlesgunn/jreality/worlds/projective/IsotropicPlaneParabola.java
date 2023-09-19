@@ -62,6 +62,7 @@ public class IsotropicPlaneParabola extends Assignment {
 	private static final Color isoColor = new Color(100, 255, 100);
 	private static final Color curveColor = new Color(200, 0,50);
 	private static final Color legcurveColor = new Color(255, 100, 100);
+	private static final Color legValColor = new Color(255,175,175);
 	private double[] tform = {
 			 1,0,0,0, 
 			0, 1, 0, 0, 
@@ -72,31 +73,42 @@ public class IsotropicPlaneParabola extends Assignment {
 	    perspWorld,
 	    curvesSGC,
 			curveSGC,
+			tanCurveSGC,
 			legendreSGC,
+				legValSGC,
 		pointsSGC,
-			pointrangeSGC,
+			basePointRangeSGC,
 			pointSGC,
 			basePointSGC,
 			isoLineSGC,
 			distSegSGC,
 		linesSGC,
-			pencilSGC,
+			basePencilSGC,
 			tangentSGC,
 			isoPointSGC,
 			distFanSGC,
 			baseLineSGC,
-		coordSysSGC,
-			graphpaperSGC;
+		absoluteSGC,
+			isoBaseLineSGC,
+			zSGC,
+			    zPointRangeSGC,
+			ZSGC,
+				absPencilSGC;
 	int numPoints = 200;
 	double domainSize = 10.0;
-	PointCollector pc = new PointCollector(numPoints, 4),
+	int maxFanSize = 100;
+	int skipfactor = 4;
+	double lineLength = 6.0;
+	double tick = .03, currentTime = .6;
+
+	PointCollector fPoints = new PointCollector(numPoints, 4),
+			fTangents = new PointCollector(numPoints, 6),
 			legendreTfPC = new PointCollector(numPoints, 4);
 	IndexedLineSetFactory distSegF;
 	Color[] colors1 = {Color.red, Color.yellow, Color.blue, Color.green, Color.magenta, fColor1};
 	Color[] colors2 = {Color.green, Color.magenta, fColor1, Color.red, Color.yellow, Color.blue};
 	
 	double yscale = .5, xscale = 1, y1 = .75, y2 = .35, yt = .4;
-	double tick = .03, currentTime = .6;
 	BezierCurve bc2 = new BezierCurve(2, 
 			new double[][] {
 			{-1, .8+yt,0,1},
@@ -106,11 +118,11 @@ public class IsotropicPlaneParabola extends Assignment {
 			{1,y1+yt,0, 1}});
 	BezierCurve bc = new BezierCurve(2, 
 			new double[][] {
-			{-2, 4+yt,0,1},
-			{-1, yt, 0,1}, 
-			{0, yt, 0,1 },
-			{1, yt, 0, 1},
-			{2,4+yt,0, 1}});
+			{-2*xscale, 4+yt,0,1},
+			{-1*xscale, yt, 0,1}, 
+			{0*xscale, yt, 0,1 },
+			{1*xscale, yt, 0, 1},
+			{2*xscale,4+yt,0, 1}});
 	Timer goPersp = null;
 	boolean isopenciltubed = true;
 @Override
@@ -119,67 +131,71 @@ public class IsotropicPlaneParabola extends Assignment {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		curvesSGC = SceneGraphUtility.createFullSceneGraphComponent("curves");
 		curveSGC = SceneGraphUtility.createFullSceneGraphComponent("curve");
+		tanCurveSGC = SceneGraphUtility.createFullSceneGraphComponent("tangent");
 		legendreSGC = SceneGraphUtility.createFullSceneGraphComponent("leg curve");
-		coordSysSGC = SceneGraphUtility.createFullSceneGraphComponent("coordsys");
-		graphpaperSGC = SceneGraphUtility.createFullSceneGraphComponent("graphpaper");
+		legValSGC = SceneGraphUtility.createFullSceneGraphComponent("leg curve val");
+		absoluteSGC = SceneGraphUtility.createFullSceneGraphComponent("coordsys");
 		pointsSGC = SceneGraphUtility.createFullSceneGraphComponent("points");
 		linesSGC = SceneGraphUtility.createFullSceneGraphComponent("lines");
-		pencilSGC = SceneGraphUtility.createFullSceneGraphComponent("pencil");
+		basePencilSGC = SceneGraphUtility.createFullSceneGraphComponent("pencil");
 		tangentSGC = SceneGraphUtility.createFullSceneGraphComponent("tangent");
 		baseLineSGC = SceneGraphUtility.createFullSceneGraphComponent("base line");
 		isoPointSGC = SceneGraphUtility.createFullSceneGraphComponent("iso point");
 		distFanSGC = SceneGraphUtility.createFullSceneGraphComponent("dist fan");
 		pointSGC = SceneGraphUtility.createFullSceneGraphComponent("point");
-		pointrangeSGC = SceneGraphUtility.createFullSceneGraphComponent("point range");
+		basePointRangeSGC = SceneGraphUtility.createFullSceneGraphComponent("point range");
 		basePointSGC = SceneGraphUtility.createFullSceneGraphComponent("base point");
 		isoLineSGC = SceneGraphUtility.createFullSceneGraphComponent("iso line");
 		distSegSGC = SceneGraphUtility.createFullSceneGraphComponent("dist seg");
-		linesSGC.addChildren(tangentSGC, baseLineSGC, isoPointSGC, distFanSGC, pencilSGC);
-		pointsSGC.addChildren(pointSGC, basePointSGC, isoLineSGC, distSegSGC, pointrangeSGC);
-		LinePencilFactory lcp= new LinePencilFactory();
-		lcp.setCenter(new double[] {0,0,0,1});
-		lcp.setNumLines(15);
-		lcp.setFiniteSphere(false);
-		lcp.setPlane(new double[] {0,0,1,0});
-		lcp.setPoint(new double[] {0,0,0,1});
-		lcp.update();
-		pencilSGC.addChild(lcp.getPencil());
-		MatrixBuilder.euclidean().rotateZ(Math.PI/30).translate(0,0, -.001).assignTo(pencilSGC);
-		
-//		LinePencilFactory isolpf= new LinePencilFactory();
-//		isolpf.setCenter(new double[] {0,1,0,0});
-//		isolpf.setNumLines(15);
-//		isolpf.setFiniteSphere(false);
-//		isolpf.setPlane(new double[] {0,0,1,0});
-//		isolpf.setPoint(new double[] {0,1,0,0});
-//		isolpf.update();
-//		graphpaperSGC.addChild(isolpf.getPencil());
+		zSGC = SceneGraphUtility.createFullSceneGraphComponent("z");
+		zPointRangeSGC = SceneGraphUtility.createFullSceneGraphComponent("z points");
+		ZSGC = SceneGraphUtility.createFullSceneGraphComponent("Z");
+		absPencilSGC = SceneGraphUtility.createFullSceneGraphComponent("graphpaper");
+		isoBaseLineSGC = SceneGraphUtility.createFullSceneGraphComponent("iso baseline");
 
-		Appearance ap = pencilSGC.getAppearance();
-		ap.setAttribute("lineShader.diffuseColor", baseColor);
-		ap.setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, true);
-		ap.setAttribute("pointShader."+CommonAttributes.LINE_WIDTH, .08);
-		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .001);
-		ap = curveSGC.getAppearance();
+		curvesSGC.addChildren(curveSGC, legendreSGC, tanCurveSGC);
+		legendreSGC.addChild(legValSGC);
+		linesSGC.addChildren(tangentSGC, baseLineSGC, isoPointSGC, distFanSGC, basePencilSGC);
+		pointsSGC.addChildren(pointSGC, basePointSGC, isoLineSGC, distSegSGC, basePointRangeSGC);
+		absoluteSGC.addChildren(zSGC, ZSGC, isoBaseLineSGC);
+		ZSGC.addChild(absPencilSGC);
+		zSGC.addChild(zPointRangeSGC);
+		world.addChildren(curvesSGC, pointsSGC, linesSGC, absoluteSGC);
+		
+		Appearance ap = curveSGC.getAppearance();
 		ap.setAttribute("lineShader.diffuseColor", curveColor);
 		ap = curvesSGC.getAppearance();
 		ap.setAttribute(VERTEX_DRAW, false);
 		ap.setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, true);
-		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .01);
-		ap.setAttribute("lineShader."+CommonAttributes.LINE_WIDTH, 3.5);
+		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .006);
+		ap.setAttribute("lineShader."+CommonAttributes.LINE_WIDTH, 2.5);
 		ap = legendreSGC.getAppearance();
 		ap.setAttribute("lineShader.diffuseColor", legcurveColor);
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, true);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		legendreSGC.setVisible(false);
+		ap = legValSGC.getAppearance();
+		ap.setAttribute("pointShader.diffuseColor", legValColor);
+		ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+		ap = tanCurveSGC.getAppearance();
+		ap.setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, true);
+		ap.setAttribute("lineShader.diffuseColor", curveColor);
+		ap.setAttribute("lineShader."+CommonAttributes.LINE_WIDTH, .5);
+		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .002);
+		ap.setAttribute("lineShader."+CommonAttributes.TRANSPARENCY, .5);
+		ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED,true);
+		ap.setAttribute(EDGE_DRAW, true);
+		ap.setAttribute(VERTEX_DRAW, false);		
+		
+		// here comes the stuff related to the original function f
 		ap = pointsSGC.getAppearance();
 		ap.setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, true);
 		ap.setAttribute("pointShader."+CommonAttributes.POINT_RADIUS, .02);
 		ap.setAttribute("pointShader.diffuseColor",fColor1);
 		ap.setAttribute(VERTEX_DRAW, true);
 		IndexedLineSet ils = PointRangeFactory.line( basis[3], basis[0]);
-		pointrangeSGC.setGeometry(ils);
-		ap = pointrangeSGC.getAppearance();
+		basePointRangeSGC.setGeometry(ils);
+		ap = basePointRangeSGC.getAppearance();
 		ap.setAttribute("lineShader.diffuseColor",fbaseColor);
 		ap.setAttribute("lineShader."+CommonAttributes.LINE_WIDTH,3.0);
 		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .003);
@@ -199,6 +215,8 @@ public class IsotropicPlaneParabola extends Assignment {
 		ap.setAttribute(VERTEX_DRAW, true);
 		ap.setAttribute("pointShader."+CommonAttributes.POINT_RADIUS, .015);
 		ap.setAttribute("pointShader.diffuseColor",fsegColor);
+		
+		// and here is the stuff about the Legendre transform of f, called g
 		ap = linesSGC.getAppearance();
 		ap.setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, true);
 		ap.setAttribute("lineShader.diffuseColor", gColor1);
@@ -219,6 +237,8 @@ public class IsotropicPlaneParabola extends Assignment {
 		ap.setAttribute("lineShader.diffuseColor", gFanColor);
 		ap.setAttribute("lineShader."+CommonAttributes.LINE_WIDTH, .5);
 		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .002);
+		
+		
 		ap = world.getAppearance();
 		ap.setAttribute("lineShader.lineWidth", 2.0);
 		ap.setAttribute(LIGHTING_ENABLED, false);
@@ -226,8 +246,6 @@ public class IsotropicPlaneParabola extends Assignment {
 		ap.setAttribute(VERTEX_DRAW, false);
 		ap.setAttribute(BOUNDING_BOX, Rectangle3D.unitCube);
 		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .003);
-		world.addChildren(curvesSGC, pointsSGC, linesSGC, coordSysSGC);
-		curvesSGC.addChildren(curveSGC, legendreSGC);
 		DragEventTool t = new DragEventTool();
 		t.addLineDragListener(new LineDragListener() {
 			
@@ -263,12 +281,13 @@ public class IsotropicPlaneParabola extends Assignment {
 
 		curveSGC.addTool(t);
 		
-		ap = coordSysSGC.getAppearance();
+		ap = absoluteSGC.getAppearance();
 		ap.setAttribute(CommonAttributes.TUBES_DRAW, false);
-		perspWorld.addChild(world);
-		MatrixBuilder.euclidean().translate(0,-1,0).assignTo(world);
-		generateGeometry();	
+		generateAbsolute();	
 		initializeCurves();
+
+		perspWorld.addChild(world);
+		MatrixBuilder.euclidean().translate(0,-1.3,0).assignTo(world);
 		setValueAtTime(currentTime);
 		
 		goPersp = new Timer(20, new ActionListener()	{
@@ -286,33 +305,76 @@ public class IsotropicPlaneParabola extends Assignment {
 	}
 	double[][] basis = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 	
-	private void generateGeometry() {
-		IndexedLineSet ils = PointRangeFactory.line( basis[0], basis[1]);
-		SceneGraphComponent xyzSGC = SceneGraphUtility.createFullSceneGraphComponent("xy");
-		SceneGraphComponent xySGC = SceneGraphUtility.createFullSceneGraphComponent("xy");
-		xySGC.setGeometry(ils);
-		SceneGraphComponent ZSGC = SceneGraphUtility.createFullSceneGraphComponent();
-		xySGC.addChild(ZSGC);
+	private void generateAbsolute() {
+
+		// here is the base pencil for the dual graph
+		// it has a parabolic distribution, since distance between lines
+		// is measured by the y-intercepts of the two lines 
+		// -- no vertical lines allowed
+		int lineCount = 49;
+		double[][] plines = new double[lineCount][];
+		for (int i = 0; i<lineCount; ++i)	{
+			double yval = .3*(i-lineCount/2.0);
+			plines[i] = PlueckerLineGeometry.lineFromPoints(null, basis[3],
+					new double[]{1, yval, 0, 1});
+		}
+		LinePencilFactory lcp= new LinePencilFactory();
+		lcp.setCenter(new double[] {0,0,0,1});
+		lcp.setNumLines(lineCount);
+		lcp.setFiniteSphere(false);
+		lcp.setPlane(new double[] {0,0,1,0});
+		lcp.setPoint(new double[] {0,0,0,1});
+		lcp.setPluckerLines(plines);
+		lcp.update();
+		basePencilSGC.addChild(lcp.getPencil());
+		MatrixBuilder.euclidean().translate(0,0, -.001).assignTo(basePencilSGC);
+		Appearance ap = basePencilSGC.getAppearance();
+		ap.setAttribute("lineShader.diffuseColor", baseColor);
+		ap.setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, true);
+		ap.setAttribute("pointShader."+CommonAttributes.LINE_WIDTH, .08);
+		ap.setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .001);
+
+		IndexedLineSet ils = PointRangeFactory.line( basis[1], basis[3]);
+		isoBaseLineSGC.setGeometry(ils);
+
+		// draw the isotropic line and the isotropic point
+		ils = PointRangeFactory.line( basis[0], basis[1]);
+		zSGC.setGeometry(ils);
+		// generate points in step measure on the isotropic line
+		int pointcount = 49;
+		double[][] zpoints = new double[49][];
+		for (int i = 0; i<pointcount; ++i)	{
+			double xval =(i-pointcount/2.0);
+			xval = (xval == 0) ? 10E8 : 3.3/xval;
+			zpoints[i] = new double[]{xval, 1,0,0};
+		}
+		ils = IndexedLineSetUtility.createCurveFromPoints(zpoints, false);
+		zPointRangeSGC.setGeometry(ils);
+		ap = zPointRangeSGC.getAppearance();
+		ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
+		ap.setAttribute(CommonAttributes.EDGE_DRAW, false);
+		ap.setAttribute(CommonAttributes.SPHERES_DRAW, false);
+		ap.setAttribute("pointShader.diffuseColor", Color.white);
+		ap.setAttribute("pointShader."+CommonAttributes.POINT_SIZE,8.0);
+		ap.setAttribute("pointShader."+CommonAttributes.ATTENUATE_POINT_SIZE, false);
+	
+		zSGC.addChild(ZSGC);
 		ZSGC.setGeometry(Primitives.point(basis[1]));
-		Appearance ap = ZSGC.getAppearance();
+		ap = ZSGC.getAppearance();
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, true);
 		ap.setAttribute(CommonAttributes.SPHERES_DRAW, false);
 		ap.setAttribute("pointShader.diffuseColor", Color.white);
 		ap.setAttribute("pointShader."+CommonAttributes.POINT_SIZE,12.0);
 		ap.setAttribute("pointShader."+CommonAttributes.ATTENUATE_POINT_SIZE, false);
 		MatrixBuilder.euclidean().translate(0,0,-.01).assignTo(ZSGC);
-		
-		SceneGraphComponent ywSGC = SceneGraphUtility.createFullSceneGraphComponent("yw");
-		ils = PointRangeFactory.line( basis[1], basis[3]);
-		ywSGC.setGeometry(ils);
-//		ywSGC.setVisible(false);
-//		SceneGraphComponent wxSGC = SceneGraphUtility.createFullSceneGraphComponent("wx");
-		// add some graph paper
+	
+		// this is a parabolic pencil in the isotropic point Z --
+		// these lines are the "rulers" for measuring parallel lines and points
 		LinePencilFactory lpf = new LinePencilFactory(); 
-		int lineCount = 200;
-		double[][] plines = new double[lineCount][];
+		lineCount = 200;
+		plines = new double[lineCount][];
 		for (int i = 0; i<lineCount; ++i)	{
-			double xval = .05*(i-lineCount/2.0);
+			double xval = .2*(i-lineCount/2.0);
 			plines[i] = PlueckerLineGeometry.lineFromPoints(null, basis[1],
 					new double[]{xval, 0, 0, 1});
 		}
@@ -324,51 +386,41 @@ public class IsotropicPlaneParabola extends Assignment {
 		lpf.setSphereRadius(500);
 		lpf.setNumLines(lineCount);
 		lpf.update();
-		graphpaperSGC.addChild(lpf.getPencil());
-//		IndexedFaceSetFactory quad = Primitives.texturedQuadrilateralFactory();
-//		graphpaperSGC.setGeometry(quad.getIndexedFaceSet());
-//		graphpaperSGC.setAppearance(new Appearance());
-//		SimpleTextureFactory stf = new SimpleTextureFactory();
-//		stf.setType(TextureType.LINE);
-//		stf.setColor(0, Color.white);
-//		stf.setColor(2, Color.white);
-//		stf.setColor(1, new Color(0,0,0,0));
-//		stf.setColor(3, new Color(0,0,0,0));
-//		stf.setSize(192);
-//		stf.update();
-//		Texture2D tex2d = TextureUtility.createTexture(graphpaperSGC.getAppearance(), "polygonShader", stf.getImageData());
-//		Matrix foo = new Matrix();
-//		MatrixBuilder.euclidean().scale(400,400,1).assignTo(foo);
-//		tex2d.setTextureMatrix(foo);
-//		MatrixBuilder.euclidean().translate(-25,-25, -.01).scale(50).assignTo(graphpaperSGC);
-//		graphpaperSGC.getAppearance().setAttribute("polygonShader.diffuseColor", Color.white);
-//		graphpaperSGC.getAppearance().setAttribute("ambientCoefficient", .05);
-		graphpaperSGC.getAppearance().setAttribute("lineShader.diffuseColor",new Color(150,150,150));
-		graphpaperSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, isopenciltubed);
-		graphpaperSGC.getAppearance().setAttribute("lineShader."+CommonAttributes.LINE_WIDTH, 1.0);
-		graphpaperSGC.getAppearance().setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .004);
+		absPencilSGC.addChild(lpf.getPencil());
+		absPencilSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
+		absPencilSGC.getAppearance().setAttribute("lineShader.diffuseColor",new Color(150,150,150));
+		absPencilSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, isopenciltubed);
+		absPencilSGC.getAppearance().setAttribute("lineShader."+CommonAttributes.LINE_WIDTH, 1.0);
+		absPencilSGC.getAppearance().setAttribute("lineShader."+CommonAttributes.TUBE_RADIUS, .004);
 		
-		
-		ap = xyzSGC.getAppearance();
+		ap = absoluteSGC.getAppearance();
 		ap.setAttribute("lineShader.diffuseColor", Color.white);
 		ap.setAttribute("lineShader.lineWidth",3.0);
-//		xyLinesSGC.getAppearance().setAttribute("lineShader.diffuseColor", new Color(200, 200, 200));
-//		xyLinesSGC.getAppearance().setAttribute("lineShader.lineWidth",1.0);
-		xyzSGC.addChildren(xySGC, ywSGC);
-		coordSysSGC.addChildren(xyzSGC, graphpaperSGC);
 		
 	}
 
 	private void initializeCurves() {
 		legendreTfPC.reset();
+		double[][] pts = new double[1+numPoints/skipfactor][],
+				lines = new double[1+numPoints/skipfactor][];
+		double[] pt = null, dbase = null, line = null;
 		for (int i = 0; i<numPoints; ++i)   {
 			double t = i/(numPoints-1.0);
-			double[] base = bc.getValueAtTime(t);
-			double[] dbase = legendreTformAtTime(t);
-			pc.addPoint(base);
+			pt = bc.getValueAtTime(t);
+			line = bc.getTangentAtTime(t);
+			dbase = legendreTformAtTime(t);
+			if (i%skipfactor == 0) {
+				pts[i/skipfactor] = pt;
+				lines[i/skipfactor] = line;
+			}
+			fPoints.addPoint(pt);
+			fTangents.addPoint(line);
 			legendreTfPC.addPoint(dbase);
 		}
-		curveSGC.setGeometry(pc.getCurve());
+		pts[numPoints/skipfactor] = pt;
+		lines[numPoints/skipfactor] = line;
+		curveSGC.setGeometry(fPoints.getCurve());
+		tanCurveSGC.addChild(LineUtility.sceneGraphForCurveOfLines(null, lines, pts, lineLength/2, false));
 		legendreSGC.setGeometry(legendreTfPC.getCurve());
 	}
 	
@@ -382,8 +434,6 @@ public class IsotropicPlaneParabola extends Assignment {
 		double[] base = val.clone();
 		base[1] = 0;
 		basePointSGC.setGeometry(Primitives.point(base));
-		double[] tl = bc.getTangentAtTime(t);
-		PlueckerLineGeometry.normalize(tl, tl);
 		double[] isoLine = PlueckerLineGeometry.lineFromPoints(null, val, base);
 		LineUtility.sceneGraphForLine(isoLineSGC, isoLine, null, 5, false);
 		double[][] nb = {base, val};
@@ -402,8 +452,10 @@ public class IsotropicPlaneParabola extends Assignment {
 		IndexedLineSet ils = IndexedLineSetUtility.refine(distSegF.getIndexedLineSet(), num);
 		distSegSGC.setGeometry(ils);
 		
+		double[] tl = bc.getTangentAtTime(t);
+		PlueckerLineGeometry.normalize(tl, tl);
 		LineUtility.sceneGraphForLine(tangentSGC, tl, null, 5, false);
-		System.err.println("tangent "+Rn.toString(tl));
+//		System.err.println("tangent "+Rn.toString(tl));
 		double[] btl = tl.clone();
 		btl[0] =  0.0;
 		LineUtility.sceneGraphForLine(baseLineSGC, btl, null, 5, false);
@@ -419,7 +471,7 @@ public class IsotropicPlaneParabola extends Assignment {
 		Pn.normalize(yintercept, yintercept, Pn.EUCLIDEAN);
 		d = yintercept[1];
 		num = (int) (d/tick);
-		if (Math.abs(num) > 100) num = (int) (100 * Math.signum(num));
+		if (Math.abs(num) > maxFanSize) num = (int) (maxFanSize * Math.signum(num));
 		max = num*tick;
 		num = Math.abs(num);
 		if (num > 1) {
@@ -440,6 +492,9 @@ public class IsotropicPlaneParabola extends Assignment {
 		} else 
 			distFanSGC.removeAllChildren();
 
+		double[] gPoint = {-tl[4]/tl[2], -yintercept[1], 0,1};
+		legValSGC.setGeometry(Primitives.point(gPoint));
+		
 //		double[] legPt = val.clone();
 //		legPt[1] = -yintercept[1];
 //		legendreTfPC.addPoint(legPt);
@@ -451,9 +506,9 @@ public class IsotropicPlaneParabola extends Assignment {
 		double[] val = bc.getValueAtTime(t);
 		double[] val2d = {val[0], val[1], val[3]},
 				tl2d = {tl[4]/tl[2], -1, tl[0]/tl[2]};
-		System.err.println("tangent = "+Rn.toString(tl2d));
+//		System.err.println("tangent = "+Rn.toString(tl2d));
 		// g(U) = <U,x> - f(x),   U = slope
-		double[] ret ={tl2d[0], -val2d[0]*tl2d[0] - val2d[1], 0, 1};
+		double[] ret ={-tl2d[0], -val2d[0]*tl2d[0] - val2d[1], 0, 1};
 		// shortcut: g(p) is -(y-intercept) of the tangent line
 //		double[] ret ={tl2d[0], -tl2d[2], 0, 1};
 //		System.err.println("legendre = "+Rn.toString(ret));
@@ -508,12 +563,24 @@ public class IsotropicPlaneParabola extends Assignment {
 						break;
 						
 					case KeyEvent.VK_5:
-						graphpaperSGC.setVisible(!graphpaperSGC.isVisible());
+						absPencilSGC.setVisible(!absPencilSGC.isVisible());
 						break;
 						
 					case KeyEvent.VK_6:
+						curveSGC.setVisible(!curveSGC.isVisible());
+						break;
+						
+					case KeyEvent.VK_7:
+						tanCurveSGC.setVisible(!tanCurveSGC.isVisible());
+						break;
+						
+					case KeyEvent.VK_8:
+						absoluteSGC.setVisible(!absoluteSGC.isVisible());
+						break;
+						
+					case KeyEvent.VK_9:
 						isopenciltubed = !isopenciltubed;
-						graphpaperSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, isopenciltubed);
+						absPencilSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, isopenciltubed);
 						break;
 						
 				}
@@ -549,7 +616,7 @@ public class IsotropicPlaneParabola extends Assignment {
 					
 				}
 				Matrix mm = new Matrix(atform);
-				mm.multiplyOnRight(MatrixBuilder.euclidean().translate(0, t, 0).getMatrix());
+				mm.multiplyOnRight(MatrixBuilder.euclidean().translate(0, t, t).getMatrix());
 				mm.assignTo(perspWorld.getTransformation());;
 
 			}
@@ -562,4 +629,24 @@ public class IsotropicPlaneParabola extends Assignment {
 	public static void main(String[] args) {
 		new IsotropicPlaneParabola().display();
 	}
+	
+//	IndexedFaceSetFactory quad = Primitives.texturedQuadrilateralFactory();
+//	graphpaperSGC.setGeometry(quad.getIndexedFaceSet());
+//	graphpaperSGC.setAppearance(new Appearance());
+//	SimpleTextureFactory stf = new SimpleTextureFactory();
+//	stf.setType(TextureType.LINE);
+//	stf.setColor(0, Color.white);
+//	stf.setColor(2, Color.white);
+//	stf.setColor(1, new Color(0,0,0,0));
+//	stf.setColor(3, new Color(0,0,0,0));
+//	stf.setSize(192);
+//	stf.update();
+//	Texture2D tex2d = TextureUtility.createTexture(graphpaperSGC.getAppearance(), "polygonShader", stf.getImageData());
+//	Matrix foo = new Matrix();
+//	MatrixBuilder.euclidean().scale(400,400,1).assignTo(foo);
+//	tex2d.setTextureMatrix(foo);
+//	MatrixBuilder.euclidean().translate(-25,-25, -.01).scale(50).assignTo(graphpaperSGC);
+//	graphpaperSGC.getAppearance().setAttribute("polygonShader.diffuseColor", Color.white);
+//	graphpaperSGC.getAppearance().setAttribute("ambientCoefficient", .05);
+
 }

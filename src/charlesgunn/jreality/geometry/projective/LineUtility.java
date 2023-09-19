@@ -133,6 +133,15 @@ public class LineUtility {
 		prf.getLine().setGeometryAttributes(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
 		return exists;
 	}
+	
+	public static SceneGraphComponent sceneGraphForCurveOfLines(SceneGraphComponent exists, double[][] lines, double[][] points, double scale, boolean finite) {
+		if (exists == null) exists = new SceneGraphComponent();
+		int n = lines.length;
+		for (int i = 0; i<n; ++i)	{
+			exists.addChild(sceneGraphForLine(null, lines[i], points[i], scale, finite));
+		}
+		return exists;
+	}
 	static SceneGraphComponent hack1 = new SceneGraphComponent(),
 		hack2 = new SceneGraphComponent(),
 		hack3 = new SceneGraphComponent();
