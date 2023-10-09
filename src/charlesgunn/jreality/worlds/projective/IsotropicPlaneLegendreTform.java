@@ -50,7 +50,7 @@ import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
-public class IsotropicPlaneParabola extends Assignment {
+public class IsotropicPlaneLegendreTform extends Assignment {
 
 	private static final Color gColor1 = new Color(200,180,50);
 	private static final Color gBaseColor = new Color(255, 230, 50);
@@ -627,7 +627,7 @@ public class IsotropicPlaneParabola extends Assignment {
 	
 
 	public static void main(String[] args) {
-		new IsotropicPlaneParabola().display();
+		new IsotropicPlaneLegendreTform().display();
 	}
 	
 //	IndexedFaceSetFactory quad = Primitives.texturedQuadrilateralFactory();

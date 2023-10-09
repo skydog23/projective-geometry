@@ -10,6 +10,7 @@ import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.math.P2;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
+import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.data.Attribute;
 
 public class ConicSection {
@@ -32,6 +33,16 @@ public class ConicSection {
 		for (int i = 0; i<5; ++i)	{
 			PaMbQ[i] = PaMbQIn[i].clone();
 		}
+	}
+	
+	public IndexedLineSet getCurve(int n) {
+		double dt = 1.0/n;
+		double[][] pts = new double[n][];
+		for (int i = 0; i<n; ++i)	{
+			pts[i] = Utility.promote(null, getValueAtTime(null, i*dt));
+		}
+//		System.err.println("Conic pts = "+Rn.toString(pts));
+		return IndexedLineSetUtility.createCurveFromPoints(null, pts, true );
 	}
 	public void setInitialPoints(double[][] init)	{
 		initialPoints = init.clone();

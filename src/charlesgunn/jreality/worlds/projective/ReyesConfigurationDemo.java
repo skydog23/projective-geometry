@@ -32,7 +32,7 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 
-public class SkewLines2x3Demo extends Assignment {
+public class ReyesConfigurationDemo extends Assignment {
 
 	SceneGraphComponent world, cube  =SceneGraphUtility.createFullSceneGraphComponent("cube");
 	SkewLines2x3 skewer = new SkewLines2x3();
@@ -129,6 +129,6 @@ public class SkewLines2x3Demo extends Assignment {
 
 
 	public static void main(String[] args) {
-		new SkewLines2x3Demo().display();
+		new ReyesConfigurationDemo().display();
 	}
 }

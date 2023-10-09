@@ -9,6 +9,7 @@ import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
+import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.SceneGraphComponent;
@@ -135,10 +136,16 @@ public class LineUtility {
 	}
 	
 	public static SceneGraphComponent sceneGraphForCurveOfLines(SceneGraphComponent exists, double[][] lines, double[][] points, double scale, boolean finite) {
-		if (exists == null) exists = new SceneGraphComponent();
+		boolean newsgc = (exists == null || exists.getChildComponentCount() != lines.length);
+		if (exists == null) {
+			exists = new SceneGraphComponent();
+		}
 		int n = lines.length;
 		for (int i = 0; i<n; ++i)	{
-			exists.addChild(sceneGraphForLine(null, lines[i], points[i], scale, finite));
+			SceneGraphComponent child = null;
+			if (!newsgc) child = exists.getChildComponent(i);
+			SceneGraphComponent child2 = sceneGraphForLine(child, lines[i], points == null ? P3.originP3 : points[i], scale, finite);
+			if (child == null) exists.addChild(child2);
 		}
 		return exists;
 	}

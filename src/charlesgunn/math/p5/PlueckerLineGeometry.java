@@ -51,6 +51,10 @@ public class PlueckerLineGeometry {
 		 return dualizeLine(dst, dst);
 	 }
 
+	public static double[] planeFromPoints(double[] dst, double[] p1, double[] p2, double[] p3) {
+		return lineJoinPoint(dst, lineFromPoints(null, p1, p2), p3);
+	}
+	
 	public static double[] intersectionPoint(double[] dst, double[] line0, double[] line1) {
 		 if (dst == null) dst = new double[4];
 //		 System.err.println("Line0 = "+Rn.toString(line0));
