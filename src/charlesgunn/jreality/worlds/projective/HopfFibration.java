@@ -32,6 +32,7 @@ import charlesgunn.anim.jreality.SceneGraphAnimator;
 import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.newtools.FlyTool;
 import charlesgunn.jreality.viewer.Assignment;
+import charlesgunn.util.ColorWheel;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
@@ -166,7 +167,7 @@ public class HopfFibration extends Assignment {
 		ap.setAttribute("lineShader.diffuseColor", Color.black);
 		cores.addChildren(coreV, coreH);
 		
-		coreColor = getColorForParameter(1.0);
+		coreColor = ColorWheel.getColorForParameter(1.0);
 		
 		for (int i = 0; i < 3; ++i) {
 			SceneGraphComponent sgc = SceneGraphUtility.createFullSceneGraphComponent();
@@ -178,7 +179,6 @@ public class HopfFibration extends Assignment {
 			theUniverse2.addChild(sgc);
 		}
 		
-		initKeyFrames();
 		initWorld();
 		updateVisibility();
 		
@@ -370,7 +370,7 @@ public class HopfFibration extends Assignment {
 			double[] clifT = leftCliffordTlateFor(null, P3.originP3, pq);
 			Matrix clifiso = new Matrix(clifT);
 
-			Color c  = getColorForPoint(verts[i], phi);
+			Color c  = ColorWheel.getColorForPoint(verts[i], phi, zColoring);
 			vc[i] = c;
 //			if (level < 2 && showLevel[level]) 
 //				System.err.println("Vertex "+i+" is "+q.toString()+"\ttheta = "+360.0*theta/(2*Math.PI)+" rgb = "+c.toString());
@@ -482,22 +482,6 @@ public class HopfFibration extends Assignment {
 		return clifT;
 	}
 	
-	private Color getColorForPoint(double[] verts, double phi) {
-		Color c;
-		if (zColoring){
-			double r = 2*phi/Math.PI;
-			c = getColorForParameter(r);
-//			System.err.println("r = "+r);
-		} else {
-			float[] fc = new float[3];
-			for (int i = 0; i<3; ++i)	{
-				fc[i] = (float) (.5 + .5 * verts[i]);
-				if (fc[i] > 1f) fc[i] = 1.0f;
-			}			
-			c = new Color(fc[0], fc[1], fc[2]);
-		}
-		return c;
-	}
 
 	static int[] numHyps = {3, 5, 10, 20, 40}; //{5, 8, 13, 21, 34};
 	private static double[][] getConcentricHyps(int level, double tpr) {
@@ -551,7 +535,7 @@ public class HopfFibration extends Assignment {
 			String name = ap.getName();
 			boolean isTube = name.contains("tube");
 			Color c = colors.get(ap);
-			c = applyGamma(c, gamma);
+			c = ColorWheel.applyGamma(c, gamma);
 			if (!isTube) ap.setAttribute("lineShader.diffuseColor", showXYZ ? Appearance.INHERITED : c);
 //			ap.setAttribute("lineShader.polygonShader.diffuseColor", showXYZ ? Appearance.INHERITED : c);
 			if (isTube) ap.setAttribute("polygonShader.diffuseColor", showXYZ ? Appearance.INHERITED : c);
@@ -560,6 +544,9 @@ public class HopfFibration extends Assignment {
 
 	Transformation avatarT, camT;
 	boolean rotating = false;
+	private FlyTool flytool;
+	private SceneGraphPath avatarPath;
+
 	@Override
 	public void display() {
 		super.display();
@@ -1011,56 +998,5 @@ public class HopfFibration extends Assignment {
 		new HopfFibration().display();
 	}
 	
-	double[] dkeyframes, acc;
-	int k = 200, m = 255, n = 60;
-	Color[] values = {
-			new Color(n, k, k),
-			new Color(n, m, n),
-			new Color(k, k, n),
-			new Color(m, n, n), 
-			new Color(k, n, k),
-			new Color(n, n, m),
-			new Color(n, k, k)
-//			Color.red,
-//			Color.magenta,
-//			Color.blue,
-//			Color.green,
-//			Color.yellow,
-//			Color.orange,
-//			Color.red
-	};
-	private FlyTool flytool;
-	private SceneGraphPath avatarPath;
-	protected void initKeyFrames() {
-//		dkeyframes = new double[]{.1,.1,.1,.1,.1,.1};
-		acc = new double[values.length];
-		for (int i = 0; i<values.length; ++i)	{
-			acc[i] = i /(values.length-1.0);
-		}
-		System.err.println("acc = "+Rn.toString(acc));
-	}
-	
-	public Color getColorForParameter(double d) {
-		Color c;
-		if (acc == null) initKeyFrames();
-		for (int i = 0; i<acc.length-1; ++i)	{
-			if (d >= acc[i] && d <= acc[i+1]) {
-				c = AnimationUtility.linearInterpolation(
-						d, acc[i], acc[i+1], values[i],values[i+1]);
-				return c;
-			} 
-		};
-		return values[acc.length-1];
-	}
-
-	private static Color applyGamma(Color c, double gamma) {
-		float[] tmp = new float[4];
-		float[] cmp = c.getComponents(tmp);
-		for (int j = 0; j<3; ++j)	{
-			cmp[j] = (float) (Math.pow(((double) cmp[j]), 1.0/gamma));
-		}
-		c = new Color(cmp[0], cmp[1], cmp[2]);
-		return c;
-	}
 
 }

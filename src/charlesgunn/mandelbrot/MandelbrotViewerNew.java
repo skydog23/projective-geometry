@@ -53,12 +53,15 @@ draw the rectangle as you drag out new viewport
 package charlesgunn.mandelbrot;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Menu;
 import java.awt.MenuBar;
 import java.awt.MenuItem;
@@ -90,12 +93,48 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-public class MandelbrotViewer extends JFrame  {
+import charlesgunn.anim.plugin.AnimationPlugin;
+import charlesgunn.jreality.viewer.Assignment;
+import de.jreality.plugin.basic.Scene;
+import de.jreality.plugin.basic.View;
+import de.jreality.plugin.icon.ImageHook;
+import de.jreality.plugin.scene.ShrinkPanelAggregator;
+import de.jreality.util.NativePathUtility;
+import de.jreality.util.Secure;
+import de.jtem.jrworkspace.plugin.Controller;
+import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
+import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
+import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController;
+
+public class MandelbrotViewerNew extends Plugin  {
+	
+	
+	static {
+		String lnfClass = UIManager.getSystemLookAndFeelClassName();
+		System.err.println("LaF class = "+lnfClass);
+		if (lnfClass.contains("Aqua") || lnfClass.contains("Windows")) {
+			if (lnfClass.contains("Aqua")) {
+//				System.setProperty("com.apple.mrj.application.apple.menu.about.name", "jReality");
+				Secure.setProperty("apple.laf.useScreenMenuBar", "true");
+			}
+			try {
+				UIManager.setLookAndFeel(lnfClass);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+
     //protected ResourceBundle resbundle;
     protected AboutBox aboutBox;
     protected Preferences prefs;
@@ -110,8 +149,8 @@ public class MandelbrotViewer extends JFrame  {
 
     protected int cmap = 0;
     
-    protected MandelbrotPane mbPane = new MandelbrotPane(this);
-    protected Mandelbrot currMb = mbPane.currMb; //mbPane.getMandelbrot();
+    protected MandelbrotPaneNew mbPane = new MandelbrotPaneNew();
+    protected MandelbrotNew currMb = mbPane.currMb; //mbPane.getMandelbrot();
     protected LinkedList collectionList = new LinkedList();
     protected Hashtable nameTable = new Hashtable();
     protected LinkedList mbList = new LinkedList();
@@ -119,10 +158,29 @@ public class MandelbrotViewer extends JFrame  {
     public boolean isDebug = true,
         isStartingRepli = true,
         isLogging = true; 
-    protected JFrame gallery = null;
+    protected JFrame myFrame = null,
+    		gallery = null;
     protected JTabbedPane tp = null;
     protected LinkedList galList = new LinkedList();
     
+    SimpleController con = new SimpleController("MandelbrotViewer");
+    
+	transient protected ShrinkPanelAggregator shrinkPanelPlugin = new ShrinkPanelAggregator() {
+	@Override
+	public Class<? extends SideContainerPerspective> getPerspectivePluginClass() {
+		return View.class;
+	}
+
+	@Override
+	public String getHelpTitle() {
+		return MandelbrotViewerNew.this.getClass().getSimpleName();
+	}
+	
+
+	};
+
+	transient protected ShrinkPanel shrinkPanel = shrinkPanelPlugin.getShrinkPanel();
+
     static String directory = "/Users/skydog/Developer/MandelbrotViewer/resources";
     static IndexColorModel[] cm = new IndexColorModel[5];
     static int numCmaps = 5;
@@ -173,10 +231,10 @@ public class MandelbrotViewer extends JFrame  {
             name = nn;
         }
     }
-    public MandelbrotViewer() {
-        super("");
-        WindowAdpt WAdapter = new WindowAdpt();
-        this.addWindowListener(WAdapter);
+    public MandelbrotViewerNew() {
+//        super("");
+//        WindowAdpt WAdapter = new WindowAdpt();
+//        this.addWindowListener(WAdapter);
         aboutBox = new AboutBox();
         prefs = new Preferences();
         Toolkit.getDefaultToolkit();
@@ -184,237 +242,53 @@ public class MandelbrotViewer extends JFrame  {
        // set up collections w/ default
         nameTable.put(mbList, "default");
         System.out.println(nameTable.toString());
-        
-        getContentPane().setSize(256, 256);
-        //mbPane.setSize(256, 256);
-//        resbundle = ResourceBundle.getBundle("charlesgunn.mandelbrot.MandelbrotViewerstrings", Locale.getDefault());
-//        setTitle (resbundle.getString("frameConstructor"));
-        setTitle ("MandelbrotViewer");
-        //setLayout(new FlowLayout());
-        //System.out.println("mbPane preferred size: "+mbPane.preferredSize().toString());
-        setLayout(new GridLayout());
-        getContentPane().add(mbPane, BorderLayout.CENTER);
-        getContentPane().add(mbPane.getInspector(), BorderLayout.EAST);
+        myFrame = new JFrame();
+        myFrame.getContentPane().setSize(256, 256);
+        myFrame.setTitle ("MandelbrotViewer");
+        myFrame.setLayout(new GridLayout());
+        myFrame.getContentPane().add(mbPane, BorderLayout.CENTER);
         addMenus();
         //createActions();
-        setVisible(true);
+        con.registerPlugin(shrinkPanelPlugin);
+        con.registerPlugin(this);
+        con.startupLocal();
+        myFrame.setVisible(true);
 
-        validate();
-        pack();
+        myFrame.validate();
+        myFrame.pack();
 //        show();
-        requestFocus();
-
-        //System.out.println("min size: "+getLayout().minimumLayoutSize(this).toString());
-        //ystem.out.println("max size: "+getLayout().maximumLayoutSize(this).toString());
-        //System.out.println("pref size: "+getLayout().preferredLayoutSize(this).toString());
-
-//        fApplication.setEnabledPreferencesMenu(true);
-//        fApplication.addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
-//            public void handleAbout(ApplicationEvent e) {
-//                System.out.println("ABOUT!!!!");
-//                about(e);
-//            }
-//            public void handleOpenApplication(ApplicationEvent e) {
-//                System.out.println("handleOpenApplication...");
-//            }
-//            public void handleOpenFile(ApplicationEvent e) {
-//                System.out.println("handleOpenFile...");
-//            }
-//            public void handlePreferences(ApplicationEvent e) {
-//                System.out.println("PREFERENCES!!!");
-//                preferences(e);
-//            }
-//            public void handlePrintFile(ApplicationEvent e) {
-//                System.out.println("handlePrintFile...");
-//            }
-//            public void handleQuit(ApplicationEvent e) {
-//                quit(e);
-//            }
-//        });
-
-        addKeyListener(new KeyAdapter()	{
-            public void keyPressed(KeyEvent e)	{
-                System.out.println("Alt + Meta: "+e.isAltDown()+" "+e.isMetaDown());
-                switch(e.getKeyCode())	{
-
-                    case KeyEvent.VK_A:		// add current value to list
-                        pushCurrMb();
-                        break;
-
-                    case KeyEvent.VK_B:		// toggle BigDecimals
-                        currMb.setUseDL( !currMb.getUseDL());
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_C:		// change colormap
-                        if (e.isShiftDown())	{
-                            mbPane.toggleCycleColormap();
-                            mbPane.repaint();
-                            break;
-                        }
-
-                        cmap = (cmap+1) % numCmaps;
-                        mbPane.setColorModel(cm[cmap]);
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_D:		// double # of iterations
-                        if (isLogging) pushCurrMb();
-                        if (e.isShiftDown()) currMb.setNumIterations(currMb.getNumIterations() >> 1);                                                			
-                        else currMb.setNumIterations(2 * currMb.getNumIterations());                        			
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_F:		// reFresh display
-                        currMb.setDirty(true);
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_G:		// show gallery
-                        makeGallery(mbList);
-                        break;
-                        
-                    case KeyEvent.VK_H:		// help menu
-                        printUsage();
-                        break;
-
-                    case KeyEvent.VK_I:		// interrupt Mandelbrot thread
-                        currMb.doInterrupt();
-                        break;
-
-                    case KeyEvent.VK_J:		// toggle Mandelbrot/Julia
-                        currMb.setIsJulia(!currMb.getIsJulia());
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_L:		
-                        isLogging = !isLogging;
-                        if (isDebug) System.out.println("Logging is: "+isLogging);
-                        break;
-
-                    case KeyEvent.VK_M:		// change multi-resolution parameters
-                        if (!e.isShiftDown())	{
-                            mbPane.lowRepliLimit *= 2;
-                        }
-                        else			{	// halve it
-                            mbPane.lowRepliLimit /= 2;
-                            if (mbPane.lowRepliLimit < 1)	mbPane.lowRepliLimit = 1;
-                        }
-                        //mbPane.setReplifactor(lowRepliLimit);
-                        //currMb.setDirty(true);
-                        //mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_N:		// change multi-resolution parameters
-                        if (!e.isShiftDown())	{	// use direct writes to save time
-                            mbPane.highRepliLimit *= 2;
-                        }
-                        else			{	// halve it
-                            mbPane.highRepliLimit /= 2;
-                            if (mbPane.highRepliLimit < mbPane.lowRepliLimit)
-                                mbPane.lowRepliLimit = mbPane.lowRepliLimit;
-                        }
-                        //mbPane.setReplifactor(lowRepliLimit);
-                        //currMb.setDirty(true);
-                        //mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_O:		// open file containing locations
-                        handleOpen();
-                        break;
-
-                    case KeyEvent.VK_P:		// print viewport
-                        System.out.println(currMb.getViewport().toString()+currMb.getNumIterations());
-                        break;
-
-                    case KeyEvent.VK_R:		// reset viewport to default
-                        if (isLogging) pushCurrMb();
-                        currMb.resetViewport(mbPane.getSize());
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_S:		// save current list to file
-                        handleSave();
-                        break;
-
-                    case KeyEvent.VK_X:		// double the size of the window
-                        if (isLogging) pushCurrMb();
-                        currMb.doInterrupt();
-
-                        Dimension dim = mbPane.getSize();
-                        if (isDebug) System.out.println("Current size is: "+dim.toString());
-                        if (!e.isShiftDown())	{
-                            dim.width *= 2;
-                            dim.height *= 2;
-                            mbPane.setSize(dim);
-                        }
-                        else			{	// halve it
-                            dim.width /= 2;
-                            dim.height /= 2;
-                            mbPane.setSize(dim);
-                        }
-                        mbPane.invalidate();
-                        pack();
-//                        show();
-                        mbPane.repaint();
-                        currMb.setDirty(true);
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_Z:		// zoom out/in
-                        if (isDebug) System.out.println("Zooming");
-                        if (isLogging) pushCurrMb();
-                        if (e.isShiftDown())	currMb.zoomOut();
-                        else			currMb.zoomIn();
-                        mbPane.repaint();
-                        break;
-
-                    case KeyEvent.VK_DELETE:		
-                            if (mbList.size() <= 1) break;
-                            int index = mbList.indexOf(mbPane);
-                            if (index < 0) break;
-                            makeCurrent(index - 1, mbList);
-                            mbList.remove(index);
-                            break;
- 
-                    case KeyEvent.VK_SLASH:		// toggle debugging
-                        isDebug = !isDebug;
-                        MandelbrotPane.isDebug = !MandelbrotPane.isDebug;
-                        Mandelbrot.isDebug = !Mandelbrot.isDebug;
-                        break;
-
-                    case KeyEvent.VK_ESCAPE:
-                    	    System.exit(-1);
-                    	    break;
-                    	    
-                    case KeyEvent.VK_RIGHT:		// move to next location in list
-                        if (isLogging)
-                            if (!mbList.contains(mbPane)) pushCurrMb();
-                        whichMb++;
-                        makeCurrent(whichMb, mbList);
-                        break;
-
-                    case KeyEvent.VK_LEFT:		// move to previous locations
-                        if (isDebug) System.out.println("Length is: "+mbList.size());
-                        if (isLogging)	{
-                            if (!mbList.contains(mbPane)) pushCurrMb();
-                            //whichMb--;
-                        }
-                        whichMb--;
-                        makeCurrent(whichMb, mbList);
-                        break;
-
-                }
-            }
-        });
-        addComponentListener(new ComponentAdapter() {
+        myFrame.requestFocus();
+        
+        myFrame.addKeyListener(getMyKeyAdapter());
+        myFrame.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e)	{
                 System.out.println("Viewer being resized.");     
-                requestFocus();
+                myFrame.requestFocus();
                 }
         });
+
     }
 
+
+	@Override
+	public void install(Controller con) throws Exception {
+		super.install(con);
+		shrinkPanel.setTitle(this.getClass().getSimpleName());
+		Component insp = mbPane.getInspector();
+		shrinkPanel.removeAll();
+		shrinkPanel.setLayout(new ShrinkPanel.MinSizeGridBagLayout());
+		Insets insets = new Insets(1,5,1,5);
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.BOTH;
+		c.insets = insets;
+		c.weighty = 0.0;
+		c.weightx = 1.0;
+		c.anchor = GridBagConstraints.CENTER;
+		if (insp != null) 
+			shrinkPanel.add(insp, c);
+		myFrame.getContentPane().add(shrinkPanel, BorderLayout.EAST);
+	}
+	
     void printUsage()	{
     		Logger theLog = Logger.getLogger("charlesgunn.mandelbrot");
     		message(theLog, "A","push current settings");
@@ -466,6 +340,183 @@ public class MandelbrotViewer extends JFrame  {
 //        System.exit(0);
 //    }
 //
+    
+    private KeyAdapter getMyKeyAdapter() {
+    	return new KeyAdapter()	{
+        public void keyPressed(KeyEvent e)	{
+            System.out.println("key event = "+e.getKeyChar());
+            switch(e.getKeyCode())	{
+
+                case KeyEvent.VK_A:		// add current value to list
+                    pushCurrMb();
+                    break;
+
+                case KeyEvent.VK_B:		// toggle BigDecimals
+                    currMb.setUseDL( !currMb.getUseDL());
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_C:		// change colormap
+                    if (e.isShiftDown())	{
+                        mbPane.toggleCycleColormap();
+                        mbPane.repaint();
+                        break;
+                    }
+
+                    cmap = (cmap+1) % numCmaps;
+                    mbPane.setColorModel(cm[cmap]);
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_D:		// double # of iterations
+                    if (isLogging) pushCurrMb();
+                    if (e.isShiftDown()) currMb.setNumIterations(currMb.getNumIterations() >> 1);                                                			
+                    else currMb.setNumIterations(2 * currMb.getNumIterations());                        			
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_F:		// reFresh display
+                    currMb.setDirty(true);
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_G:		// show gallery
+                    makeGallery(mbList);
+                    break;
+                    
+                case KeyEvent.VK_H:		// help menu
+                    printUsage();
+                    break;
+
+                case KeyEvent.VK_I:		// interrupt Mandelbrot thread
+                    currMb.doInterrupt();
+                    break;
+
+                case KeyEvent.VK_J:		// toggle Mandelbrot/Julia
+                    currMb.setIsJulia(!currMb.getIsJulia());
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_L:		
+                    isLogging = !isLogging;
+                    if (isDebug) System.out.println("Logging is: "+isLogging);
+                    break;
+
+                case KeyEvent.VK_M:		// change multi-resolution parameters
+                    if (!e.isShiftDown())	{
+                        mbPane.lowRepliLimit *= 2;
+                    }
+                    else			{	// halve it
+                        mbPane.lowRepliLimit /= 2;
+                        if (mbPane.lowRepliLimit < 1)	mbPane.lowRepliLimit = 1;
+                    }
+                    //mbPane.setReplifactor(lowRepliLimit);
+                    //currMb.setDirty(true);
+                    //mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_N:		// change multi-resolution parameters
+                    if (!e.isShiftDown())	{	// use direct writes to save time
+                        mbPane.highRepliLimit *= 2;
+                    }
+                    else			{	// halve it
+                        mbPane.highRepliLimit /= 2;
+                        if (mbPane.highRepliLimit < mbPane.lowRepliLimit)
+                            mbPane.lowRepliLimit = mbPane.lowRepliLimit;
+                    }
+                    //mbPane.setReplifactor(lowRepliLimit);
+                    //currMb.setDirty(true);
+                    //mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_O:		// open file containing locations
+                    handleOpen();
+                    break;
+
+                case KeyEvent.VK_P:		// print viewport
+                    System.out.println(currMb.getViewport().toString()+currMb.getNumIterations());
+                    break;
+
+                case KeyEvent.VK_R:		// reset viewport to default
+                    if (isLogging) pushCurrMb();
+                    currMb.resetViewport(mbPane.getSize());
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_S:		// save current list to file
+                    handleSave();
+                    break;
+
+                case KeyEvent.VK_X:		// double the size of the window
+                    if (isLogging) pushCurrMb();
+                    currMb.doInterrupt();
+
+                    Dimension dim = mbPane.getSize();
+                    if (isDebug) System.out.println("Current size is: "+dim.toString());
+                    if (!e.isShiftDown())	{
+                        dim.width *= 2;
+                        dim.height *= 2;
+                        mbPane.setSize(dim);
+                    }
+                    else			{	// halve it
+                        dim.width /= 2;
+                        dim.height /= 2;
+                        mbPane.setSize(dim);
+                    }
+                    mbPane.invalidate();
+                    myFrame.pack();
+//                    show();
+                    mbPane.repaint();
+                    currMb.setDirty(true);
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_Z:		// zoom out/in
+                    if (isDebug) System.out.println("Zooming");
+                    if (isLogging) pushCurrMb();
+                    if (e.isShiftDown())	currMb.zoomOut();
+                    else			currMb.zoomIn();
+                    mbPane.repaint();
+                    break;
+
+                case KeyEvent.VK_DELETE:		
+                        if (mbList.size() <= 1) break;
+                        int index = mbList.indexOf(mbPane);
+                        if (index < 0) break;
+                        makeCurrent(index - 1, mbList);
+                        mbList.remove(index);
+                        break;
+
+                case KeyEvent.VK_SLASH:		// toggle debugging
+                    isDebug = !isDebug;
+                    MandelbrotPane.isDebug = !MandelbrotPane.isDebug;
+                    Mandelbrot.isDebug = !Mandelbrot.isDebug;
+                    break;
+
+                case KeyEvent.VK_ESCAPE:
+                	    System.exit(-1);
+                	    break;
+                	    
+                case KeyEvent.VK_RIGHT:		// move to next location in list
+                    if (isLogging)
+                        if (!mbList.contains(mbPane)) pushCurrMb();
+                    whichMb++;
+                    makeCurrent(whichMb, mbList);
+                    break;
+
+                case KeyEvent.VK_LEFT:		// move to previous locations
+                    if (isDebug) System.out.println("Length is: "+mbList.size());
+                    if (isLogging)	{
+                        if (!mbList.contains(mbPane)) pushCurrMb();
+                        //whichMb--;
+                    }
+                    whichMb--;
+                    makeCurrent(whichMb, mbList);
+                    break;
+
+            }
+        }};
+    }
     public void createActions() {
         System.out.println("Creating actions");
         int shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -503,7 +554,7 @@ public class MandelbrotViewer extends JFrame  {
     public void addMenus() {
         fileMenu = new Menu("File");
         addFileMenuItems();
-        setMenuBar (mainMenuBar);
+        myFrame.setMenuBar (mainMenuBar);
     }
 
     public void handleAbout()
@@ -551,26 +602,26 @@ public class MandelbrotViewer extends JFrame  {
         index = index % xxList.size();
         whichMb = index;
         mbList = xxList;
-        makeCurrent((MandelbrotPane) xxList.get(index));
+        makeCurrent((MandelbrotPaneNew) xxList.get(index));
    }
     
-    public void makeCurrent(MandelbrotPane nmp)		{
+    public void makeCurrent(MandelbrotPaneNew nmp)		{
         //mbPane.deactivate();        
-        remove(mbPane);
+    	 myFrame.remove(mbPane);
         mbPane = nmp;
         currMb = mbPane.getMandelbrot();
         //mbPane.activate();
-        getContentPane().add(mbPane);
+        myFrame.getContentPane().add(mbPane);
         mbPane.repaint();
-        validate();
-        pack();
-        show();
+        myFrame.validate();
+        myFrame.pack();
+        myFrame.show();
     }
     
     public void handleOpen()	{
         String shortname, filename, ss;
         File file;
-        FileDialog fd = new FileDialog(this, "Open file", FileDialog.LOAD);
+        FileDialog fd = new FileDialog(myFrame, "Open file", FileDialog.LOAD);
         
         //StreamTokenizer st;
         java.util.StringTokenizer st;
@@ -593,7 +644,7 @@ public class MandelbrotViewer extends JFrame  {
                     vals[i] = Double.parseDouble(st.nextToken());
                     System.out.println(vals[i]);
                 }
-                mbList.add(new MandelbrotPane(new Mandelbrot(vals[0], vals[1], vals[2], vals[3], ((int) vals[4])), this));
+                mbList.add(new MandelbrotPaneNew(new MandelbrotNew(vals[0], vals[1], vals[2], vals[3], ((int) vals[4]))));
             }
             fin.close();
         }
@@ -609,7 +660,7 @@ public class MandelbrotViewer extends JFrame  {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         String filename, ss;
         File file;
-        FileDialog fd = new FileDialog(this, "Open file", FileDialog.SAVE);
+        FileDialog fd = new FileDialog(myFrame, "Open file", FileDialog.SAVE);
         ListIterator ls;
         Mandelbrot mb;
         MandelbrotPane mbp;
@@ -725,7 +776,7 @@ public class MandelbrotViewer extends JFrame  {
     }
     
     public static void main(String args[]) {
-        new MandelbrotViewer();
+        new MandelbrotViewerNew();
     }
 
 

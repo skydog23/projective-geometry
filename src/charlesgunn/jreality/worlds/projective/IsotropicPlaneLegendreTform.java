@@ -26,6 +26,7 @@ import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.geometry.projective.LineUtility;
 import charlesgunn.jreality.geometry.projective.PointCollector;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
+import charlesgunn.jreality.newtools.FlyTool;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
@@ -523,6 +524,7 @@ public class IsotropicPlaneLegendreTform extends Assignment {
 //		CameraUtility.encompass(viewer);
 		Camera cam  = CameraUtility.getCamera(jrviewer.getViewer());
 		cam.setFar(-1.0);
+		CameraUtility.getCameraNode(viewer).addTool(new FlyTool());
 //		SceneGraphComponent camsgc = CameraUtility.getCameraNode(jrviewer.getViewer());
 //		MatrixBuilder.euclidean().translate(0,0,3.0).rotateX(Math.PI/4).assignTo(camsgc);
 		((Component) viewer.getViewingComponent()).addKeyListener(getKeyAdapter());

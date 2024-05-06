@@ -22,7 +22,7 @@ import charlesgunn.util.Rectangle2D_DL;
 import charlesgunn.util.TextSlider;
 import charlesgunn.util.doubleLong;
 
-public class Mandelbrot extends Object implements Cloneable {
+public class MandelbrotNew extends Object implements Cloneable {
     protected Rectangle2D_DL viewport = null ;
     protected doubleLong jcx, jcy;		// coordinates of Julia-set value
     protected int numIters = 256;
@@ -32,17 +32,15 @@ public class Mandelbrot extends Object implements Cloneable {
         useDL = false;
     static boolean isDebug = false;
     static doubleLong zeroDL = new doubleLong(0.0);
-    private MandelbrotPane mbR = null;
-
-    public Mandelbrot()	{
+    public MandelbrotNew()	{
         this(new Rectangle2D_DL(-3.0, -2.0, 4.0, 4.0), 256);
     }
 
-    public Mandelbrot(double x, double y, double w, double h, int n)	{
+    public MandelbrotNew(double x, double y, double w, double h, int n)	{
         this(new Rectangle2D_DL(x,y, w, h), n);
     }
 
-    public Mandelbrot(Rectangle2D_DL vp, int n)	{
+    public MandelbrotNew(Rectangle2D_DL vp, int n)	{
         //this(sz.width, sz.height, defaultCM, valArray = new byte[size.width * size.height], 0, sz.width);
         viewport = vp;
         numIters = n;
@@ -57,7 +55,7 @@ public class Mandelbrot extends Object implements Cloneable {
 */    
     protected Object clone()	{
         try {
-        Mandelbrot copy = (Mandelbrot) super.clone();
+        MandelbrotNew copy = (MandelbrotNew) super.clone();
         copy.viewport = (Rectangle2D_DL) viewport.clone();
         copy.isDirty = true;	// no data left, needs to be regenerated
         return copy;
@@ -230,7 +228,7 @@ public class Mandelbrot extends Object implements Cloneable {
         setDirty(true);
     }
     
-    public boolean threadCalcImage(MandelbrotPane mp)  { 
+    public boolean threadCalcImage(MandelbrotPaneNew mp)  { 
     	System.err.println("rectangle = "+viewport.toString());
         int tlo, thi, currRf;
         Dimension tsize;

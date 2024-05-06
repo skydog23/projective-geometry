@@ -3,8 +3,11 @@ package charlesgunn.jreality.geometry.projective;
 import java.util.List;
 
 import charlesgunn.jreality.geometry.Snake;
+import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Rn;
 import de.jreality.scene.IndexedLineSet;
+import de.jreality.scene.PointSet;
+import de.jreality.scene.data.Attribute;
 
 public class PointCollector {
 
@@ -101,7 +104,21 @@ public class PointCollector {
 	public int getCount() {
 		return count;
 	}
+
 	
+	public PointSetFactory getPointSetFactory() {
+		int begin = curve.getInfo()[0];
+		double[][] pts = new double[count][points[0].length];
+		double[][] allpts = curve.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(null);
+		for (int i = 0; i<count; ++i)	{
+			pts[i] = allpts[i+begin];
+		}
+		PointSetFactory psf = new PointSetFactory();
+		psf.setVertexCount(count);
+		psf.setVertexCoordinates(pts);
+		psf.update();
+		return psf;
+	}
 	public void reset()	{
 //		System.err.println("resetting collector");
 		int[] snakeinfo = curve.getInfo();

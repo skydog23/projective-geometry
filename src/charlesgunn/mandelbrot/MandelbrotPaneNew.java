@@ -32,11 +32,11 @@ import javax.swing.SwingConstants;
 import charlesgunn.util.Rectangle2D_DL;
 import charlesgunn.util.TextSlider;
 
-public class MandelbrotPane extends JPanel implements Cloneable  {
+public class MandelbrotPaneNew extends JPanel implements Cloneable  {
 
     protected Rectangle2D_DL viewportDL = null; 
 //    protected JPanel thePanel = null;
-    protected Mandelbrot currMb = null;
+    protected MandelbrotNew currMb = null;
     protected byte[] valArray = null;
     protected MemoryImageSource mis = null;
     protected IndexColorModel cm = null;
@@ -72,17 +72,17 @@ public class MandelbrotPane extends JPanel implements Cloneable  {
     int ixmin, iymin, ixmax, iymax;
     boolean dragging  = false;
     Rectangle dragged;
-    JFrame parent;
+//    JFrame parent;
     Box inspector = Box.createHorizontalBox();
 
-    public MandelbrotPane(JFrame p)	{
-       this(new Mandelbrot(new Rectangle2D_DL(-3.0,-2.0,4.0,4.0), 256), p);
+    public MandelbrotPaneNew()	{
+       this(new MandelbrotNew(new Rectangle2D_DL(-3.0,-2.0,4.0,4.0), 256));
     }
 
 
-    public MandelbrotPane(Mandelbrot mb, JFrame p) {
+    public MandelbrotPaneNew(MandelbrotNew mb) {
         super();
-        parent = p;
+//        parent = p;
         cm = defaultCM;
         System.err.println("rect = "+mb.getViewport().toString());
 		calcThread = new Thread(new Runnable()	{
@@ -155,7 +155,7 @@ public class MandelbrotPane extends JPanel implements Cloneable  {
                 if (true || e.getComponent().getHeight() != 0 && e.getComponent().getWidth() != 0) {
                 	setImageSize(e.getComponent().getSize());
                 	repaint();
-                	parent.requestFocus();
+ //               	parent.requestFocus();
                 }
                	System.err.println("rectangle = "+getImageSize().toString());
             }
@@ -164,7 +164,7 @@ public class MandelbrotPane extends JPanel implements Cloneable  {
 
     protected Object clone()	{
         //try {
-            MandelbrotPane copy = (MandelbrotPane) new MandelbrotPane((Mandelbrot) currMb.clone(), parent);
+            MandelbrotPaneNew copy = (MandelbrotPaneNew) new MandelbrotPaneNew((MandelbrotNew) currMb.clone());
             copy.cm = cm;
             copy.calcThread = null;
             copy.isFinished = false;
@@ -180,11 +180,11 @@ public class MandelbrotPane extends JPanel implements Cloneable  {
     	return inspector;
     }
 
-    public Mandelbrot getMandelbrot()	{
+    public MandelbrotNew getMandelbrot()	{
         return currMb;
     }
 
-    public void setMandelbrot(Mandelbrot xx)	{
+    public void setMandelbrot(MandelbrotNew xx)	{
         currMb = xx;
         currMb.setDirty(true);
         repaint();
@@ -343,7 +343,7 @@ public void calculateImage()	{
 					long elapsedTime = endTime - startTime;
 
 					// print the elapsed time
-					System.err.println("Elapsed time: " + elapsedTime + " nanoseconds");
+					System.err.println("Elapsed time: " + elapsedTime/(1.0 * 10e9) + " seconds");
 
 				}
 				isCalculating = false;

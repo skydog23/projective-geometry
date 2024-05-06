@@ -12,7 +12,8 @@ import de.jreality.util.CameraUtility;
 public class DPLCCircle extends DualPointLineCurve {
 
 	{		
-			scale = 1.0; 
+			numberOfSegments = 36; 
+			scale = 3.0; 
 			tscale = .15; 
 			pointRadius = .055;
 			lineRadius = .008;
