@@ -144,7 +144,7 @@ public class MandelbrotPaneNew extends JPanel implements Cloneable  {
                 if (dragged == null) dragged = new Rectangle(downX-getSize().width/2, downY-getSize().height/2, getSize().width, getSize().height);
                 currMb.subViewport(imageSize, dragged);
                 repaint();
-                //getParent().requestFocus();
+                getParent().requestFocusInWindow();
                 //System.out.println("Parent is: "+getParent());
                 dragging = false;
             }
@@ -155,7 +155,7 @@ public class MandelbrotPaneNew extends JPanel implements Cloneable  {
                 if (true || e.getComponent().getHeight() != 0 && e.getComponent().getWidth() != 0) {
                 	setImageSize(e.getComponent().getSize());
                 	repaint();
- //               	parent.requestFocus();
+                	getParent().requestFocusInWindow();
                 }
                	System.err.println("rectangle = "+getImageSize().toString());
             }
@@ -356,7 +356,8 @@ public void calculateImage()	{
 			}
 	}
 	
-	
+
+	   
 	
 // public void calcImage() {
 //	    

@@ -245,9 +245,8 @@ public class MandelbrotNew extends Object implements Cloneable {
         //currRf = thi = tlo = 1;
         for (currRf = thi; currRf >= tlo; currRf = currRf/2)	{
             
-        int i,j,k,m, start;
-        int val;
-        double xmin, xmax, ymin, ymax, dx, dy, x,y, jcxd=0, jcyd=0;
+        int i,j,k,m;
+        double xmin, ymin, dx, dy, jcxd=0, jcyd=0;
         doubleLong dlx, dly, dldx, dldy, dldxs, dldys, bx, by;
         int tval;
         //if (!isDirty)	return;
@@ -295,7 +294,6 @@ public class MandelbrotNew extends Object implements Cloneable {
                         if (useDL)		tval = getValueDL(zeroDL, zeroDL, bx, by );
                     else			tval = getValue(0.0, 0.0, xmin+dx*j, ymin+dy*i);
                     
-                    start = i*tsize.width + j;
                     for (k=0; k < currRf; k++)
                         for (m=0;m<currRf; ++m)	{
                            if ( (i+k) >= tsize.height || (j+m) >= tsize.width) continue;

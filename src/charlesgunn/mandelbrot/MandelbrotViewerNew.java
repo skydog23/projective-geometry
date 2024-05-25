@@ -72,6 +72,8 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -86,36 +88,32 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
-import charlesgunn.anim.plugin.AnimationPlugin;
-import charlesgunn.jreality.viewer.Assignment;
-import de.jreality.plugin.basic.Scene;
 import de.jreality.plugin.basic.View;
-import de.jreality.plugin.icon.ImageHook;
 import de.jreality.plugin.scene.ShrinkPanelAggregator;
-import de.jreality.util.NativePathUtility;
 import de.jreality.util.Secure;
 import de.jtem.jrworkspace.plugin.Controller;
 import de.jtem.jrworkspace.plugin.Plugin;
+import de.jtem.jrworkspace.plugin.flavor.PerspectiveFlavor;
 import de.jtem.jrworkspace.plugin.sidecontainer.SideContainerPerspective;
 import de.jtem.jrworkspace.plugin.sidecontainer.widget.ShrinkPanel;
 import de.jtem.jrworkspace.plugin.simplecontroller.SimpleController;
 
-public class MandelbrotViewerNew extends Plugin  {
+public class MandelbrotViewerNew extends Plugin implements PerspectiveFlavor {
 	
 	
 	static {
@@ -158,12 +156,12 @@ public class MandelbrotViewerNew extends Plugin  {
     public boolean isDebug = true,
         isStartingRepli = true,
         isLogging = true; 
-    protected JFrame myFrame = null,
-    		gallery = null;
+    protected JPanel myMainPanel = null;
+    protected JFrame gallery = null;
     protected JTabbedPane tp = null;
     protected LinkedList galList = new LinkedList();
     
-    SimpleController con = new SimpleController("MandelbrotViewer");
+    SimpleController con = new SimpleController("MandelbrotViewerNew");
     
 	transient protected ShrinkPanelAggregator shrinkPanelPlugin = new ShrinkPanelAggregator() {
 	@Override
@@ -242,28 +240,48 @@ public class MandelbrotViewerNew extends Plugin  {
        // set up collections w/ default
         nameTable.put(mbList, "default");
         System.out.println(nameTable.toString());
-        myFrame = new JFrame();
-        myFrame.getContentPane().setSize(256, 256);
-        myFrame.setTitle ("MandelbrotViewer");
-        myFrame.setLayout(new GridLayout());
-        myFrame.getContentPane().add(mbPane, BorderLayout.CENTER);
         addMenus();
         //createActions();
         con.registerPlugin(shrinkPanelPlugin);
         con.registerPlugin(this);
-        con.startupLocal();
-        myFrame.setVisible(true);
-
-        myFrame.validate();
-        myFrame.pack();
-//        show();
-        myFrame.requestFocus();
+        con.startup();
         
-        myFrame.addKeyListener(getMyKeyAdapter());
-        myFrame.addComponentListener(new ComponentAdapter() {
+
+//        myFrame.validate();
+//        myFrame.pack();
+//        show();
+        myMainPanel.requestFocus();
+        myMainPanel.addKeyListener(getMyKeyAdapter());
+        myMainPanel.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				System.err.println("Pane: Focus lost\n"+e.toString());
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				System.err.println("Pane: Focus gained\n"+e.toString());
+				
+			}
+		});
+        myMainPanel.addFocusListener(new FocusListener() {
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				System.err.println("Frame: Focus lost\n"+e.toString());
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				System.err.println("Frame: Focus gained\n"+e.toString());
+				
+			}
+		});
+        myMainPanel.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e)	{
                 System.out.println("Viewer being resized.");     
-                myFrame.requestFocus();
+                myMainPanel.requestFocus();
                 }
         });
 
@@ -286,7 +304,16 @@ public class MandelbrotViewerNew extends Plugin  {
 		c.anchor = GridBagConstraints.CENTER;
 		if (insp != null) 
 			shrinkPanel.add(insp, c);
-		myFrame.getContentPane().add(shrinkPanel, BorderLayout.EAST);
+		myMainPanel = new JPanel();
+		myMainPanel.setSize(256, 256);
+//	        myFrame.setTitle ("MandelbrotViewerNew");
+		myMainPanel.setLayout(new GridLayout());
+		myMainPanel.add(mbPane, BorderLayout.SOUTH);
+		myMainPanel.setVisible(true);
+
+		myMainPanel.add(shrinkPanel, BorderLayout.EAST);
+		
+
 	}
 	
     void printUsage()	{
@@ -464,7 +491,6 @@ public class MandelbrotViewerNew extends Plugin  {
                         mbPane.setSize(dim);
                     }
                     mbPane.invalidate();
-                    myFrame.pack();
 //                    show();
                     mbPane.repaint();
                     currMb.setDirty(true);
@@ -554,7 +580,7 @@ public class MandelbrotViewerNew extends Plugin  {
     public void addMenus() {
         fileMenu = new Menu("File");
         addFileMenuItems();
-        myFrame.setMenuBar (mainMenuBar);
+//        myFrame.setMenuBar (mainMenuBar);
     }
 
     public void handleAbout()
@@ -607,95 +633,95 @@ public class MandelbrotViewerNew extends Plugin  {
     
     public void makeCurrent(MandelbrotPaneNew nmp)		{
         //mbPane.deactivate();        
-    	 myFrame.remove(mbPane);
+    	 myMainPanel.remove(mbPane);
         mbPane = nmp;
         currMb = mbPane.getMandelbrot();
         //mbPane.activate();
-        myFrame.getContentPane().add(mbPane);
+        myMainPanel.add(mbPane);
         mbPane.repaint();
-        myFrame.validate();
-        myFrame.pack();
-        myFrame.show();
+//        myFrame.validate();
+//        myFrame.pack();
+//        myFrame.show();
     }
     
     public void handleOpen()	{
-        String shortname, filename, ss;
-        File file;
-        FileDialog fd = new FileDialog(myFrame, "Open file", FileDialog.LOAD);
-        
-        //StreamTokenizer st;
-        java.util.StringTokenizer st;
-        double [] vals = new double[5];
-        int nt, i;
-        collectionList.add(mbList);
-        mbList = new LinkedList();
-        fd.setDirectory(directory);
-        fd.show();
-        directory = fd.getDirectory();
-        shortname = fd.getFile();
-        filename = directory+shortname;
-
-        try {
-            file = new File(filename);
-            BufferedReader fin = new BufferedReader(new FileReader(file));
-            while ( (ss = fin.readLine()) != null)	{
-                st = new java.util.StringTokenizer(ss);
-                for (i=0; i<5; ++i)	{
-                    vals[i] = Double.parseDouble(st.nextToken());
-                    System.out.println(vals[i]);
-                }
-                mbList.add(new MandelbrotPaneNew(new MandelbrotNew(vals[0], vals[1], vals[2], vals[3], ((int) vals[4]))));
-            }
-            fin.close();
-        }
-        catch (java.io.IOException ev)	{
-            System.out.println("IOException:"+ev.getMessage());
-        }
-        nameTable.put(mbList,shortname);
-        System.out.println(nameTable.toString());
+//        String shortname, filename, ss;
+//        File file;
+//        FileDialog fd = new FileDialog(myFrame, "Open file", FileDialog.LOAD);
+//        
+//        //StreamTokenizer st;
+//        java.util.StringTokenizer st;
+//        double [] vals = new double[5];
+//        int nt, i;
+//        collectionList.add(mbList);
+//        mbList = new LinkedList();
+//        fd.setDirectory(directory);
+//        fd.show();
+//        directory = fd.getDirectory();
+//        shortname = fd.getFile();
+//        filename = directory+shortname;
+//
+//        try {
+//            file = new File(filename);
+//            BufferedReader fin = new BufferedReader(new FileReader(file));
+//            while ( (ss = fin.readLine()) != null)	{
+//                st = new java.util.StringTokenizer(ss);
+//                for (i=0; i<5; ++i)	{
+//                    vals[i] = Double.parseDouble(st.nextToken());
+//                    System.out.println(vals[i]);
+//                }
+//                mbList.add(new MandelbrotPaneNew(new MandelbrotNew(vals[0], vals[1], vals[2], vals[3], ((int) vals[4]))));
+//            }
+//            fin.close();
+//        }
+//        catch (java.io.IOException ev)	{
+//            System.out.println("IOException:"+ev.getMessage());
+//        }
+//        nameTable.put(mbList,shortname);
+//        System.out.println(nameTable.toString());
     }
 
 
     public void handleSave()	{
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        String filename, ss;
-        File file;
-        FileDialog fd = new FileDialog(myFrame, "Open file", FileDialog.SAVE);
-        ListIterator ls;
-        Mandelbrot mb;
-        MandelbrotPane mbp;
-        //StreamTokenizer st;
-        java.util.StringTokenizer st;
-        double [] vals = new double[5];
-        int nt, i;
-        //System.out.print("Input file name: ");
-        fd.setDirectory(directory);
-        fd.show();
-        directory = fd.getDirectory();
-        filename = directory+fd.getFile();
-
-        try {
-            //filename = in.readLine();
-            file = new File(filename);
-            PrintWriter pw = new PrintWriter(new FileWriter(file));
-            
-            //st = new StreamTokenizer(fr);
-            for( ls = mbList.listIterator(); ls.hasNext();)	{
-                mbp = (MandelbrotPane) (ls.next());
-                mb = mbp.getMandelbrot();
-                pw.print(mb.getViewport().toString());
-                pw.print(" ");
-                pw.println(mb.getNumIterations());
-            }
-            pw.close();
-            //viewportDL.setRect(vals[0], vals[1], vals[2], vals[3]);
-            //currMb.setDirty(true);
-            //mbPane.repaint();
-        }
-        catch (java.io.IOException ev)	{
-            System.out.println("IOException:"+ev.getMessage());
-        }
-
+//        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//        String filename, ss;
+//        File file;
+//        FileDialog fd = new FileDialog(myFrame, "Open file", FileDialog.SAVE);
+//        ListIterator ls;
+//        Mandelbrot mb;
+//        MandelbrotPane mbp;
+//        //StreamTokenizer st;
+//        java.util.StringTokenizer st;
+//        double [] vals = new double[5];
+//        int nt, i;
+//        //System.out.print("Input file name: ");
+//        fd.setDirectory(directory);
+//        fd.show();
+//        directory = fd.getDirectory();
+//        filename = directory+fd.getFile();
+//
+//        try {
+//            //filename = in.readLine();
+//            file = new File(filename);
+//            PrintWriter pw = new PrintWriter(new FileWriter(file));
+//            
+//            //st = new StreamTokenizer(fr);
+//            for( ls = mbList.listIterator(); ls.hasNext();)	{
+//                mbp = (MandelbrotPane) (ls.next());
+//                mb = mbp.getMandelbrot();
+//                pw.print(mb.getViewport().toString());
+//                pw.print(" ");
+//                pw.println(mb.getNumIterations());
+//            }
+//            pw.close();
+//            //viewportDL.setRect(vals[0], vals[1], vals[2], vals[3]);
+//            //currMb.setDirty(true);
+//            //mbPane.repaint();
+//        }
+//        catch (java.io.IOException ev)	{
+//            System.out.println("IOException:"+ev.getMessage());
+//        }
+//
     }
 
    
@@ -778,6 +804,39 @@ public class MandelbrotViewerNew extends Plugin  {
     public static void main(String args[]) {
         new MandelbrotViewerNew();
     }
+
+
+	@Override
+	public Component getCenterComponent() {
+		return myMainPanel;
+	}
+
+
+	@Override
+	public Icon getIcon() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public List<Image> getIconList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String getTitle() {
+		// TODO Auto-generated method stub
+		return "MandyRandy";
+	}
+
+
+	@Override
+	public void setVisible(boolean arg0) {
+		
+	}
 
 
 }
