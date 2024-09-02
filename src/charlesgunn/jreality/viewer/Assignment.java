@@ -11,6 +11,8 @@ import java.awt.Desktop;
 import java.awt.Desktop.Action;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -24,6 +26,7 @@ import java.util.Locale;
 import java.util.Vector;
 
 import javax.swing.Box;
+import javax.swing.SwingConstants;
 
 import charlesgunn.anim.core.Animated;
 import charlesgunn.anim.gui.AnimationPanel;
@@ -31,6 +34,7 @@ import charlesgunn.anim.gui.AnimationPanelEvent;
 import charlesgunn.anim.gui.AnimationPanelListener;
 import charlesgunn.anim.plugin.AnimationPlugin;
 import charlesgunn.jreality.plugin.TermesSpherePlugin;
+import charlesgunn.util.TextSlider;
 import de.jreality.plugin.JRViewer;
 import de.jreality.plugin.basic.Content;
 import de.jreality.plugin.basic.Scene;
@@ -43,9 +47,12 @@ import de.jreality.plugin.content.DirectContent;
 import de.jreality.plugin.experimental.ViewerKeyListenerPlugin;
 import de.jreality.plugin.scene.ShrinkPanelAggregator;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.PointLight;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Viewer;
 import de.jreality.shader.CommonAttributes;
+import de.jreality.tutorial.util.FlyTool;
+import de.jreality.util.CameraUtility;
 import de.jreality.util.Input;
 import de.jreality.util.Secure;
 import de.jtem.beans.InspectorPanel;
@@ -172,6 +179,17 @@ public abstract class Assignment extends Plugin implements Animated {
 	 * @return
 	 */
 	public Component getInspector()	{
+		if (addCameraLight ) {
+			final TextSlider<Double> eSlider = new TextSlider.Double("headlight",  SwingConstants.HORIZONTAL, -1, 1, hlIntensity);
+			eSlider.addActionListener(new ActionListener()	{
+				public void actionPerformed(ActionEvent e)	{
+					hlIntensity = eSlider.getValue().doubleValue();
+					headlight.setIntensity(hlIntensity);
+				}});
+			Box hbox = Box.createHorizontalBox();
+			hbox.add(eSlider);
+			inspector.add(hbox);
+		}
 		return inspector;
 	}
 
@@ -314,6 +332,7 @@ public abstract class Assignment extends Plugin implements Animated {
 		setupJRViewer(jrviewer);
 		jrviewer.startup();
 		viewer = jrviewer.getViewer();
+		if (addCameraLight) addCameraLight(.6);
 		// comment out the following to get transparent black background
 		Appearance ap = jrviewer.getViewer().getSceneRoot().getAppearance();
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
@@ -338,6 +357,25 @@ public abstract class Assignment extends Plugin implements Animated {
 			});
 	}
 	
+	boolean addCameraLight = true;
+	double hlIntensity = .6;
+    PointLight headlight = new PointLight();
+	public boolean isAddCameraLight() {
+		return addCameraLight;
+	}
+
+	public void setAddCameraLight(boolean addCameraLight) {
+		this.addCameraLight = addCameraLight;
+	}
+
+	protected void addCameraLight(double intensity) {
+	    SceneGraphComponent cnode = CameraUtility.getCameraNode(viewer);
+	    headlight.setColor(Color.white);
+	    headlight.setGlobal(true);
+	    headlight.setIntensity(intensity);
+	    headlight.setFalloff(new double[] {1,0,0});
+	    cnode.setLight(headlight);
+	}
 	/**
 	 * handle display of on-line documentation using the Desktop object of Java 6
 	 */
