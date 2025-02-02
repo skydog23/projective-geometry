@@ -103,7 +103,7 @@ public class PenrosePlanePairs3D extends Assignment {
 		Camera c = CameraUtility.getCamera(viewer);
 		c.setFieldOfView(80.0);
 	    CameraUtility.getCameraNode(viewer).addTool(new FlyTool());
-	    addCameraLight(.6);
+//	    addCameraLight(.6);
 	    
 		Component comp = ((Component) viewer.getViewingComponent());
 		comp.addKeyListener(new KeyAdapter() {

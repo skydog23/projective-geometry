@@ -180,7 +180,7 @@ public abstract class Assignment extends Plugin implements Animated {
 	 */
 	public Component getInspector()	{
 		if (addCameraLight ) {
-			final TextSlider<Double> eSlider = new TextSlider.Double("headlight",  SwingConstants.HORIZONTAL, -1, 1, hlIntensity);
+			final TextSlider<Double> eSlider = new TextSlider.Double("headlight",  SwingConstants.HORIZONTAL, 0, 1, hlIntensity);
 			eSlider.addActionListener(new ActionListener()	{
 				public void actionPerformed(ActionEvent e)	{
 					hlIntensity = eSlider.getValue().doubleValue();
@@ -357,13 +357,14 @@ public abstract class Assignment extends Plugin implements Animated {
 			});
 	}
 	
-	boolean addCameraLight = true;
-	double hlIntensity = .6;
+	boolean addCameraLight = false;
+	protected double hlIntensity = .6;
     PointLight headlight = new PointLight();
 	public boolean isAddCameraLight() {
 		return addCameraLight;
 	}
 
+	// this has to  be called before display() is called!
 	public void setAddCameraLight(boolean addCameraLight) {
 		this.addCameraLight = addCameraLight;
 	}

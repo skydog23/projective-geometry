@@ -25,6 +25,19 @@ import de.jreality.tools.PointDragListener;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
 
+// the first punch line of this demo of 2D PGA is:
+// given a triangle with sides a,b,c. 
+// The geometric products abc, bca, and cab represent
+// glide reflections whose axes join the feet of two altitudes of 
+// the triangle. 
+// For example, the glide axis of abc joins the feet of the altitudes a-A and c-C.
+//
+// The second punch line is:
+// the sum of the normalized axes is a line perpendicular to the Euler line
+// of the triangle.
+// Note: the sum of the axes is the full symmetric product of the 3 lines.
+//
+// See Charles Gunn, "Doing Euclidean Plane Geometry Using PGA", https://arxiv.org/abs/1501.06511
 public class AaBb extends Assignment {
 	// start with a triangle
 	// the third coordinate of pts3 is the w-coordinate, not the z-coordinate!
@@ -144,12 +157,15 @@ public class AaBb extends Assignment {
 		ifsf.update();
 		
 		System.err.println("points = "+Rn.toString(pts3));
+		// the corners of the triangle
 		A= MultivectorP2.point(pts3[0]);
 		B = MultivectorP2.point(pts3[1]);
 		C = MultivectorP2.point(pts3[2]);
+		// the sides of the triangle
 		a = MultivectorP2.join(null, B, C);
 		b = MultivectorP2.join(null, C, A);
 		c = MultivectorP2.join(null, A, B);
+		// normalize them
 		a = ts.normalize(null, a);
 		b = ts.normalize(null, b);
 		c = ts.normalize(null, c);
@@ -161,6 +177,7 @@ public class AaBb extends Assignment {
 			mirrorIfsf[i].setVertexCoordinates(pts4);
 			mirrorIfsf[i].update();
 			int ii = i, jj = (i+1)%3, kk = (i+2)%3;
+			// take the geometric product of the three sides in 3 ways
 			glideReflection = ts.gp(null, abc[kk], ts.gp(null, abc[jj], abc[ii]));
 			mirrorLines[i] = new MultivectorP2(glideReflection);
 			
@@ -202,6 +219,7 @@ public class AaBb extends Assignment {
 		MultivectorP2 altA = MultivectorP2.grade(null, ts.gp(null, a, A), 1);
 		MultivectorP2 altB = MultivectorP2.grade(null, ts.gp(null, b, B), 1);
 		MultivectorP2 orthocenter = MultivectorP2.grade(null, ts.gp(null, altA, altB), 2);
+		// perpendicular bisectors
 		MultivectorP2 perpA = MultivectorP2.grade(null, ts.gp(null, a, MultivectorP2.plus(null, B, C)), 1);
 		MultivectorP2 perpB = MultivectorP2.grade(null, ts.gp(null, b, MultivectorP2.plus(null, C, A)), 1);
 		MultivectorP2 circumcenter = MultivectorP2.grade(null, ts.gp(null, perpA, perpB), 2);

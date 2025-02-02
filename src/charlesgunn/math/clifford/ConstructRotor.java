@@ -16,11 +16,14 @@ public class ConstructRotor {
 			0., c, -s, 0.,
 			0., s, c, 0.0,
 			0., 0., 0., 1.};
+	
+	static double[] M2 = {0.833333, -0.5, 0.235702, -0.333333, 0.5, 0.5, -0.707107, 0, 
+			0.235702, 0.707107, 0.666667, -0.235702, 0, 0, 0, 1.};
 	static double[][] points = {{0, 0, 0, 1}, {1, 0, 0, 1}, {0, 1, 0, 1}, {0, 0, 1, 1}, {1, 
 		   1, 1, 1}};
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Biquaternion bq = Biquaternion.biquaternionFromDirectIsometry(null, M, Biquaternion.Metric.EUCLIDEAN);
+		Biquaternion bq = Biquaternion.biquaternionFromDirectIsometry(null, M2, Biquaternion.Metric.EUCLIDEAN);
 		System.err.println("biq = "+bq);
 		Biquaternion axis = Biquaternion.axisForBivector(null, 
 				Biquaternion.bivector(null, bq));

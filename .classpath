@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/animation"/>
 	<classpathentry excluding="charlesgunn/video/VideoTexture.java|charlesgunn/jreality/oldtools/|charlesgunn/jreality/worlds/AnimatedTexture.java|charlesgunn/jreality/worlds/TestKernelHull.java|mathvisws12/|charlesgunn/bicycle/BicycleVR.java|charlesgunn/jreality/geometry/MarchingCubesTest.java|charlesgunn/jreality/worlds/projective/StrahlUndAchse (original).java|charlesgunn/jreality/worlds/projective/HopfFibrationAssignment.java|charlesgunn/jreality/worlds/projective/DualPointLineCurve.java|charlesgunn/jreality/worlds/projective/Elation2.java|charlesgunn/jreality/worlds/projective/NullPlanesOnLIne.java|charlesgunn/jreality/worlds/projective/QuadricSurfaceFromBundles.java|charlesgunn/jreality/worlds/rugr2d/DualPointLineCurveBad.java" kind="src" path="src">
 		<attributes>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="jreality/jni/macosx"/>
@@ -7,10 +9,8 @@
 	</classpathentry>
 	<classpathentry excluding="de/jreality/tools/|de/jreality/geometry/TestGL2C.java|de/jreality/tutorial/MeshFrame.java" kind="src" path="src-test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jreality"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/beans"/>
 	<classpathentry kind="lib" path="/lib/jh.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/animation"/>
 	<classpathentry kind="lib" path="/lib/quickhull3d.jar"/>
 	<classpathentry kind="lib" path="/lib/jmf.jar"/>
 	<classpathentry kind="lib" path="/lib/numericalMethods-22.05.06.jar"/>

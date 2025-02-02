@@ -349,6 +349,7 @@ public class AmesRoom extends Assignment {
 	private double[] totalM;
 	@Override
 	public Component getInspector() {
+		super.getInspector();
 		Box container = Box.createVerticalBox();
 		Box plane = Box.createVerticalBox();
 		container.add(plane);
@@ -404,7 +405,8 @@ public class AmesRoom extends Assignment {
 			}
 		});
 		container.add(hSlider);
-		return container;
+		inspector.add(container);
+		return inspector;
 	}
 
 	public static void main(String[] arg)	{
