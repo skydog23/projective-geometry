@@ -48,6 +48,9 @@ import de.jreality.scene.SceneGraphPath;
 import de.jreality.scene.event.TransformationEvent;
 import de.jreality.scene.event.TransformationListener;
 import de.jreality.shader.CommonAttributes;
+import de.jreality.shader.DefaultGeometryShader;
+import de.jreality.shader.ImplodePolygonShader;
+import de.jreality.shader.ShaderUtility;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
@@ -68,7 +71,8 @@ public class DandelinConfiguration extends Assignment {
 	double parameter = 0.3,
 		depth = .625,
 		sphereRadius = 20,
-		epsilon = 5.0;
+		epsilon = 5.0,
+		lineWidth = 4.0;
 	boolean show3D = false,
 			clip = false;
 	private SceneGraphComponent 
@@ -118,7 +122,7 @@ public class DandelinConfiguration extends Assignment {
 		onRegSGC = SceneGraphUtility.createFullSceneGraphComponent("on regulus");
 		linesSGC = SceneGraphUtility.createFullSceneGraphComponent("lines");
 		linesSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
-//		linesSGC.getAppearance().setAttribute(CommonAttributes.LINE_WIDTH, 1.5);
+		linesSGC.getAppearance().setAttribute(CommonAttributes.LINE_WIDTH, lineWidth);
 		linesSGC.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.black);
 		linesSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, false);
 		MatrixBuilder.euclidean().translate(0,0,.01).assignTo(linesSGC);
@@ -126,18 +130,25 @@ public class DandelinConfiguration extends Assignment {
 		Appearance ap = pascalTriSGC.getAppearance();
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, false);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
+		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
 //		ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, true);
 		ap.setAttribute(CommonAttributes.TRANSPARENCY, 0.6);
+		DefaultGeometryShader dgs = (DefaultGeometryShader) 
+	   			ShaderUtility.createDefaultGeometryShader(ap, true);
+		ImplodePolygonShader dps = (ImplodePolygonShader) dgs.createPolygonShader("implode");
+		ap.setAttribute("polygonShader.implodeFactor", .25);
+		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
 		
 		pointsSGC.getAppearance().setAttribute(CommonAttributes.POINT_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.yellow);
 		conicSGC = SceneGraphUtility.createFullSceneGraphComponent("conic");
-		conicSGC.getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, false);
-		conicSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		conicSGC.getAppearance().setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.green);
+	    ap = conicSGC.getAppearance();
+		ap.setAttribute(CommonAttributes.TUBES_DRAW, false);
+		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
+		ap.setAttribute(CommonAttributes.LINE_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.black);
+		ap.setAttribute("lineShader.lineWidth", 4.0);
 		MatrixBuilder.euclidean().translate(0,0,.01).assignTo(conicSGC);
 
 		theRestSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
-		theRestSGC.getAppearance().setAttribute("lineShader.lineWidth", 3.0);
 
 		world.addChildren(world2, clip1SGC, clip2SGC);
 		world2.addChildren(regulusSGC, theRestSGC);
@@ -159,7 +170,7 @@ public class DandelinConfiguration extends Assignment {
 		bothSGC.addChildren(regFacSGC, leitSharSGC);
 		ap = bothSGC.getAppearance();
 		ap.setAttribute(CommonAttributes.TUBES_DRAW,false);
-		ap.setAttribute(CommonAttributes.LINE_WIDTH, 1.0);
+		ap.setAttribute(CommonAttributes.LINE_WIDTH, 2.0);
 		ap.setAttribute(CommonAttributes.TUBE_RADIUS, .02);
 		bothSGC.setPickable(false);
 		bothSGC.setVisible(false);
@@ -189,7 +200,7 @@ public class DandelinConfiguration extends Assignment {
 		pointsSGC.getAppearance().setAttribute(CommonAttributes.TEXT_SHADER+"."+CommonAttributes.TEXT_SCALE, .003);
 		pointsSGC.getAppearance().setAttribute(CommonAttributes.TEXT_SCALE, .003);
 
-		conicSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
+		ap.setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 
 		world.getAppearance().setAttribute(CommonAttributes.SMOOTH_SHADING, false);
 		world.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
@@ -243,8 +254,8 @@ public class DandelinConfiguration extends Assignment {
 
 		updateReglines();
 
-		Color[] colors = new Color[]{m,gr,vi,m,gr,vi, Color.blue, m, gr, vi};
-		Boolean[] stipple = {true, true, true, true, true, true, false, false, false, false};
+		Color[] colors = new Color[]{m,gr,vi,m,gr,vi, new Color(150,150,0), m, gr, vi};
+		Boolean[] stipple = {true, true, true, true, true, true, true, false, false, false};
 		int[] stippleVals = {127, 127, 127, 127, 127, 127, 15*257,165*257, 234*257, 15*257, 165*257, 234*257,0, 0, 0, 0};
 		for (int i = 0; i<10; ++i)	{
 			lineFactories[i] = new PointRangeFactory(); 
@@ -287,16 +298,17 @@ public class DandelinConfiguration extends Assignment {
 	int pascalTris[][] = {{0,1,2},{0,2,1},{1,0,2},{1,2,0},{2,0,1},{2,1,0}},
 			pascalTri[] = pascalTris[0];
 	int[][] hexagon = new int[6][2];
-	boolean[] showFaces = {false, false, false, false, false, false};
+	boolean[] showFaces = {false, false, false, false, false, false, false};
 	int[][] pascalIndices = {
-			{12, 13, 17},
-			{15, 16, 14},
-			{13, 14, 12},
-			{16, 17, 15},
-			{14, 15, 13},
-			{17, 12, 16}
+			{12, 10, 11},
+			{15, 11, 10},
+			{13, 11, 9},
+			{16, 9, 11},
+			{14, 9, 10},
+			{17, 10, 9},
+			{9,10,11}
 	};
-	Color[] pascalColors = { gr, gr, vi, vi, m, m};
+	Color[] pascalColors = { gr, gr, vi, vi, m, m, y};
 	
 	protected void update()	{
 		updateReglines();
@@ -377,12 +389,12 @@ public class DandelinConfiguration extends Assignment {
 		regulusSGC.setVisible(show3D);
 		clip1SGC.setVisible(show3D);
 		clip2SGC.setVisible(show3D);
-		if (show3D)	{
-			world.addChildren(clip1SGC, clip2SGC);
-		} else {
-			world.removeChild(clip1SGC);
-			world.removeChild(clip2SGC);
-		}
+//		if (show3D)	{
+//			world.addChildren(clip1SGC, clip2SGC);
+//		} else {
+//			world.removeChild(clip1SGC);
+//			world.removeChild(clip2SGC);
+//		}
 		for (int i = 0; i<3; ++i)	{
 			linesSGC.getChildComponent(i+7).setVisible(show3D);
 		}
@@ -403,27 +415,20 @@ public class DandelinConfiguration extends Assignment {
 		if (pascalTriFac == null)	{
 			pascalTriFac = new IndexedFaceSetFactory();
 			pascalTriFac.setVertexCount(points4.length);
-			pascalTriFac.setFaceCount(6);
-			pascalTriFac.setFaceIndices(new int[][] {
-				{12, 10, 11},
-				{15, 11, 10},
-				{13, 11, 9},
-				{16, 9, 11},
-				{14, 9, 10},
-				{17, 10, 9}
-			});
-			pascalTriFac.setFaceColors(new Color[]{ gr, gr, vi, vi, m, m});
+			pascalTriFac.setFaceCount(pascalIndices.length);
+			pascalTriFac.setFaceIndices(pascalIndices);
+			pascalTriFac.setFaceColors(pascalColors);
 			pascalTriFac.setGenerateFaceNormals(true);
 		}
 		pascalTriFac.setVertexCoordinates(points4);
 		int count = 0;
-		for (int i = 0; i<6; ++i) {
+		for (int i = 0; i<7; ++i) {
 			if (showFaces[i]) count++;
 		}
 		int[][] inds = new int[count][];
 		Color[] fc = new Color[count];
 		count = 0;
-		for (int i = 0; i<6; ++i) {
+		for (int i = 0; i<7; ++i) {
 			if (showFaces[i]) {
 				inds[count] = pascalIndices[i];
 				fc[count] = pascalColors[i];
@@ -529,9 +534,10 @@ public class DandelinConfiguration extends Assignment {
 	int counter = 0;
 	@Override
 	public void display() {
-		// TODO Auto-generated method stub
+		hlIntensity = .2;
+		setAddCameraLight(true);
 		super.display();
-		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, Color.white);
+		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, new Color(250,250,230));
 		Camera cam = CameraUtility.getCamera(jrviewer.getViewer());
 		cam.setFar(50);
 		cam.setFocus(8.0);
@@ -564,11 +570,11 @@ public class DandelinConfiguration extends Assignment {
 		update();
 	}
 
-	final String[] zigzagNames = {"0","0'","1","1'","2", "2'"};
+	final String[] zigzagNames = {"0","1","2", "P"};
 	@Override
 	public Component getInspector() {
 		if (bothSGC == null) getContent();
-		Box inspectionPanel = inspector;
+		Box inspectionPanel = (Box) super.getInspector();
 		Box vbox = Box.createVerticalBox();
 		inspector.add(vbox);
 		vbox.setBorder(new CompoundBorder(new EmptyBorder(5, 5, 5, 5),
@@ -609,8 +615,8 @@ public class DandelinConfiguration extends Assignment {
 		});	
 		hbox = Box.createHorizontalBox();
 		vbox.add(hbox);
-		hbox.add(new JLabel("Show zigzag planes:"));
-		for (int i = 0; i<6; ++i)	{
+		hbox.add(new JLabel("Show triangles:"));
+		for (int i = 0; i<4; ++i)	{
 			cb = new JCheckBox(zigzagNames[i]);
 			hbox.add(cb);
 			cb.setSelected(showFaces[i]);
@@ -619,7 +625,9 @@ public class DandelinConfiguration extends Assignment {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					showFaces[j] = ((JCheckBox) e.getSource()).isSelected();
+					boolean b = ((JCheckBox) e.getSource()).isSelected();
+					if (j < 3) showFaces[2*j] = showFaces[2*j+1] = b; 
+					else showFaces[6] = b;
 					update();
 				}
 			});	
@@ -645,11 +653,19 @@ public class DandelinConfiguration extends Assignment {
 			public void actionPerformed(ActionEvent e)	{
 				depth = depthSlider.getValue().doubleValue();
 				MatrixBuilder.euclidean().translate(0,0,depth).assignTo(regulusSGC);
-
 				update();
 			}
 		});
 		inspectionPanel.add(depthSlider);
+		final TextSlider lineWidthSlider = new TextSlider.Double("line width",SwingConstants.HORIZONTAL, .2, 8.0, lineWidth);
+		lineWidthSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				lineWidth= lineWidthSlider.getValue().doubleValue();
+				linesSGC.getAppearance().setAttribute("lineShader."+CommonAttributes.LINE_WIDTH, lineWidth);
+			}
+		});
+		inspectionPanel.add(lineWidthSlider);
+		
 		final TextSlider clipSlider = new TextSlider.Double("clip amount",SwingConstants.HORIZONTAL, 0.0, 2, epsilon);
 		clipSlider.addActionListener(new ActionListener()	{
 			public void actionPerformed(ActionEvent e)	{
