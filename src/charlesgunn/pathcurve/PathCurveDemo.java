@@ -243,11 +243,10 @@ public class PathCurveDemo extends Assignment  {
 //		psf.getGeometry().setGeometryAttributes(GeometryUtility.BOUNDING_BOX, Rectangle3D.EMPTY_BOX);
 	}
 
-	Viewer viewer;
 	@Override
 	public void display() {
 		super.display();
-		this.viewer = jrviewer.getViewer();
+		viewer = jrviewer.getViewer();
 //		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.FOG_ENABLED, true);
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.FOG_DENSITY, .15);
 		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.TUBES_DRAW, false);
@@ -297,6 +296,7 @@ public class PathCurveDemo extends Assignment  {
 		});
 		adb.setName("PathCurveDemo");
 		
+		animationPlugin.setAnimateSceneGraph(true);
 		animationPlugin.getAnimated().add(adb);
 		Camera c = CameraUtility.getCamera(viewer);
 		KeyFrameAnimatedBean<Camera> ac = new KeyFrameAnimatedBean<Camera>(c);
