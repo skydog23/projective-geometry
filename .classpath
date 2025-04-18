@@ -31,5 +31,6 @@
 	<classpathentry kind="lib" path="/lib/discretegroupCGG.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all-natives-macosx-universal.jar"/>
 	<classpathentry kind="lib" path="/lib/jrworkspace.jar"/>
+	<classpathentry kind="lib" path="/lib/rings-2.5.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

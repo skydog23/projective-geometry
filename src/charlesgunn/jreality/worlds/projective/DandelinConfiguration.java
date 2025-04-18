@@ -130,14 +130,14 @@ public class DandelinConfiguration extends Assignment {
 		Appearance ap = pascalTriSGC.getAppearance();
 		ap.setAttribute(CommonAttributes.EDGE_DRAW, false);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
+//		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, true);
 //		ap.setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, true);
 		ap.setAttribute(CommonAttributes.TRANSPARENCY, 0.6);
 		DefaultGeometryShader dgs = (DefaultGeometryShader) 
 	   			ShaderUtility.createDefaultGeometryShader(ap, true);
 		ImplodePolygonShader dps = (ImplodePolygonShader) dgs.createPolygonShader("implode");
 		ap.setAttribute("polygonShader.implodeFactor", .25);
-		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
+//		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
 		
 		pointsSGC.getAppearance().setAttribute(CommonAttributes.POINT_SHADER+"."+CommonAttributes.DIFFUSE_COLOR, Color.yellow);
 		conicSGC = SceneGraphUtility.createFullSceneGraphComponent("conic");

@@ -8,12 +8,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import charlesgunn.jreality.geometry.GeometryUtilityOverflow;
 import charlesgunn.jreality.geometry.projective.CircleFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.newtools.RotateTool;
 import charlesgunn.jreality.viewer.Assignment;
+import charlesgunn.math.ContinuedFraction;
 import de.jreality.geometry.BoundingBoxTraversal;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -22,6 +24,7 @@ import de.jreality.geometry.Primitives;
 import de.jreality.geometry.SphereUtility;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
+import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.IndexedLineSet;
@@ -44,15 +47,15 @@ public class CounterSpacePlanets extends Assignment {
 			Color.cyan, 
 			Color.gray, 
 			new Color(0, 255, 125)};
-	double[] eccentricity = {
-			.2056,		// mercury
-			.00677,		// venus
-			.0167,		// earth
-			.0934,		// mars
-			.0484,		// jupiter
-			.0542,		// saturn
-			.0472,		// uranus
-			.0086		// neptune
+	static double[] eccentricity = {
+		    0.20563069, // Mercury
+		    0.00677672, // Venus
+		    0.01671022, // Earth
+		    0.09339410, // Mars
+		    0.04839266, // Jupiter
+		    0.05415060, // Saturn
+		    0.04716771, // Uranus
+		    0.00858587, // Neptune
 	},
 		perihelion = {
 			.307,
@@ -76,7 +79,7 @@ public class CounterSpacePlanets extends Assignment {
 	};
 	double scaler = 1.0/perihelion[7];
 	
-	String[] names = {"mercury","venus","earth","mars","jupiter","saturn","uranus","neptune"};
+	static String[] names = {"mercury","venus","earth","mars","jupiter","saturn","uranus","neptune"};
 	
 	boolean stPr = false;
 	SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("planet");
@@ -129,6 +132,7 @@ public class CounterSpacePlanets extends Assignment {
 	public void display() {
 		// TODO Auto-generated method stub
 		super.display();
+		getDualRadii();
 		Component comp = ((Component) jrviewer.getViewer().getViewingComponent());
 		comp.addKeyListener(new KeyAdapter() {
  				public void keyPressed(KeyEvent e)	{ 
@@ -149,6 +153,27 @@ public class CounterSpacePlanets extends Assignment {
 			});
 	}
 
+	
+	public static double[] getDualRadii()	{
+		double[] dualRadii = new double[names.length];
+		
+		for (int i = 0; i<names.length; ++i)	{
+			double f = eccentricity[i] * perihelion[i]/ (1-eccentricity[i]),
+					major = f + perihelion[i];
+			dualRadii[i] = 1/(major-f) + 1/(major+f);
+		}
+		double scale = 1.0/dualRadii[2];
+		double[] ratio = new double[names.length*names.length];
+		for (int i = 0; i<names.length; ++i)	{
+			for (int j = 0; j<names.length; ++j)	{
+				double r = dualRadii[i]/dualRadii[j];
+				ratio[names.length * i + j] = r;
+			}
+		}
+		System.err.println(Rn.toString(dualRadii));
+		
+		return dualRadii;
+	}
 	public static SceneGraphComponent planetaryPath(double ecc, double peri, double lp, boolean stPr, String name)	{
 		SceneGraphComponent sgc = SceneGraphUtility.createFullSceneGraphComponent("planet");
 		SceneGraphComponent bahnSGC = SceneGraphUtility.createFullSceneGraphComponent("bahn");
@@ -158,6 +183,7 @@ public class CounterSpacePlanets extends Assignment {
 				a = f + peri,
 				b = Math.sqrt(a*a-f*f);
 		System.err.println("f a b = "+f+" "+a+" "+b);
+		System.err.println("dual radius "+(1/(a-f)+1/(a+f)));
 		
 		double[][] points = new double[100][4];
 		for (int i = 0; i<100; ++i)	{
@@ -211,4 +237,5 @@ public class CounterSpacePlanets extends Assignment {
 		new CounterSpacePlanets().display();
 	}
 
+	
 }

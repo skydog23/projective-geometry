@@ -332,7 +332,7 @@ public abstract class Assignment extends Plugin implements Animated {
 		setupJRViewer(jrviewer);
 		jrviewer.startup();
 		viewer = jrviewer.getViewer();
-		if (addCameraLight) addCameraLight(.6);
+		if (addCameraLight) addCameraLight(hlIntensity);
 		// comment out the following to get transparent black background
 		Appearance ap = jrviewer.getViewer().getSceneRoot().getAppearance();
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
