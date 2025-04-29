@@ -1,6 +1,7 @@
 package charlesgunn.pathcurve;
 import java.awt.Color;
 
+import charlesgunn.jreality.geometry.ClipBox;
 import charlesgunn.jreality.geometry.GeometryUtilityOverflow;
 import charlesgunn.math.Complex;
 import de.jreality.geometry.BallAndStickFactory;
@@ -244,135 +245,12 @@ public class PathCurveUtility {
 		
 		return world;
 	}
-
-	public static SceneGraphComponent makeImWorld() {
-		double alpha = 1.2;
-		double beta =1;
-		double scale = .85;
-		double radius = .5;
-		double[] coordinateSystem = Rn.transpose(null, new double[]{
-				1, 1, 0, 1, 
-				1, -1, 0, 1,
-				0, 0, 1, 1, 
-				0, 0, -1, 1});
-//		coordinateSystem = Rn.identityMatrix(4);
-		double[] p = {radius,0,0,1};
-		
-		double tmin = -2; //-3*Math.PI;
-		double tmax = 2; //3*Math.PI;
-		int steps = 100;
-		
-		Complex[] ev = new Complex[4];
-		ev[0] = new Complex(0,alpha);
-		ev[1] = Complex.conjugate(null, ev[0]);
-		ev[2] = new Complex(Math.log(scale), -beta);
-		ev[3] = Complex.conjugate(null, ev[2]);
-		SceneGraphComponent world = SceneGraphUtility.createFullSceneGraphComponent("Imaginary path curve world");
-		PathCurveFactory pcf = new PathCurveFactory();
-		pcf.setCoordinateSystem(coordinateSystem);
-		pcf.setEigenvalues(ev);
-		pcf.setTmin(tmin);
-		pcf.setTmax(tmax);
-		pcf.setNumberSteps(steps);
-		pcf.setInitialPoint(p);
-		pcf.update();
-		double[][] orbit = PathCurveUtility.pathCurveOrbit(ev, coordinateSystem, p, tmin, tmax, steps);
-//		double[][] orbit = new double[12][4];
-//		for (int i = 0; i<12; ++i)	{
-//			orbit[i][0] = .5 * Math.cos(2*Math.PI*i/11.0);
-//			orbit[i][1] = .5 * Math.sin(2*Math.PI*i/11.0);
-//			orbit[i][2] = 0.0;
-//			orbit[i][3] = 1.0;
-//		}
-		ev = new Complex[4];
-		ev[0] = new Complex(-Math.log(scale), alpha);
-		ev[1] = Complex.conjugate(null, ev[0]);
-		ev[2] = new Complex(Math.log(scale), beta);
-		ev[3] = Complex.conjugate(null, ev[2]);
-		tmin = -2;
-		tmax = 2;
-		steps = 180;
-		PathCurveParametricSurfaceFactory pcpsf = new PathCurveParametricSurfaceFactory();
-		pcpsf.setCoordinateSystem(coordinateSystem);
-		pcpsf.setEigenvalues(ev);
-		pcpsf.setInitialCurveFactory(pcf);
-		pcpsf.setTmin(tmin);
-		pcpsf.setTmax(tmax);
-		pcpsf.setNumberSteps(steps);
-		pcpsf.update();
-		
-//		IndexedFaceSet qms = pcpsf.getIndexedFaceSet();
-		IndexedFaceSet qms = PathCurveUtility.pathCurveMesh(ev, coordinateSystem, orbit,tmin, tmax, steps);
-		Rectangle3D box = new Rectangle3D();
-		double[][] bnds = box.getBounds();
-		double size = 6.0;
-		double b = size+.01;
-		double bndsize = size+.5;
-		bnds[0][0] = bnds[0][1] = bnds[0][2] = -bndsize;
-		bnds[1][0] = bnds[1][1] = bnds[1][2] = bndsize;
-		box.setBounds(bnds);
-		box.update();
-		IndexedFaceSet clipped = GeometryUtilityOverflow.clipToBox(qms, box);
-		String attrbox = GeometryUtility.BOUNDING_BOX;
-		double[][] bounds = {{-b,-b,-b},{b,b,b}};
-		Rectangle3D bbox = new Rectangle3D(bounds);
-		clipped.setGeometryAttributes(attrbox, bbox);
-		SceneGraphComponent mesh = SceneGraphUtility.createFullSceneGraphComponent("mesh");
-		mesh.setGeometry(clipped);
-		world.addChild(mesh);
-		mesh.getAppearance().setAttribute(CommonAttributes.EDGE_DRAW, false);
-//		SceneGraphComponent bs = TubeUtility.ballAndStick(clipped, .02,.01,new Color(.99f, 0f, .1f, .8f), Color.GREEN, Pn.EUCLIDEAN);
-//		bs.getAppearance().setAttribute(CommonAttributes.BACK_FACE_CULLING_ENABLED, true);
-//		world.addChild(bs);
-		boolean boundit = true;
-		if (boundit)	{
-			world.addChild(Primitives.clippingPlane(new double[]{1,0,0,-b}));
-			world.addChild(Primitives.clippingPlane(new double[]{-1,0,0,-b}));
-			world.addChild(Primitives.clippingPlane(new double[]{0,1,0,-b}));
-			world.addChild(Primitives.clippingPlane(new double[]{0,-1,0,-b}));
-			world.addChild(Primitives.clippingPlane(new double[]{0,0,1,-b}));
-			world.addChild(Primitives.clippingPlane(new double[]{0,0,-1,-b}));			
-		}
-		
-		SceneGraphComponent tetra = SceneGraphUtility.createFullSceneGraphComponent("tetra");
-		tetra.getTransformation().setMatrix(P3.makeStretchMatrix(null, size));
-		IndexedFaceSet tet = Primitives.cube();
-		tetra.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+"."+CommonAttributes.DIFFUSE_COLOR,Color.WHITE);
-		BallAndStickFactory basf = new BallAndStickFactory(tet);
-		basf.setBallColor(null);
-		basf.setBallRadius(.01);
-		basf.setStickColor(null);
-		basf.setStickRadius(.01);
-		basf.setMetric(Pn.EUCLIDEAN);
-		basf.update();
-		SceneGraphComponent ballAndStick = basf.getSceneGraphComponent();
-		//tetra.addChild(TubeUtility.ballAndStick(tet,.01,.01, null, null, Pn.EUCLIDEAN));
-		tetra.addChild(ballAndStick);
-		tetra.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+".name", "default");
-		world.addChild(tetra);
-
-		double[][] verts = {{0,0,-5},{0,0,5},{1,-5,0},{1,5,0}};
-		int[][] indices = {{0,1},{2,3}};
-		DataList dl = StorageModel.DOUBLE_ARRAY.array(3).createReadOnly(verts);
-		IndexedLineSet axs = new IndexedLineSet(4,2);
-		axs.setVertexAttributes(Attribute.COORDINATES, dl);
-		axs.setEdgeAttributes(Attribute.INDICES, StorageModel.INT_ARRAY.array().createReadOnly(indices));
-		basf = new BallAndStickFactory(axs);
-		basf.setBallColor(Color.RED);
-		basf.setBallRadius(.03);
-		basf.setStickColor(Color.RED);
-		basf.setStickRadius(.03);
-		basf.setMetric(Pn.EUCLIDEAN);
-		basf.update();
-		SceneGraphComponent thickAxes = basf.getSceneGraphComponent();
-//		SceneGraphComponent thickAxes = TubeUtility.ballAndStick(axs, .03, .03, Color.RED, Color.RED, Pn.EUCLIDEAN);
-		thickAxes.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER, "default");
-		thickAxes.getAppearance().setAttribute(CommonAttributes.POLYGON_SHADER+".name", "default");
-		world.addChild(thickAxes);
-
-		return world;
-	}
 	
+	static ImaginaryPathCurveSurface ipcs = new ImaginaryPathCurveSurface();
+	public static SceneGraphComponent makeImaginaryWorld() {
+		ipcs = new ImaginaryPathCurveSurface();
+		return ipcs.getSGC();
+	}
 /**
 	 * @param coordinateSystem
 	 * @return

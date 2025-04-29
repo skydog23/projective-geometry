@@ -8,7 +8,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry excluding="de/jreality/tools/|de/jreality/geometry/TestGL2C.java|de/jreality/tutorial/MeshFrame.java" kind="src" path="src-test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/beans"/>
 	<classpathentry kind="lib" path="/lib/jh.jar"/>
 	<classpathentry kind="lib" path="/lib/quickhull3d.jar"/>
@@ -23,14 +27,14 @@
 			<attribute name="javadoc_location" value="file:/Users/gunn/Software/android-sdk-mac_86/docs/reference/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/lib/discretegroup.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/beans.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/bsh.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/jterm.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all.jar"/>
-	<classpathentry kind="lib" path="/lib/discretegroupCGG.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/jogamp/jogl-all-natives-macosx-universal.jar"/>
 	<classpathentry kind="lib" path="/lib/jrworkspace.jar"/>
 	<classpathentry kind="lib" path="/lib/rings-2.5.8.jar"/>
+	<classpathentry kind="lib" path="/lib/discretegroup.jar"/>
+	<classpathentry kind="lib" path="/lib/discretegroupCGG.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
