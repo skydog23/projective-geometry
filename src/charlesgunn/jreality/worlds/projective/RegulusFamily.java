@@ -36,6 +36,7 @@ import charlesgunn.anim.plugin.AnimationPlugin;
 import charlesgunn.anim.util.AnimationUtility.InterpolationTypes;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.geometry.projective.SkewQuad;
+import charlesgunn.jreality.newtools.FlyTool;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.jreality.viewer.PluginSceneLoader;
@@ -46,6 +47,7 @@ import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
+import de.jreality.scene.Camera;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.Viewer;
@@ -70,7 +72,7 @@ public class RegulusFamily extends Assignment {
 	double[][] rPlucker  = new double[3][], lPlucker = new double[3][];
 	PointRangeFactory[] generatorFactories = new PointRangeFactory[5];
 	int lineCount = 64;
-	double sphereRadius = 10.0, 
+	double sphereRadius = 100.0, 
 		globalSphereRadius = 200.0;
 	double time = 0.25;
 	boolean showTetra = true,
@@ -320,6 +322,12 @@ public class RegulusFamily extends Assignment {
 		super.display();
 		MatrixBuilder.euclidean().translate(0,0,5).assignTo(CameraUtility.getCameraNode(viewer));
 		viewer.getSceneRoot().getAppearance().setAttribute(BACKGROUND_COLOR, new Color(20,20,40));
+		Camera cam = CameraUtility.getCamera(viewer);
+		cam.setFar(100.0);
+		FlyTool flytool = new FlyTool();
+		flytool.setGain(.1);
+		CameraUtility.getCameraNode(viewer).addTool(flytool);
+		
 		AnimationPlugin ap = animationPlugin;
 		ap.setAnimateSceneGraph(true);
 		ap.setDefaultInterp(InterpolationTypes.CUBIC_HERMITE);
