@@ -390,7 +390,7 @@ public abstract class TextSlider<T extends Number> extends JPanel  {
 
 		@Override
 		String getFormattedValue(java.lang.Double n) {
-			System.err.println("integerlog format = "+n);
+//			System.err.println("integerlog format = "+n);
 			return String.format("%8d",((int)(n+.001)));
 		}
 				
