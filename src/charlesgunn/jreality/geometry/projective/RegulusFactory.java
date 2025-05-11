@@ -17,7 +17,7 @@ public class RegulusFactory extends Abstract1DExtentFactory {
 	double[] element2;
 	double tolerance = 10E-8;
 	boolean finiteSphere = false;
-	double sphereRadius = 10E2;
+	double sphereRadius = 100;
 	boolean isLeitSchar = false;
 	transient boolean isDegenerate = false;
 	int[] intersectors = new int[2];
