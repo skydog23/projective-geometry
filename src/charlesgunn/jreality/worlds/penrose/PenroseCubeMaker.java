@@ -12,7 +12,6 @@ import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.IndexedFaceSetFactory;
-import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
@@ -21,7 +20,6 @@ import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
-import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.data.Attribute;
 import de.jreality.shader.CommonAttributes;
@@ -34,6 +32,7 @@ public class PenroseCubeMaker extends Assignment {
 	SceneGraphComponent cube = SceneGraphUtility.createFullSceneGraphComponent("cube");
 	SceneGraphComponent prism = SceneGraphUtility.createFullSceneGraphComponent("prism");
 
+	protected boolean trunc = false;
 	protected double f = .2;
 	@Override
 	public void display() {
@@ -48,16 +47,20 @@ public class PenroseCubeMaker extends Assignment {
 	public SceneGraphComponent getContent() {
 		cube.setGeometry(truncateEdges(f, Primitives.cube()));
 		Appearance ap = cube.getAppearance();
-		ap.setAttribute(CommonAttributes.FACE_DRAW, false);
+//		ap.setAttribute(CommonAttributes.FACE_DRAW, false);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, false);
-		ap.setAttribute("lineShader.polygonShader.diffuseColor", Color.black);
+		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, !trunc);
+		ap.setAttribute("polygonShader.diffuseColor",new Color(255,204,204));
+		ap.setAttribute("lineShader.diffuseColor", Color.black);
 		ap.setAttribute("lineShader.tubeRadius", .01); //36);
-		ap.setAttribute("pointShader.polygonShader.diffuseColor", Color.BLACK);
+		ap.setAttribute("pointShader.diffuseColor", Color.BLACK);
 		ap.setAttribute("pointShader.pointRadius", .12);
 		
 		prism.setGeometry(truncateEdges(f,triangularAntiPrism()));
-		world.addChildren(stackedTriPrisms(2));
+		trunc = true;
+		world.addChildren(stackedTriPrisms(2, trunc));
+		trunc = false;
+		world.addChildren(stackedTriPrisms(2, trunc));
 		return world;
 	}
 
@@ -75,62 +78,73 @@ public class PenroseCubeMaker extends Assignment {
 		return inspector;
 	}
 
-	public static void main(String[] args) {
-		new PenroseCubeMaker().display();
-
-	}
 
 	static double[][] apv = {{1,1,-1},{1,-1,1},{-1,1,1},{-1,-1,1},{-1,1,-1},{1,-1,-1},{1,1,1},{-1,-1,-1}};
 //	static int[][] apvi = {{0,1,2,0},{3,4,5,3},{0,5,1},{5,1,3},{1,3,2},{3,2,4},{2,4,0},{4,0,5}};
 	static int[][] apvi = {{0,5},{5,1},{1,3},{3,2},{2,4},{4,0}};
+	static int[][] apfi = {{0,5,1},{5,1,3},{1,3,2},{3,2,4},{2,4,0},{4,0,5}};
 	static int[][] capi = {{7,3},{7,4},{7,5}};
-	private IndexedLineSet triangularAntiPrism()	{
-		IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
+	static int[][] capfi = {{7,3,4},{7,4,5},{7,5,3}};
+	private IndexedFaceSet triangularAntiPrism()	{
+		IndexedFaceSetFactory ilsf = new IndexedFaceSetFactory();
 		ilsf.setVertexCount(apv.length);
 		ilsf.setVertexCoordinates(apv);
-		ilsf.setEdgeCount(apvi.length);
-		ilsf.setEdgeIndices(apvi);
+		if (trunc) {
+			ilsf.setEdgeCount(apvi.length);
+			ilsf.setEdgeIndices(apvi);
+		}
+		ilsf.setFaceCount(apfi.length);
+		ilsf.setFaceIndices(apfi);
+		ilsf.setGenerateFaceNormals(true);
+		ilsf.setGenerateEdgesFromFaces(!trunc);
 		ilsf.update();
-		return ilsf.getIndexedLineSet();
+		return ilsf.getIndexedFaceSet();
 	}
-	private IndexedLineSet prismCap()	{
-		IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
+	private IndexedFaceSet prismCap()	{
+		IndexedFaceSetFactory ilsf = new IndexedFaceSetFactory();
 		ilsf.setVertexCount(apv.length);
 		ilsf.setVertexCoordinates(apv);
-		ilsf.setEdgeCount(capi.length);
-		ilsf.setEdgeIndices(capi);
+		if (trunc) {
+			ilsf.setEdgeCount(capi.length);
+			ilsf.setEdgeIndices(capi);
+		}
+		ilsf.setFaceCount(capfi.length);
+		ilsf.setFaceIndices(capfi);
+		ilsf.setGenerateFaceNormals(true);
+		ilsf.setGenerateEdgesFromFaces(!trunc);
 		ilsf.update();
-		return ilsf.getIndexedLineSet();
+		return ilsf.getIndexedFaceSet();
 	}
 	
-	private SceneGraphComponent stackedTriPrisms(int n)	{
+	private SceneGraphComponent stackedTriPrisms(int n, boolean trunc)	{
 		SceneGraphComponent stack = SceneGraphUtility.createFullSceneGraphComponent("stack");
 		stack.setAppearance(cube.getAppearance());
-		SceneGraphComponent geomSGC = SceneGraphUtility.createFullSceneGraphComponent("stack");
-		SceneGraphComponent capSGC = SceneGraphUtility.createFullSceneGraphComponent("stack");
-		IndexedLineSet onePrism = triangularAntiPrism();
-		geomSGC.setGeometry(truncateEdges(f,onePrism));
-		capSGC.setGeometry(truncateEdges(f,prismCap()));
-		SceneGraphComponent childCapSGC = SceneGraphUtility.createFullSceneGraphComponent("cap");
+		SceneGraphComponent geomSGC = SceneGraphUtility.createFullSceneGraphComponent("onePrism");
+		SceneGraphComponent capSGC = SceneGraphUtility.createFullSceneGraphComponent("cap");
+		IndexedFaceSet onePrism = triangularAntiPrism();
+		geomSGC.setGeometry(trunc ? truncateEdges(f,onePrism) : onePrism);
+		capSGC.setGeometry(trunc ? truncateEdges(f,prismCap()) : prismCap());
+		SceneGraphComponent childCapSGC = SceneGraphUtility.createFullSceneGraphComponent("cap2");
 		childCapSGC.addChild(capSGC);
-		double[] acc = Rn.identityMatrix(4);
-		double a = 2.0/3.0;
+		double op = 0; //.1;
+		double[] acc = MatrixBuilder.euclidean().translate(op,op,op).getArray();
+		double a = 2.0/3.0 + op;
 		double[] mat = P3.makeScrewMotionMatrix(null, new double[] {0,0,0,1}, new double[] {a,a,a,1}, Math.PI/3.0, Pn.EUCLIDEAN);
 	for (int i = 0; i<n ; ++i ) {
 			SceneGraphComponent child = SceneGraphUtility.createFullSceneGraphComponent("child");
 			new Matrix(acc).assignTo(child);
 			child.addChild(geomSGC);
-			Rn.times(acc, acc, mat);
 			stack.addChild(child);
+			acc = Rn.times(null, acc, mat);
 		}
 //		new Matrix(acc).assignTo(childCapSGC);
 	 	MatrixBuilder.euclidean(new Matrix(acc)).reflect(new double[] {1,1,1,1}).assignTo(childCapSGC);
 		stack.addChildren(capSGC, childCapSGC );
 		return stack;
 	}
-	private IndexedLineSet truncateEdges(double f, IndexedLineSet ils) {
+	private IndexedFaceSet truncateEdges(double f, IndexedFaceSet ils) {
 		
-		IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
+		IndexedFaceSetFactory ilsf = new IndexedFaceSetFactory();
 		int[][] ind = ils.getEdgeAttributes(Attribute.INDICES).toIntArrayArray(null);
 		double[][] vv = ils.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(null);
 		double[][] nv = new double[2*ind.length][];
@@ -148,7 +162,13 @@ public class PenroseCubeMaker extends Assignment {
 		ilsf.setEdgeCount(nind.length);
 		ilsf.setEdgeIndices(nind);
 		ilsf.update();
-		return ilsf.getIndexedLineSet();
+		return ilsf.getIndexedFaceSet();
 		
 	}
+	
+	public static void main(String[] args) {
+		new PenroseCubeMaker().display();
+
+	}
+
 }
