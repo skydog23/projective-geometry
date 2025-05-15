@@ -26,6 +26,7 @@ import de.jreality.scene.data.Attribute;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.SceneGraphUtility;
+import de.jtem.discretegroup.util.WingedEdge;
 
 public class PenroseCubeMaker extends Assignment {
 
@@ -68,7 +69,7 @@ public class PenroseCubeMaker extends Assignment {
 
 	private void updateGeometry() {
 		cube.getAppearance().setAttribute(CommonAttributes.LIGHTING_ENABLED, !trunc);
-		cube.setGeometry(truncateEdges(f,doGem ? getGem(n) : Primitives.cube()));
+		cube.setGeometry(truncateEdges(f,doGem ? getGem2(n) : Primitives.cube()));
 	}
 
 	@Override
@@ -165,6 +166,18 @@ public class PenroseCubeMaker extends Assignment {
 		return stack;
 	}
 	
+	private IndexedFaceSet getGem2(int n)	{
+		WingedEdge we = new WingedEdge(2,2,2);
+		double[] plane = {1,0,1,-1};   // x+z = 1
+		for (int i = 0; i<2*n; ++i) {
+			double angle = i*Math.PI*2.0/(2*n);
+			double[] m = MatrixBuilder.euclidean().rotateZ(angle).getArray();
+			double[] tplane = Rn.matrixTimesVector(null, m, plane);
+			tplane[2] = ((i%2) == 0 ? 1:-1);
+			we.cutWithPlane(tplane);
+		}
+		return we;
+	}
 	private IndexedFaceSet getGem(int n) {
 		IndexedFaceSetFactory ilsf = new IndexedFaceSetFactory();
 		int[][] ind = new int[2*n][];
