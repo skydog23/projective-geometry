@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Box;
+import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 
 import charlesgunn.anim.util.AnimationUtility;
@@ -32,8 +33,9 @@ public class PenroseCubeMaker extends Assignment {
 	SceneGraphComponent cube = SceneGraphUtility.createFullSceneGraphComponent("cube");
 	SceneGraphComponent prism = SceneGraphUtility.createFullSceneGraphComponent("prism");
 
-	protected boolean trunc = false;
+	protected boolean trunc = true, doGem = true;
 	protected double f = .2;
+	int n = 5;
 	@Override
 	public void display() {
 		// TODO Auto-generated method stub
@@ -49,32 +51,52 @@ public class PenroseCubeMaker extends Assignment {
 		Appearance ap = cube.getAppearance();
 //		ap.setAttribute(CommonAttributes.FACE_DRAW, false);
 		ap.setAttribute(CommonAttributes.VERTEX_DRAW, false);
-		ap.setAttribute(CommonAttributes.LIGHTING_ENABLED, !trunc);
 		ap.setAttribute("polygonShader.diffuseColor",new Color(255,204,204));
 		ap.setAttribute("lineShader.diffuseColor", Color.black);
 		ap.setAttribute("lineShader.tubeRadius", .01); //36);
 		ap.setAttribute("pointShader.diffuseColor", Color.BLACK);
 		ap.setAttribute("pointShader.pointRadius", .12);
 		
-		prism.setGeometry(truncateEdges(f,triangularAntiPrism()));
-		trunc = true;
-		world.addChildren(stackedTriPrisms(2, trunc));
-		trunc = false;
-		world.addChildren(stackedTriPrisms(2, trunc));
+		updateGeometry();
+//		trunc = true;
+//		world.addChildren(stackedTriPrisms(2, trunc));
+//		trunc = false;
+//		world.addChildren(stackedTriPrisms(2, trunc));
+		world.addChildren(cube);
 		return world;
+	}
+
+	private void updateGeometry() {
+		cube.getAppearance().setAttribute(CommonAttributes.LIGHTING_ENABLED, !trunc);
+		cube.setGeometry(truncateEdges(f,doGem ? getGem(n) : Primitives.cube()));
 	}
 
 	@Override
 	public Component getInspector()	{
-			final TextSlider<Double> eSlider = new TextSlider.Double("factor",  SwingConstants.HORIZONTAL, 0, 1, f);
-			eSlider.addActionListener(new ActionListener()	{
-				public void actionPerformed(ActionEvent e)	{
-					f = eSlider.getValue().doubleValue();
-					cube.setGeometry(truncateEdges(f, Primitives.cube()));
-				}});
-			Box hbox = Box.createHorizontalBox();
-			hbox.add(eSlider);
-			inspector.add(hbox);
+		Box vbox = Box.createVerticalBox();
+		inspector.add(vbox);
+		final TextSlider<Double> eSlider = new TextSlider.Double("factor",  SwingConstants.HORIZONTAL, 0, 1, f);
+		eSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				f = eSlider.getValue().doubleValue();
+				updateGeometry();
+		}});
+		vbox.add(eSlider);
+		final TextSlider<Integer> nSlider = new TextSlider.Integer("n",  SwingConstants.HORIZONTAL, 1,10,n);
+		nSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				n = nSlider.getValue().intValue();
+				updateGeometry();
+			}});
+		vbox.add(nSlider);
+		final JRadioButton truncB = new JRadioButton("trunc");
+		truncB.setSelected(trunc);
+		truncB.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				trunc = truncB.isSelected();
+				updateGeometry();
+			}});
+		vbox.add(truncB);
 		return inspector;
 	}
 
@@ -142,8 +164,40 @@ public class PenroseCubeMaker extends Assignment {
 		stack.addChildren(capSGC, childCapSGC );
 		return stack;
 	}
-	private IndexedFaceSet truncateEdges(double f, IndexedFaceSet ils) {
+	
+	private IndexedFaceSet getGem(int n) {
+		IndexedFaceSetFactory ilsf = new IndexedFaceSetFactory();
+		int[][] ind = new int[2*n][];
+		double [][] vv = new double[2*n+2][];
+		vv[2*n] = new double[] {0,0,1,1};
+		vv[2*n+1] = new double[] {0,0,-1,1};
+		double a = Math.PI*2.0/(2*n),
+				c = Math.cos(a),
+				s = Math.sin(a);
+//		double width = (1-Math.cos(a))/(1+Math.cos(a));
+		double width = .5*Math.sqrt(s*s - (c-1)*(c-1));
+		for (int i = 0; i<2*n; ++i) {
+			double angle = i*Math.PI*2.0/(2*n);
+			vv[i] = new double[] {Math.cos(angle), Math.sin(angle), ((i%2)==0) ? width : -width};
+		}
+		for (int i = 0; i<n; ++i) {
+			int tn = 2*n;
+			ind[i] = new int[] {2*n, 2*i, (2*i+1)%tn, (2*i+2)%tn}; 
+			ind[i+n] = new int[] {2*n+1, (2*i+1)%tn, (2*i+2)%tn, (2*i+3)%tn};
+		}
+		ilsf.setVertexCount(vv.length);
+		ilsf.setVertexCoordinates(vv);
+		ilsf.setFaceCount(ind.length);
+		ilsf.setFaceIndices(ind);
+		ilsf.setGenerateEdgesFromFaces(true);
+		ilsf.setGenerateFaceNormals(true);
+		ilsf.update();
+	
+		return ilsf.getIndexedFaceSet();
 		
+	}
+	private IndexedFaceSet truncateEdges(double f, IndexedFaceSet ils) {
+		if (!trunc) return ils;
 		IndexedFaceSetFactory ilsf = new IndexedFaceSetFactory();
 		int[][] ind = ils.getEdgeAttributes(Attribute.INDICES).toIntArrayArray(null);
 		double[][] vv = ils.getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(null);
