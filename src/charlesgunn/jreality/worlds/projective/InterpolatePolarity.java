@@ -75,6 +75,7 @@ public class InterpolatePolarity extends 	Assignment  {
 	public SceneGraphComponent getContent()	{
 		theWorld = SceneGraphUtility.createFullSceneGraphComponent("theWorld");
 		theWorld.getAppearance().setAttribute(CommonAttributes.EDGE_DRAW, false);
+		theWorld.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 		c1 = SceneGraphUtility.createFullSceneGraphComponent("c1");
 		c2 = SceneGraphUtility.createFullSceneGraphComponent("c2");
 		ct = SceneGraphUtility.createFullSceneGraphComponent("ct");
@@ -419,6 +420,7 @@ public class InterpolatePolarity extends 	Assignment  {
 //	public boolean addBackPlane()	{return false;}
 	@Override
 	public void display()	{
+		setAddCameraLight(true);
 		super.display();
 		viewer = jrviewer.getViewer();
 		animationPlugin.setAnimateCamera(true);
