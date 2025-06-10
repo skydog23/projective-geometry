@@ -20,12 +20,12 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import charlesgunn.jreality.geometry.projective.ConicSectionSynthetic;
 import charlesgunn.jreality.geometry.projective.PlanePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.geometry.projective.RegulusFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.Utility;
-import charlesgunn.math.clifford.ConicSection;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.GeometryUtility;
@@ -103,7 +103,7 @@ public class DandelinConfiguration extends Assignment {
 	Color y = Color.yellow, g = Color.green, m = new Color(200,0,50), 
 			c = Color.cyan, bl = Color.black, vi = new Color(100,0,180),
 			bl2 = new Color(40,40,40), bl3 = new Color(20,20,20), gr = new Color(0,135,50);
-	ConicSection conic = new ConicSection();
+	ConicSectionSynthetic conic = new ConicSectionSynthetic();
 	Appearance regAp, leitAp;
 
 	@Override

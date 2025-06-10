@@ -11,6 +11,7 @@ import java.util.List;
 import javax.swing.SwingConstants;
 
 import charlesgunn.anim.util.AnimationUtility;
+import charlesgunn.jreality.geometry.projective.ConicSectionSynthetic;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.Utility;
@@ -71,8 +72,8 @@ public class PascalDemo extends Assignment {
 		    pointSGC,
 		    polarLineSGC;
 	transient IndexedLineSetFactory ilsf = new IndexedLineSetFactory();
-	transient ConicSection conicSection = new ConicSection(),
-			conicSection2 = new ConicSection();
+	transient ConicSectionSynthetic conicSection = new ConicSectionSynthetic(),
+			conicSection2 = new ConicSectionSynthetic();
 	transient int np = 200;
 	transient IndexedLineSetFactory connie = null;
 	transient PointSetFactory pascalConfig = null;

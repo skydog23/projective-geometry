@@ -17,10 +17,10 @@ import java.util.List;
 import javax.swing.SwingConstants;
 
 import charlesgunn.anim.plugin.AnimationPlugin;
+import charlesgunn.jreality.geometry.projective.ConicSectionSynthetic;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.Utility;
-import charlesgunn.math.clifford.ConicSection;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -70,7 +70,7 @@ public class Complete4Point4Line extends Assignment {
 	int numPoints = 500;
 	Color[] colors1 = {Color.red, Color.yellow, Color.blue, Color.green, Color.magenta, Color.cyan};
 	Color[] colors2 = {Color.green, Color.magenta, Color.cyan, Color.red, Color.yellow, Color.blue};
-	ConicSection conicSection = new ConicSection();
+	ConicSectionSynthetic conicSection = new ConicSectionSynthetic();
 	@Override
 	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");

@@ -2,9 +2,8 @@
  * Created on 28.01.2017
  *
  */
-package charlesgunn.math.clifford;
+package charlesgunn.jreality.geometry.projective;
 
-import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.math.Utility;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -16,7 +15,7 @@ import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.data.Attribute;
 import de.jreality.util.SceneGraphUtility;
 
-public class ConicSection {
+public class ConicSectionSynthetic {
 	
 	double[][] initialPoints, initialPoints3;
 	double[][] pentagram = new double[5][], 
@@ -29,7 +28,7 @@ public class ConicSection {
 	
 	SceneGraphComponent ptAndLnSGC = SceneGraphUtility.createFullSceneGraphComponent("ptAndLn");
 
-	public ConicSection()	{
+	public ConicSectionSynthetic()	{
 		double[][] circlePoints = ilsf.getIndexedLineSet().getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(null);
 		setInitialPoints(circlePoints);		
 	}
