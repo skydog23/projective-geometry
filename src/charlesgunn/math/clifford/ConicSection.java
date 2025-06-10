@@ -4,6 +4,7 @@
  */
 package charlesgunn.math.clifford;
 
+import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.math.Utility;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
@@ -11,7 +12,9 @@ import de.jreality.math.P2;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.IndexedLineSet;
+import de.jreality.scene.SceneGraphComponent;
 import de.jreality.scene.data.Attribute;
+import de.jreality.util.SceneGraphUtility;
 
 public class ConicSection {
 	
@@ -20,9 +23,11 @@ public class ConicSection {
 			PaMbQ = new double[5][];
 //	double[] P, Q, M, a, b;
 	boolean dim4 = false;
-	int numberOfPoints = 200;
+	int numberOfPoints = 200, samples = 24;
 	IndexedLineSetFactory connie = null;
 	IndexedLineSetFactory ilsf = IndexedLineSetUtility.circleFactory(5, 0, 0, 1);
+	
+	SceneGraphComponent ptAndLnSGC = SceneGraphUtility.createFullSceneGraphComponent("ptAndLn");
 
 	public ConicSection()	{
 		double[][] circlePoints = ilsf.getIndexedLineSet().getVertexAttributes(Attribute.COORDINATES).toDoubleArrayArray(null);
@@ -115,5 +120,21 @@ public class ConicSection {
 		System.err.println("Polarize variables = "+Rn.toString(new double[][]{ax,cx,axp,cxp,b,d,R,ac,bd,Q,output}));
 		return output;
 	}
+	String[] names = {"P","m","M","n","Q"};
+	public SceneGraphComponent getRangesAndPencils()	{
+		if (ptAndLnSGC == null) {
+			ptAndLnSGC = SceneGraphUtility.createFullSceneGraphComponent("ptAndLn");
+			for (int i = 0; i<5; ++i)	{
+				SceneGraphComponent child = new SceneGraphComponent("child"+names[i]);
+				ptAndLnSGC.addChild(child);
+			}
+		}
+		for (int i = 0; i<5; ++i)	{
+			SceneGraphComponent child = new SceneGraphComponent("child"+names[i]);
+			ptAndLnSGC.addChild(child);
+		}
+		LinePencilFactory lpf = new LinePencilFactory();
 
+		return ptAndLnSGC;
+	}
 }

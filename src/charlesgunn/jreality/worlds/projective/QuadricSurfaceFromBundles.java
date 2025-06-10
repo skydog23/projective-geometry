@@ -7,8 +7,11 @@ package charlesgunn.jreality.worlds.projective;
 import java.awt.Color;
 
 import charlesgunn.jreality.viewer.Assignment;
+import charlesgunn.math.BiquaternionUtility;
+import charlesgunn.util.ColorWheel;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.geometry.SphereUtility;
+import de.jreality.geometry.TubeUtility;
 import de.jreality.math.Matrix;
 import de.jreality.math.P3;
 import de.jreality.scene.Appearance;
@@ -55,10 +58,10 @@ public class QuadricSurfaceFromBundles extends Assignment {
 			double y = Math.cos(phi) * verts[i][1] / xy;
 			double z = Math.sin(phi);
 			double[] pq = new double[]{x, y, z, 0};
-			double[] clifT = leftCliffordTlateFor(null, P3.originP3, pq);
+			double[] clifT = BiquaternionUtility.leftCliffordTlateFor(null, P3.originP3, pq);
 			Matrix clifiso = new Matrix(clifT);
 
-			Color c  = getColorForPoint(verts[i], phi);
+			Color c  = ColorWheel.getColorForPoint(verts[i], phi, false);
 			vc[i] = c;
 //			if (level < 2 && showLevel[level]) 
 //				System.err.println("Vertex "+i+" is "+q.toString()+"\ttheta = "+360.0*theta/(2*Math.PI)+" rgb = "+c.toString());
@@ -66,15 +69,15 @@ public class QuadricSurfaceFromBundles extends Assignment {
 			SceneGraphComponent coreSGC = new SceneGraphComponent("curve "+i);
 			coreSGC.setAppearance(new Appearance());
 			coreSGC.getAppearance().setName("coreSGC"+i);
-			coreSGC.addChild(urCurve);
+//			coreSGC.addChild(urCurve);
 			curves.addChild(coreSGC);
-			colors.put(coreSGC.getAppearance(), c);
+//			colors.put(coreSGC.getAppearance(), c);
 
 			SceneGraphComponent tubeSGC = new SceneGraphComponent("tube "+i);
 			tubeSGC.setAppearance(new Appearance());
-			tubeSGC.getAppearance().setName("tubeSGC"+colors.size());
-			colors.put(tubeSGC.getAppearance(), c);
-			tubeSGC.addChild(urTube[level]);
+//			tubeSGC.getAppearance().setName("tubeSGC"+colors.size());
+//			colors.put(tubeSGC.getAppearance(), c);
+//			tubeSGC.addChild(TubeUtility.urTube[level]);
 			tubes.addChild(tubeSGC);
 			
 			clifiso.assignTo(coreSGC);
@@ -85,7 +88,7 @@ public class QuadricSurfaceFromBundles extends Assignment {
 		psf.setVertexCoordinates(verts);
 		psf.setVertexColors(vc);
 		psf.update();
-		colorSphereKids[level].setGeometry(psf.getGeometry());
+//		colorSphereKids[level].setGeometry(psf.getGeometry());
 
 		return node;
 	}

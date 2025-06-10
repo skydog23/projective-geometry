@@ -1,6 +1,7 @@
 package charlesgunn.math;
 
 import charlesgunn.math.p5.PlueckerLineGeometry;
+import de.jreality.math.P3;
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 
@@ -44,4 +45,26 @@ public class BiquaternionUtility {
 		for (int i = 0; i<n; ++i) dst[i] = m[i*(n+1)] * src[i];
 		return dst;
 	}
+	
+	public static double[] leftCliffordTlateFor(double[] dst, double[] P, double[] Q) {
+		double dist = Pn.distanceBetween(P, Q, Pn.ELLIPTIC);
+		return P3.makeScrewMotionMatrix(dst, P, Q, dist, Pn.ELLIPTIC);
+	}
+	public static double[] rightCliffordTlateFor(double[] dst, double[] P, double[] Q) {
+		double dist = Pn.distanceBetween(P, Q, Pn.ELLIPTIC);
+		return P3.makeScrewMotionMatrix(dst, P, Q, -dist, Pn.ELLIPTIC);
+	}
+
+	public static double[] leftCliffordTlateFor(double[] dst, double[] P) {
+		double xy = Math.sqrt(P[0] * P[0] + P[1] * P[1]);
+		double phi = Math.atan2(P[2], xy);
+		phi = (phi + Math.PI/2)/2;
+		double x = Math.cos(phi) * P[0] / xy;
+		double y = Math.cos(phi) * P[1] / xy;
+		double z = Math.sin(phi);
+		double[] pq = new double[]{x, y, z, 0};
+		double[] clifT = leftCliffordTlateFor(null, P3.originP3, pq);
+		return clifT;
+	}
+
 }

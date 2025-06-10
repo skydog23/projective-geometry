@@ -126,7 +126,7 @@ public class PointRangeFactory extends Abstract1DExtentFactory{
 	public  boolean intersectLineWithSphere(double[][] result, int offset2, double[] p0, double[] p1, double radius) {
 		return intersectLineWithSphere(result, offset2, p0, p1, null, radius);
 	}
-	public  boolean intersectLineWithSphere(double[][] result, int offset2, double[] p0x, double[] p1x, double[] oldP0, double radius) {
+	public boolean intersectLineWithSphere(double[][] result, int offset2, double[] p0x, double[] p1x, double[] oldP0, double radius) {
 		double[] p0 = p0x.clone(), p1 = p1x.clone();
 		double[] ct = center;
 		if (center.length == 3) ct = Pn.homogenize(null, center);

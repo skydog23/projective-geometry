@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.JCheckBox;
-import javax.swing.JMenuBar;
 import javax.swing.SwingConstants;
 
 import charlesgunn.anim.core.Animated;
@@ -38,10 +37,9 @@ import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.geometry.projective.SkewQuad;
 import charlesgunn.jreality.newtools.FlyTool;
 import charlesgunn.jreality.viewer.Assignment;
-import charlesgunn.jreality.viewer.LoadableScene;
-import charlesgunn.jreality.viewer.PluginSceneLoader;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
+import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
@@ -50,7 +48,6 @@ import de.jreality.scene.Appearance;
 import de.jreality.scene.Camera;
 import de.jreality.scene.PointSet;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.scene.Viewer;
 import de.jreality.scene.data.Attribute;
 import de.jreality.scene.data.StorageModel;
 import de.jreality.scene.pick.PickResult;
@@ -59,6 +56,7 @@ import de.jreality.scene.tool.InputSlot;
 import de.jreality.scene.tool.ToolContext;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
+import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
 public class RegulusFamily extends Assignment {
@@ -74,6 +72,8 @@ public class RegulusFamily extends Assignment {
 	int lineCount = 64;
 	double sphereRadius = 100.0, 
 		globalSphereRadius = 200.0;
+	private double rotateGain = .05;
+
 	double time = 0.25;
 	boolean showTetra = true,
 		showSurface = false,
@@ -83,6 +83,7 @@ public class RegulusFamily extends Assignment {
 	private SkewQuad regulusFactory;
 	private SceneGraphComponent 
 		world,
+			bothSGC,
 			rSGC,		// the regelschar
 			lSGC,		// the leitschar
 			fourLines,	// the four skew lines of a skew quadrilateral
@@ -91,13 +92,23 @@ public class RegulusFamily extends Assignment {
 			thirdLeitLine, 
 			tetraSGC,
 			surfaceRep;
+	FlyTool flytool = new FlyTool();
+
 	@Override
 	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		lSGC  = SceneGraphUtility.createFullSceneGraphComponent("leitschar");
 		rSGC = SceneGraphUtility.createFullSceneGraphComponent("regelschar");
 		fourLines = SceneGraphUtility.createFullSceneGraphComponent("four lines");
-		world.addChildren(rSGC, lSGC, fourLines);
+		bothSGC = SceneGraphUtility.createFullSceneGraphComponent("both");
+		Appearance ap = bothSGC.getAppearance();
+		ap.setAttribute(LINE_SHADER+"."+TUBE_RADIUS, .04);
+		ap.setAttribute(LINE_SHADER+"."+TUBES_DRAW, false);
+		ap.setAttribute(POINT_SHADER+"."+POINT_RADIUS, .06);
+
+		bothSGC.addChildren(rSGC, lSGC);
+		world.addChildren(fourLines, bothSGC);
+		world.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 		thirdLeitLine = SceneGraphUtility.createFullSceneGraphComponent("third leit line");
 		l3p1SGC = SceneGraphUtility.createFullSceneGraphComponent("p1");
 		l3p2SGC = SceneGraphUtility.createFullSceneGraphComponent("p2");
@@ -127,7 +138,7 @@ public class RegulusFamily extends Assignment {
 		gap.setAttribute(VERTEX_DRAW, true);
 		tap.setAttribute(VERTEX_DRAW, true);
 //		thirdLeitLine.setAppearance(tap);
-		Appearance ap = thirdLeitLine.getAppearance();
+		ap = thirdLeitLine.getAppearance();
 		ap.setAttribute(LINE_SHADER+"."+DIFFUSE_COLOR, Color.red);
 		ap.setAttribute(LINE_SHADER+"."+POLYGON_SHADER+"."+DIFFUSE_COLOR, Color.red);
 		thirdLeitLine.setAppearance(ap);
@@ -170,7 +181,7 @@ public class RegulusFamily extends Assignment {
 //			parameterLineF[i].setPluckerLine(parameterLines[i]);
 			parameterLineF[i].setElement0(points[inds[i][0]]);
 			parameterLineF[i].setElement1(points[inds[i][1]]);
-			parameterLineF[i].setFiniteSphere(false);
+			parameterLineF[i].setFiniteSphere(true);
 			parameterLineF[i].setNumberOfSamples(lineCount);
 			parameterLineF[i].update();			
 		}
@@ -193,7 +204,7 @@ public class RegulusFamily extends Assignment {
 //		regulusFactory.setElement0(lPlucker[0]);
 //		regulusFactory.setElement2(lPlucker[1]);
 		regulusFactory.setElement1(lPlucker[2]);
-		regulusFactory.setFiniteSphere(true);
+		regulusFactory.setFiniteSphere(false);
 		regulusFactory.setSphereRadius(sphereRadius);
 		regulusFactory.setNumberOfSamples(lineCount);
 		regulusFactory.update();
@@ -279,7 +290,15 @@ public class RegulusFamily extends Assignment {
 				viewer.renderAsync();
 			}
 		});
-		inspectionPanel.add(radiusSlider);
+		final TextSlider rgSlider = new TextSlider.Double("rot gain",SwingConstants.HORIZONTAL,0,1, rotateGain);
+		rgSlider.addActionListener(new ActionListener()	{
+			public void actionPerformed(ActionEvent e)	{
+				rotateGain = rgSlider.getValue().doubleValue();
+				flytool.setRotateGain(rotateGain);
+				viewer.renderAsync();
+			}
+		});
+		inspectionPanel.add(rgSlider);
 		
 		final JCheckBox tetraBox = new JCheckBox("Show tetrahedron");
 		tetraBox.setSelected(showTetra);
@@ -322,12 +341,13 @@ public class RegulusFamily extends Assignment {
 		super.display();
 		MatrixBuilder.euclidean().translate(0,0,5).assignTo(CameraUtility.getCameraNode(viewer));
 		viewer.getSceneRoot().getAppearance().setAttribute(BACKGROUND_COLOR, new Color(20,20,40));
+//		viewer.getSceneRoot().getAppearance().setAttribute(CommonAttributes.METRIC, Pn.ELLIPTIC);
 		Camera cam = CameraUtility.getCamera(viewer);
-		cam.setFar(100.0);
-		FlyTool flytool = new FlyTool();
-		flytool.setGain(.1);
+		cam.setFar(-.1);
+		flytool.setGain(.5);
+		flytool.setRotateGain(rotateGain);
 		CameraUtility.getCameraNode(viewer).addTool(flytool);
-		
+		CameraUtility.getCamera(viewer).setFar(-1);
 		AnimationPlugin ap = animationPlugin;
 		ap.setAnimateSceneGraph(true);
 		ap.setDefaultInterp(InterpolationTypes.CUBIC_HERMITE);

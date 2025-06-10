@@ -96,7 +96,7 @@ public class FlyTool extends AbstractTool {
   boolean  shiftIsRotate = true;
   
   public void perform(ToolContext tc) {
-//	  System.err.println("fly tool perform");		
+	  System.err.println("fly tool perform");		
 		if (tc.getSource() == forwardBackwardSlot) {
 			currentKeySlot = forwardBackwardSlot;
 		} else if (tc.getSource() == shiftForwardBackwardSlot) {
@@ -111,7 +111,6 @@ public class FlyTool extends AbstractTool {
 			currentKeySlot = altLeftRightSlot;
 		} //else currentKeySlot = null;
 		if (currentKeySlot != null) {
-//			System.err.println("current key slot: "+currentKeySlot.toString());
 			released = tc.getAxisState(currentKeySlot).isReleased();
 			if (released) {
 				flying = false;
@@ -126,6 +125,7 @@ public class FlyTool extends AbstractTool {
 			tc.getViewer().getSceneRoot().setPickable(false);
 		}
 	if (!flying) return;
+	System.err.println("current key slot: "+currentKeySlot.toString());
 	if (readFromAp)	{
 	    if (eap == null || !EffectiveAppearance.matches(eap, tc.getRootToToolComponent())) {
 	        eap = EffectiveAppearance.create(tc.getRootToToolComponent());
@@ -140,15 +140,16 @@ public class FlyTool extends AbstractTool {
       
     double val = tc.getAxisState(timerSlot).intValue();    
     forwardVal = val*velocity*.001;
-	double[] dir = null;
 	pointerMatrix = new Matrix(tc.getTransformationMatrix(InputSlot.getDevice("PointerTransformation")));
 	localPointer = ToolUtility.worldToTool(tc, pointerMatrix);
 	if (currentKeySlot == forwardBackwardSlot)	{
         	int direction = 2;
         	moveShipInDirection(direction);   		
    	} else if (currentKeySlot == shiftForwardBackwardSlot) {
-   		if (shiftIsRotate)	
+   		if (shiftIsRotate)	{
+   			System.err.println("flytool: rotating x");
    			MatrixBuilder.init(shipMatrix, metric).rotateX(rotateGain*forwardVal).assignTo(shipSGC);  
+   		}
    		else moveShipInDirection(1);   		
    	} else if (currentKeySlot == altForwardBackwardSlot) {
    		moveShipInDirection(1);   		
@@ -165,6 +166,7 @@ public class FlyTool extends AbstractTool {
   }
 
 private void moveShipInDirection(int direction) {
+	System.err.println("Fly tool: move in direction");
 	double[] dir;
 	dir = localPointer.getColumn(direction); 
 	if (metric != Pn.EUCLIDEAN) {
@@ -188,6 +190,14 @@ private void moveShipInDirection(int direction) {
 	  
 	public void setGain(double gain) {
 	  	this.gain = gain;
+	}
+
+	public double getRotateGain() {
+		return rotateGain;
+	}
+
+	public void setRotateGain(double rotateGain) {
+		this.rotateGain = rotateGain;
 	}
 
 	public void setMetric(int sig)	{
