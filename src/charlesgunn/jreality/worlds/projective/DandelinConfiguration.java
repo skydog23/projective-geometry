@@ -74,7 +74,8 @@ public class DandelinConfiguration extends Assignment {
 		epsilon = 5.0,
 		lineWidth = 4.0;
 	boolean show3D = false,
-			clip = false;
+			clip = false,
+			animatePtPr = true;
 	private SceneGraphComponent 
 	world,
 	    clip1SGC,
@@ -82,6 +83,7 @@ public class DandelinConfiguration extends Assignment {
 	world2,
 		regulusSGC,
 			rotateSGC,
+				lines3x3SGC,
 				bothSGC,
 			        regFacSGC,
 			        leitSharSGC,
@@ -120,6 +122,7 @@ public class DandelinConfiguration extends Assignment {
 		pointsSGC = SceneGraphUtility.createFullSceneGraphComponent("points");
 		onConicSGC = SceneGraphUtility.createFullSceneGraphComponent("on conic");
 		onRegSGC = SceneGraphUtility.createFullSceneGraphComponent("on regulus");
+		lines3x3SGC = SceneGraphUtility.createFullSceneGraphComponent("lines3x3");
 		linesSGC = SceneGraphUtility.createFullSceneGraphComponent("lines");
 		linesSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		linesSGC.getAppearance().setAttribute(CommonAttributes.LINE_WIDTH, lineWidth);
@@ -155,7 +158,8 @@ public class DandelinConfiguration extends Assignment {
 		pointsSGC.addChildren(onConicSGC, onRegSGC);
 		theRestSGC.addChildren(pointsSGC, linesSGC, conicSGC, pascalTriSGC);
 		regulusSGC.addChildren(rotateSGC);
-		rotateSGC.addChildren(bothSGC);
+		rotateSGC.addChildren(bothSGC, lines3x3SGC);
+		if (animatePtPr) show3D = animatePtPr;
 		regulusSGC.setVisible(show3D);
 		
 		regAp = new Appearance();
@@ -173,7 +177,7 @@ public class DandelinConfiguration extends Assignment {
 		ap.setAttribute(CommonAttributes.LINE_WIDTH, 2.0);
 		ap.setAttribute(CommonAttributes.TUBE_RADIUS, .02);
 		bothSGC.setPickable(false);
-		bothSGC.setVisible(false);
+		bothSGC.setVisible(animatePtPr);
 
 		
 		regAp = new Appearance();
@@ -219,6 +223,10 @@ public class DandelinConfiguration extends Assignment {
 		
 		MatrixBuilder.euclidean().translate(0,0,-8).assignTo(world2);
 
+		if (animatePtPr)	{
+			theRestSGC.setVisible(false);
+			lines3x3SGC.setVisible(false);
+		}
 
 		return world;
 	}
@@ -275,7 +283,7 @@ public class DandelinConfiguration extends Assignment {
 		}
 		for (int i = 0; i<6; ++i)	{
 			regLineFactories[i] = new PointRangeFactory(); 
-			regLineFactories[i].setFiniteSphere(true);
+			regLineFactories[i].setFiniteSphere(false);
 			regLineFactories[i].setSphereRadius(sphereRadius);
 			regLineFactories[i].setPluckerLine(regLines[i]);
 			regLineFactories[i].update();
@@ -283,7 +291,7 @@ public class DandelinConfiguration extends Assignment {
 			child.setAppearance(new Appearance());
 			child.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 			child.setAppearance( ((i%2) == 0) ? regAp : leitAp);
-			rotateSGC.addChild(child);
+			lines3x3SGC.addChild(child);
 			child.setGeometry(regLineFactories[i].getLine());
 		}
 	}
@@ -537,15 +545,20 @@ public class DandelinConfiguration extends Assignment {
 		hlIntensity = .2;
 		setAddCameraLight(true);
 		super.display();
-		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, new Color(250,250,230));
+		Color bcol = animatePtPr ? Color.white : new Color(250,250,230);
+		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, bcol);
 		Camera cam = CameraUtility.getCamera(jrviewer.getViewer());
 		cam.setFar(50);
 		cam.setFocus(8.0);
 		cam.setEyeSeparation(0.5);
+		if (animatePtPr)	{
+			cam.setFar(-1.0);
+			cam.setNear(.1);
+		}
 		SceneGraphComponent camNode = CameraUtility.getCameraNode(jrviewer.getViewer());
-//		PointLight dl = new PointLight();
-//		dl.setIntensity(.5);
-//		camNode.setLight(dl);
+		animationPlugin.setAnimateCamera(true);
+		animationPlugin.setAnimateSceneGraph(true);
+		
 		Component comp = ((Component) jrviewer.getViewer().getViewingComponent());
 		comp.addKeyListener(new KeyAdapter() {
 				public void keyPressed(KeyEvent e)	{ 
