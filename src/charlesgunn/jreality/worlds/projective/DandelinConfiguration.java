@@ -20,6 +20,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import charlesgunn.anim.util.AnimationUtility;
+import charlesgunn.anim.util.AnimationUtility.InterpolationTypes;
 import charlesgunn.jreality.geometry.projective.ConicSectionSynthetic;
 import charlesgunn.jreality.geometry.projective.PlanePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
@@ -67,10 +69,10 @@ public class DandelinConfiguration extends Assignment {
 	           conicPoints4;
 
 	int numPoints = 200,
-			numRulings = 100;
+			numRulings = 30;
 	double parameter = 0.3,
 		depth = .625,
-		sphereRadius = 20,
+		sphereRadius = 200,
 		epsilon = 5.0,
 		lineWidth = 4.0;
 	boolean show3D = false,
@@ -153,7 +155,10 @@ public class DandelinConfiguration extends Assignment {
 
 		theRestSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 
-		world.addChildren(world2, clip1SGC, clip2SGC);
+		world.addChildren(world2);
+		if (!animatePtPr) {
+			world.addChildren(clip1SGC, clip2SGC);
+		}
 		world2.addChildren(regulusSGC, theRestSGC);
 		pointsSGC.addChildren(onConicSGC, onRegSGC);
 		theRestSGC.addChildren(pointsSGC, linesSGC, conicSGC, pascalTriSGC);
@@ -283,7 +288,7 @@ public class DandelinConfiguration extends Assignment {
 		}
 		for (int i = 0; i<6; ++i)	{
 			regLineFactories[i] = new PointRangeFactory(); 
-			regLineFactories[i].setFiniteSphere(false);
+			regLineFactories[i].setFiniteSphere(true);
 			regLineFactories[i].setSphereRadius(sphereRadius);
 			regLineFactories[i].setPluckerLine(regLines[i]);
 			regLineFactories[i].update();
@@ -472,6 +477,7 @@ public class DandelinConfiguration extends Assignment {
 		regFac.setElement2(rawLines[0][2]);
 		regFac.setNumberOfSamples(numRulings);
 		regFac.setSphereRadius(sphereRadius);
+		regFac.setFiniteSphere(false);
 		regFac.update();			
 		
 		// transform according to the scene graph
@@ -539,6 +545,15 @@ public class DandelinConfiguration extends Assignment {
 		}
 		return is;
 	}
+	
+	
+	@Override
+	public void setValueAtTime(double d) {
+		double t = d; //AnimationUtility.linearInterpolation(d, 0.0, 1.0, .4,.6);
+		MatrixBuilder.euclidean().rotateX(.5*Math.PI * t).assignTo(regulusSGC);
+		super.setValueAtTime(d);
+	}
+
 	int counter = 0;
 	@Override
 	public void display() {
@@ -556,9 +571,9 @@ public class DandelinConfiguration extends Assignment {
 			cam.setNear(.1);
 		}
 		SceneGraphComponent camNode = CameraUtility.getCameraNode(jrviewer.getViewer());
-		animationPlugin.setAnimateCamera(true);
-		animationPlugin.setAnimateSceneGraph(true);
-		
+//		animationPlugin.setAnimateCamera(true);
+//		animationPlugin.setAnimateSceneGraph(true);
+		animationPlugin.setDefaultInterp(InterpolationTypes.LINEAR);
 		Component comp = ((Component) jrviewer.getViewer().getViewingComponent());
 		comp.addKeyListener(new KeyAdapter() {
 				public void keyPressed(KeyEvent e)	{ 
