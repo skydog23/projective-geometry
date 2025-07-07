@@ -69,7 +69,7 @@ public class DandelinConfiguration extends Assignment {
 	           conicPoints4;
 
 	int numPoints = 200,
-			numRulings = 30;
+			numRulings = 40;
 	double parameter = 0.3,
 		depth = .625,
 		sphereRadius = 200,
@@ -189,6 +189,8 @@ public class DandelinConfiguration extends Assignment {
 		leitAp = new Appearance();
 		regAp.setAttribute("diffuseColor", new Color(255,50,50));
 		leitAp.setAttribute("diffuseColor",new Color(50,150,255));	
+		if (animatePtPr)
+			regulusSGC.getAppearance().setAttribute(CommonAttributes.LINE_WIDTH,3.0);
 		regulusSGC.getAppearance().setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, false);
 		regulusSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 		pathToRegulus = SceneGraphUtility.getPathsBetween(regulusSGC, rotateSGC).get(0);
@@ -549,7 +551,13 @@ public class DandelinConfiguration extends Assignment {
 	
 	@Override
 	public void setValueAtTime(double d) {
-		double t = d; //AnimationUtility.linearInterpolation(d, 0.0, 1.0, .4,.6);
+		System.err.println("time = "+d);
+		double t = d-.07; //AnimationUtility.linearInterpolation(d, 0.0, 1.0, .4,.6);
+		if (d < .5)	{
+			t = Math.sqrt(.25 - (.5-d)*(.5-d)); //.5 - Math.sqrt(.25-d*d);
+		} else {
+			t = 1- Math.sqrt(.25-(d-.5)*(d-.5));//.5 + Math.sqrt(d*d - .25);
+		}
 		MatrixBuilder.euclidean().rotateX(.5*Math.PI * t).assignTo(regulusSGC);
 		super.setValueAtTime(d);
 	}
