@@ -200,7 +200,7 @@ public class Complete4Point4Line extends Assignment {
 	}
 	private void update() {
 		double[][] points4d1 = Utility.promote(null, points4);
-		System.err.println("points = "+Rn.toString(points4));
+//		System.err.println("points = "+Rn.toString(points4));
 		pt4Fac.setVertexCoordinates(points4d1);
 		pt4Fac.update();
 		fourPtsSGC.setGeometry(pt4Fac.getGeometry());
@@ -266,7 +266,7 @@ public class Complete4Point4Line extends Assignment {
 		tangentPts[3][1] = points4[3];
 		lines4[1] = P2.lineFromPoints(null, tmp2, points4[1]);
 		lines4[3] = P2.lineFromPoints(null, tmp2, points4[3]);
-		System.err.println("tangents = "+Rn.toString(lines4));
+//		System.err.println("tangents = "+Rn.toString(lines4));
 		double[][] fourByTwo = {tmp, points4[0],tmp2, points4[1], tmp, points4[2],tmp2, points4[3]},
 				fourByTwo4d = Utility.promote(null, fourByTwo);
 		for (int i = 0; i<4; ++i)	{
@@ -313,15 +313,40 @@ public class Complete4Point4Line extends Assignment {
 		updateConic();
 	}
 	
-	int np = 200;
+	int np = 20;
 	IndexedLineSetFactory connie = null;
 	protected void updateConic() {
 		
 		double  conic[][] = new double[np][];
 		for (int i = 0; i<np; ++i)	{
 			conic[i] = conicSection.getValueAtTime(conic[i], (.023 + i)/np);
-//			System.err.println("proj: "+Rn.toString(new double[][]{pencil[i],Pa,aM,Mb,bQ,PQ}));
 		}
+		double sd[] = new double[np];
+		double td = 0;
+		for (int i = 0; i<np; ++i)	{
+			sd[i] = Pn.distanceBetween(conic[(i+1)%np], conic[i], Pn.ELLIPTIC);
+			td += sd[i];
+		}
+		//System.err.println("distances:\n"+Rn.toString(sd));
+		double avgd = td/np;
+		double ts[] = new double[np];
+		ts[np-1] = 0.0;
+		double tt = 0;
+		// adjust times to try to get equally-spaced segments in elliptic plane
+		for (int i = 0; i<np; ++i)	{
+			ts[i] = ts[(i-1+np)%np] + (avgd/sd[i])/np;
+		}
+		double tstr = 1.0/ts[np-1];
+		double  conic2[][] = new double[np][];
+		for (int i = 0; i<np; ++i)	{
+			conic2[i] = conicSection.getValueAtTime(conic[i], 0.023 + tstr*ts[i]);
+		}
+		for (int i = 0; i<np; ++i)	{
+			sd[i] = Pn.distanceBetween(conic2[(i+1)%np], conic2[i], Pn.ELLIPTIC);
+			td += sd[i];
+		}
+		System.err.println("times:\n"+Rn.toString(ts));
+		System.err.println("distances:\n"+Rn.toString(sd));
 		conic = Utility.promote(null, conic);
 //		System.err.println("pencil = "+Rn.toString(pencil));
 //		System.err.println("conic = "+Rn.toString(conic));
