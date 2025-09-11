@@ -16,7 +16,6 @@ import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
 
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import charlesgunn.anim.core.Animated;
 import charlesgunn.anim.core.KeyFrameAnimatedDelegate;
 import charlesgunn.anim.core.KeyFrameAnimatedDouble;
@@ -25,29 +24,21 @@ import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.geometry.GeometryUtilityOverflow;
 import charlesgunn.jreality.geometry.InterpolatedILS;
 import charlesgunn.jreality.geometry.projective.DualizeSceneGraph;
-import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.geometry.projective.LineUtility;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
-import charlesgunn.jreality.newtools.DraggingTool;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
-import de.jreality.geometry.GeometryAttributeListSet;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.IndexedLineSetFactory;
 import de.jreality.geometry.IndexedLineSetUtility;
 import de.jreality.geometry.PointSetFactory;
-import de.jreality.geometry.PointSetUtility;
 import de.jreality.geometry.Primitives;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.P3;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Geometry;
-import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.scene.data.Attribute;
-import de.jreality.scene.data.AttributeEntity;
-import de.jreality.scene.data.StorageModel;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
@@ -77,7 +68,7 @@ public class RuGR2D extends Assignment {
 	arrowSGC;
 	private transient int num = 100,
 			numrr = 400,
-			phase = 0;		// -2,-1: degenerate motion 
+			phase = -2;		// -2,-1: degenerate motion 
 							//	 0: generate circle,  1: generate center,  2: show inside, 3: outside
 							//   4: contraction/expansion	
 	private transient double time = 0, radius = 1.0;

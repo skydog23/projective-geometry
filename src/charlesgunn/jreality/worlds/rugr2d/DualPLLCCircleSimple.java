@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.SwingConstants;
-import javax.xml.ws.Endpoint;
 
 import charlesgunn.anim.jreality.SceneGraphAnimator;
 import charlesgunn.anim.plugin.AnimationPlugin;

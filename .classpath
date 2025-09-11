@@ -19,14 +19,8 @@
 	<classpathentry kind="lib" path="/lib/jmf.jar"/>
 	<classpathentry kind="lib" path="/lib/numericalMethods-22.05.06.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/colorpicker.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/lib/mfc-14-04-05.jar"/>
 	<classpathentry kind="lib" path="/lib/mathExpr-14-04-05.jar"/>
-	<classpathentry kind="lib" path="/lib/android.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="file:/Users/gunn/Software/android-sdk-mac_86/docs/reference/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="/jreality/lib/beans.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/bsh.jar"/>
 	<classpathentry kind="lib" path="/jreality/lib/jterm.jar"/>
@@ -36,5 +30,10 @@
 	<classpathentry kind="lib" path="/lib/rings-2.5.8.jar"/>
 	<classpathentry kind="lib" path="/lib/discretegroup.jar"/>
 	<classpathentry kind="lib" path="/lib/discretegroupCGG.jar"/>
+	<classpathentry kind="lib" path="/lib/ejml-core-0.44.0.jar"/>
+	<classpathentry kind="lib" path="/lib/ejml-ddense-0.44.0.jar"/>
+	<classpathentry kind="lib" path="/lib/ejml-simple-0.44.0.jar"/>
+	<classpathentry kind="lib" path="/lib/ejml-fdense-0.44.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

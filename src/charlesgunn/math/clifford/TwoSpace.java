@@ -5,11 +5,8 @@
  */
 package charlesgunn.math.clifford;
 
-import com.sun.org.apache.xpath.internal.operations.Mult;
-
 import de.jreality.math.Pn;
 import de.jreality.math.Rn;
-import junit.framework.Assert;
 
 /**
  * This class features a the class variable <i>metric</i> which can take the three values 1,0,-1,

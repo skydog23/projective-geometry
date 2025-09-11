@@ -34,9 +34,9 @@ public class PenroseCubeMaker extends Assignment {
 	SceneGraphComponent cube = SceneGraphUtility.createFullSceneGraphComponent("cube");
 	SceneGraphComponent prism = SceneGraphUtility.createFullSceneGraphComponent("prism");
 
-	protected boolean trunc = true, doGem = true;
+	protected boolean trunc = true, doGem = false;
 	protected double f = .2;
-	int n = 5;
+	int n = 4;
 	@Override
 	public void display() {
 		// TODO Auto-generated method stub
@@ -59,17 +59,22 @@ public class PenroseCubeMaker extends Assignment {
 		ap.setAttribute("pointShader.pointRadius", .12);
 		
 		updateGeometry();
-//		trunc = true;
-//		world.addChildren(stackedTriPrisms(2, trunc));
-//		trunc = false;
-//		world.addChildren(stackedTriPrisms(2, trunc));
-		world.addChildren(cube);
 		return world;
 	}
 
 	private void updateGeometry() {
-		cube.getAppearance().setAttribute(CommonAttributes.LIGHTING_ENABLED, !trunc);
-		cube.setGeometry(truncateEdges(f,doGem ? getGem2(n) : Primitives.cube()));
+		world.removeAllChildren();
+//		cube.getAppearance().setAttribute(CommonAttributes.LIGHTING_ENABLED, !trunc);
+		if (doGem) {
+			world.addChild(cube);
+			cube.setGeometry(truncateEdges(f,doGem ? getGem2(n) : Primitives.cube()));
+		}
+		else  {
+			trunc = true;
+			world.addChildren(stackedTriPrisms(n, f, trunc));
+			trunc = false;
+			world.addChildren(stackedTriPrisms(n, f, trunc));
+		}
 	}
 
 	@Override
@@ -139,7 +144,7 @@ public class PenroseCubeMaker extends Assignment {
 		return ilsf.getIndexedFaceSet();
 	}
 	
-	private SceneGraphComponent stackedTriPrisms(int n, boolean trunc)	{
+	private SceneGraphComponent stackedTriPrisms(int n, double f, boolean trunc)	{
 		SceneGraphComponent stack = SceneGraphUtility.createFullSceneGraphComponent("stack");
 		stack.setAppearance(cube.getAppearance());
 		SceneGraphComponent geomSGC = SceneGraphUtility.createFullSceneGraphComponent("onePrism");
@@ -149,9 +154,8 @@ public class PenroseCubeMaker extends Assignment {
 		capSGC.setGeometry(trunc ? truncateEdges(f,prismCap()) : prismCap());
 		SceneGraphComponent childCapSGC = SceneGraphUtility.createFullSceneGraphComponent("cap2");
 		childCapSGC.addChild(capSGC);
-		double op = 0; //.1;
-		double[] acc = MatrixBuilder.euclidean().translate(op,op,op).getArray();
-		double a = 2.0/3.0 + op;
+		double[] acc = MatrixBuilder.euclidean().translate(f,f,f).getArray();
+		double a = 2.0/3.0 + f;
 		double[] mat = P3.makeScrewMotionMatrix(null, new double[] {0,0,0,1}, new double[] {a,a,a,1}, Math.PI/3.0, Pn.EUCLIDEAN);
 	for (int i = 0; i<n ; ++i ) {
 			SceneGraphComponent child = SceneGraphUtility.createFullSceneGraphComponent("child");
@@ -177,37 +181,6 @@ public class PenroseCubeMaker extends Assignment {
 			we.cutWithPlane(tplane);
 		}
 		return we;
-	}
-	private IndexedFaceSet getGem(int n) {
-		IndexedFaceSetFactory ilsf = new IndexedFaceSetFactory();
-		int[][] ind = new int[2*n][];
-		double [][] vv = new double[2*n+2][];
-		vv[2*n] = new double[] {0,0,1,1};
-		vv[2*n+1] = new double[] {0,0,-1,1};
-		double a = Math.PI*2.0/(2*n),
-				c = Math.cos(a),
-				s = Math.sin(a);
-//		double width = (1-Math.cos(a))/(1+Math.cos(a));
-		double width = .5*Math.sqrt(s*s - (c-1)*(c-1));
-		for (int i = 0; i<2*n; ++i) {
-			double angle = i*Math.PI*2.0/(2*n);
-			vv[i] = new double[] {Math.cos(angle), Math.sin(angle), ((i%2)==0) ? width : -width};
-		}
-		for (int i = 0; i<n; ++i) {
-			int tn = 2*n;
-			ind[i] = new int[] {2*n, 2*i, (2*i+1)%tn, (2*i+2)%tn}; 
-			ind[i+n] = new int[] {2*n+1, (2*i+1)%tn, (2*i+2)%tn, (2*i+3)%tn};
-		}
-		ilsf.setVertexCount(vv.length);
-		ilsf.setVertexCoordinates(vv);
-		ilsf.setFaceCount(ind.length);
-		ilsf.setFaceIndices(ind);
-		ilsf.setGenerateEdgesFromFaces(true);
-		ilsf.setGenerateFaceNormals(true);
-		ilsf.update();
-	
-		return ilsf.getIndexedFaceSet();
-		
 	}
 	private IndexedFaceSet truncateEdges(double f, IndexedFaceSet ils) {
 		if (!trunc) return ils;

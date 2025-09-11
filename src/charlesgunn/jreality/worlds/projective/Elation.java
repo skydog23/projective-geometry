@@ -6,7 +6,6 @@ package charlesgunn.jreality.worlds.projective;
 
 import java.awt.Color;
 
-import android.R.color;
 import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.math.p5.PlueckerLineGeometry;
@@ -37,7 +36,7 @@ public class Elation extends Assignment {
 		lpf1.setSphereRadius(10);
 		lpf1.setNumLines(10);
 		lpf1.update();
-		tworld.getAppearance().setAttribute("lineShader.diffuseColor", color.black);
+		tworld.getAppearance().setAttribute("lineShader.diffuseColor", Color.black);
 		tworld.addChild(lpf1.getPencil());
 		// create the line pencil in the plane z=1 in the ideal point in the x-direction
 		lpf2.setPoint(new double[]{1,0,0,0});

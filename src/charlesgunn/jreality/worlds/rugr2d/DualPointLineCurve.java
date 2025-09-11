@@ -10,34 +10,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.SwingConstants;
-import javax.xml.ws.Endpoint;
 
 import charlesgunn.anim.jreality.SceneGraphAnimator;
-import charlesgunn.anim.plugin.AnimationPlugin;
-import charlesgunn.anim.util.AnimationUtility;
 import charlesgunn.jreality.geometry.projective.DualizeSceneGraph;
 import charlesgunn.jreality.viewer.Assignment;
-import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
-import de.jreality.geometry.BoundingBoxTraversal;
 import de.jreality.geometry.BoundingBoxUtility;
 import de.jreality.geometry.GeometryUtility;
 import de.jreality.geometry.PointSetFactory;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
 import de.jreality.math.Pn;
-import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Camera;
 import de.jreality.scene.SceneGraphComponent;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
-import de.jreality.util.Input;
-import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
 public class DualPointLineCurve extends Assignment {

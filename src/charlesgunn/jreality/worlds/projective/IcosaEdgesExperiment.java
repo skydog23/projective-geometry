@@ -11,22 +11,14 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
 import javax.swing.SwingConstants;
 
-import android.R.color;
-import charlesgunn.jreality.geometry.projective.LinePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
-import charlesgunn.math.p5.PlueckerLineGeometry;
 import charlesgunn.util.TextSlider;
 import de.jreality.geometry.GeometryUtility;
-import de.jreality.geometry.IndexedFaceSetUtility;
 import de.jreality.geometry.Primitives;
 import de.jreality.geometry.SphereUtility;
-import de.jreality.math.Matrix;
-import de.jreality.math.MatrixBuilder;
-import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.IndexedFaceSet;
 import de.jreality.scene.SceneGraphComponent;
@@ -65,7 +57,7 @@ public class IcosaEdgesExperiment extends Assignment {
 		}
 		Appearance ap = world.getAppearance();
 		ap.setAttribute(BOUNDING_BOX, Rectangle3D.unitCube);
-		world.getAppearance().setAttribute("lineShader.diffuseColor", color.white);
+		world.getAppearance().setAttribute("lineShader.diffuseColor", Color.white);
 		tworld.getAppearance().setAttribute("lineShader.diffuseColor", Color.white);
 //		world.getAppearance().setAttribute("lineShader."+CommonAttributes.TUBES_DRAW, false);
 		world.addChild(tworld);

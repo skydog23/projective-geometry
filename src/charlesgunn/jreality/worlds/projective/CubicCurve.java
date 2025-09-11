@@ -5,45 +5,24 @@
 package charlesgunn.jreality.worlds.projective;
 
 import static de.jreality.geometry.GeometryUtility.BOUNDING_BOX;
-import static de.jreality.shader.CommonAttributes.DIFFUSE_COLOR;
-import static de.jreality.shader.CommonAttributes.EDGE_DRAW;
 import static de.jreality.shader.CommonAttributes.LIGHTING_ENABLED;
-import static de.jreality.shader.CommonAttributes.POLYGON_SHADER;
-import static de.jreality.shader.CommonAttributes.TUBES_DRAW;
 import static de.jreality.shader.CommonAttributes.VERTEX_DRAW;
 
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.JMenuBar;
-import javax.swing.SwingConstants;
-
-import android.view.animation.Transformation;
 import charlesgunn.anim.util.AnimationUtility;
-import charlesgunn.anim.util.AnimationUtility.InterpolationTypes;
-import charlesgunn.jreality.GeometryCollector;
 import charlesgunn.jreality.geometry.projective.LinePencilFactory;
-import charlesgunn.jreality.geometry.projective.LineUtility;
 import charlesgunn.jreality.geometry.projective.PointCollector;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
 import charlesgunn.jreality.viewer.Assignment;
-import charlesgunn.jreality.viewer.LoadableScene;
-import charlesgunn.jreality.viewer.PluginSceneLoader;
-import charlesgunn.math.Biquaternion;
 import charlesgunn.math.p5.PlueckerLineGeometry;
-import charlesgunn.util.TextSlider;
 import de.jreality.math.Matrix;
 import de.jreality.math.MatrixBuilder;
-import de.jreality.math.Pn;
 import de.jreality.math.Rn;
 import de.jreality.scene.Appearance;
 import de.jreality.scene.Camera;
 import de.jreality.scene.IndexedLineSet;
 import de.jreality.scene.SceneGraphComponent;
-import de.jreality.scene.Viewer;
 import de.jreality.shader.CommonAttributes;
 import de.jreality.util.CameraUtility;
 import de.jreality.util.Rectangle3D;
