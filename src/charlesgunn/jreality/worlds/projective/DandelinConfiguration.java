@@ -20,6 +20,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
+import charlesgunn.anim.util.AnimationUtility;
+import charlesgunn.anim.util.AnimationUtility.InterpolationTypes;
 import charlesgunn.jreality.geometry.projective.ConicSectionSynthetic;
 import charlesgunn.jreality.geometry.projective.PlanePencilFactory;
 import charlesgunn.jreality.geometry.projective.PointRangeFactory;
@@ -67,14 +69,15 @@ public class DandelinConfiguration extends Assignment {
 	           conicPoints4;
 
 	int numPoints = 200,
-			numRulings = 100;
+			numRulings = 40;
 	double parameter = 0.3,
 		depth = .625,
-		sphereRadius = 20,
+		sphereRadius = 200,
 		epsilon = 5.0,
 		lineWidth = 4.0;
 	boolean show3D = false,
-			clip = false;
+			clip = false,
+			animatePtPr = true;
 	private SceneGraphComponent 
 	world,
 	    clip1SGC,
@@ -82,6 +85,7 @@ public class DandelinConfiguration extends Assignment {
 	world2,
 		regulusSGC,
 			rotateSGC,
+				lines3x3SGC,
 				bothSGC,
 			        regFacSGC,
 			        leitSharSGC,
@@ -120,6 +124,7 @@ public class DandelinConfiguration extends Assignment {
 		pointsSGC = SceneGraphUtility.createFullSceneGraphComponent("points");
 		onConicSGC = SceneGraphUtility.createFullSceneGraphComponent("on conic");
 		onRegSGC = SceneGraphUtility.createFullSceneGraphComponent("on regulus");
+		lines3x3SGC = SceneGraphUtility.createFullSceneGraphComponent("lines3x3");
 		linesSGC = SceneGraphUtility.createFullSceneGraphComponent("lines");
 		linesSGC.getAppearance().setAttribute(CommonAttributes.VERTEX_DRAW, false);
 		linesSGC.getAppearance().setAttribute(CommonAttributes.LINE_WIDTH, lineWidth);
@@ -150,12 +155,16 @@ public class DandelinConfiguration extends Assignment {
 
 		theRestSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 
-		world.addChildren(world2, clip1SGC, clip2SGC);
+		world.addChildren(world2);
+		if (!animatePtPr) {
+			world.addChildren(clip1SGC, clip2SGC);
+		}
 		world2.addChildren(regulusSGC, theRestSGC);
 		pointsSGC.addChildren(onConicSGC, onRegSGC);
 		theRestSGC.addChildren(pointsSGC, linesSGC, conicSGC, pascalTriSGC);
 		regulusSGC.addChildren(rotateSGC);
-		rotateSGC.addChildren(bothSGC);
+		rotateSGC.addChildren(bothSGC, lines3x3SGC);
+		if (animatePtPr) show3D = animatePtPr;
 		regulusSGC.setVisible(show3D);
 		
 		regAp = new Appearance();
@@ -173,13 +182,15 @@ public class DandelinConfiguration extends Assignment {
 		ap.setAttribute(CommonAttributes.LINE_WIDTH, 2.0);
 		ap.setAttribute(CommonAttributes.TUBE_RADIUS, .02);
 		bothSGC.setPickable(false);
-		bothSGC.setVisible(false);
+		bothSGC.setVisible(animatePtPr);
 
 		
 		regAp = new Appearance();
 		leitAp = new Appearance();
 		regAp.setAttribute("diffuseColor", new Color(255,50,50));
 		leitAp.setAttribute("diffuseColor",new Color(50,150,255));	
+		if (animatePtPr)
+			regulusSGC.getAppearance().setAttribute(CommonAttributes.LINE_WIDTH,3.0);
 		regulusSGC.getAppearance().setAttribute(CommonAttributes.TRANSPARENCY_ENABLED, false);
 		regulusSGC.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 		pathToRegulus = SceneGraphUtility.getPathsBetween(regulusSGC, rotateSGC).get(0);
@@ -219,6 +230,10 @@ public class DandelinConfiguration extends Assignment {
 		
 		MatrixBuilder.euclidean().translate(0,0,-8).assignTo(world2);
 
+		if (animatePtPr)	{
+			theRestSGC.setVisible(false);
+			lines3x3SGC.setVisible(false);
+		}
 
 		return world;
 	}
@@ -283,7 +298,7 @@ public class DandelinConfiguration extends Assignment {
 			child.setAppearance(new Appearance());
 			child.getAppearance().setAttribute(GeometryUtility.BOUNDING_BOX, Rectangle3D.unitCube);
 			child.setAppearance( ((i%2) == 0) ? regAp : leitAp);
-			rotateSGC.addChild(child);
+			lines3x3SGC.addChild(child);
 			child.setGeometry(regLineFactories[i].getLine());
 		}
 	}
@@ -464,6 +479,7 @@ public class DandelinConfiguration extends Assignment {
 		regFac.setElement2(rawLines[0][2]);
 		regFac.setNumberOfSamples(numRulings);
 		regFac.setSphereRadius(sphereRadius);
+		regFac.setFiniteSphere(false);
 		regFac.update();			
 		
 		// transform according to the scene graph
@@ -531,21 +547,41 @@ public class DandelinConfiguration extends Assignment {
 		}
 		return is;
 	}
+	
+	
+	@Override
+	public void setValueAtTime(double d) {
+		System.err.println("time = "+d);
+		double t = d-.07; //AnimationUtility.linearInterpolation(d, 0.0, 1.0, .4,.6);
+		if (d < .5)	{
+			t = Math.sqrt(.25 - (.5-d)*(.5-d)); //.5 - Math.sqrt(.25-d*d);
+		} else {
+			t = 1- Math.sqrt(.25-(d-.5)*(d-.5));//.5 + Math.sqrt(d*d - .25);
+		}
+		MatrixBuilder.euclidean().rotateX(.5*Math.PI * t).assignTo(regulusSGC);
+		super.setValueAtTime(d);
+	}
+
 	int counter = 0;
 	@Override
 	public void display() {
 		hlIntensity = .2;
 		setAddCameraLight(true);
 		super.display();
-		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, new Color(250,250,230));
+		Color bcol = animatePtPr ? Color.white : new Color(250,250,230);
+		jrviewer.getViewer().getSceneRoot().getAppearance().setAttribute(CommonAttributes.BACKGROUND_COLOR, bcol);
 		Camera cam = CameraUtility.getCamera(jrviewer.getViewer());
 		cam.setFar(50);
 		cam.setFocus(8.0);
 		cam.setEyeSeparation(0.5);
+		if (animatePtPr)	{
+			cam.setFar(-1.0);
+			cam.setNear(.1);
+		}
 		SceneGraphComponent camNode = CameraUtility.getCameraNode(jrviewer.getViewer());
-//		PointLight dl = new PointLight();
-//		dl.setIntensity(.5);
-//		camNode.setLight(dl);
+//		animationPlugin.setAnimateCamera(true);
+//		animationPlugin.setAnimateSceneGraph(true);
+		animationPlugin.setDefaultInterp(InterpolationTypes.LINEAR);
 		Component comp = ((Component) jrviewer.getViewer().getViewingComponent());
 		comp.addKeyListener(new KeyAdapter() {
 				public void keyPressed(KeyEvent e)	{ 
