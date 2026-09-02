@@ -36,7 +36,7 @@ public class PenroseCubeMaker extends Assignment {
 
 	protected boolean trunc = true, doGem = false;
 	protected double f = .2;
-	int n = 4;
+	int n = 3;
 	@Override
 	public void display() {
 		// TODO Auto-generated method stub

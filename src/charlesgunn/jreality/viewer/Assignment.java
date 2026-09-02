@@ -142,6 +142,7 @@ public abstract class Assignment extends Plugin implements Animated {
     		System.err.println("cp = "+cp);
 		Scene.defaultZTranslation = 0.0;
 		jrviewer = new JRViewer();
+		setupJRViewer(jrviewer);
 		jrviewer.registerPlugin(this);
 		shrinkPanel.setTitle(this.getClass().getSimpleName());
 	}
@@ -329,7 +330,6 @@ public abstract class Assignment extends Plugin implements Animated {
 	 */
 	protected boolean useContent = true;
 	public void display()	{
-		setupJRViewer(jrviewer);
 		jrviewer.startup();
 		viewer = jrviewer.getViewer();
 		if (addCameraLight) addCameraLight(hlIntensity);

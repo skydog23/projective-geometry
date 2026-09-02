@@ -13,6 +13,7 @@ import javax.swing.JMenuBar;
 
 import charlesgunn.jreality.geometry.projective.DualizeSceneGraph;
 import charlesgunn.jreality.tools.TranslateShapeTool;
+import charlesgunn.jreality.viewer.Assignment;
 import charlesgunn.jreality.viewer.LoadableScene;
 import charlesgunn.jreality.viewer.PluginSceneLoader;
 import de.jreality.geometry.GeometryUtility;
@@ -30,13 +31,13 @@ import de.jreality.shader.CommonAttributes;
 import de.jreality.util.Rectangle3D;
 import de.jreality.util.SceneGraphUtility;
 
-public class TestDualizeVisitor extends LoadableScene {
+public class TestDualizeVisitor extends JSRApp {
 
 	private SceneGraphComponent standardSGC, dualSGC;
 	int showWhich = 1, which = 0;
 	private SceneGraphComponent childSGC, world;
 	@Override
-	public SceneGraphComponent makeWorld() {
+	public SceneGraphComponent getContent() {
 		world = SceneGraphUtility.createFullSceneGraphComponent("world");
 		standardSGC = SceneGraphUtility.createFullSceneGraphComponent("standard");
 		
@@ -117,9 +118,10 @@ public class TestDualizeVisitor extends LoadableScene {
 	}
 	
 	@Override
-	public void customize(JMenuBar menuBar, PluginSceneLoader psl) {
-		psl.getViewer().getSceneRoot().getAppearance().setAttribute("backgroundColor", Color.white);
-		((Component) psl.getViewer().getViewingComponent()).addKeyListener( new KeyAdapter()	{
+	public void display() {
+		super.display();
+		viewer.getSceneRoot().getAppearance().setAttribute("backgroundColor", Color.white);
+		((Component) viewer.getViewingComponent()).addKeyListener( new KeyAdapter()	{
 
 			public void keyPressed(KeyEvent e)	{ 
 				switch(e.getKeyCode())	{
@@ -165,10 +167,9 @@ public class TestDualizeVisitor extends LoadableScene {
 		standardSGC.setVisible((showWhich & 1) != 0);
 		dualSGC.setVisible((showWhich & 2) != 0);
 	}
-	@Override
-	public boolean isEncompass() {
-		// TODO Auto-generated method stub
-		return true;
+
+	public static void main(String[] args) {
+		new TestDualizeVisitor().display();
 	}
 
 

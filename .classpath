@@ -30,10 +30,6 @@
 	<classpathentry kind="lib" path="/lib/rings-2.5.8.jar"/>
 	<classpathentry kind="lib" path="/lib/discretegroup.jar"/>
 	<classpathentry kind="lib" path="/lib/discretegroupCGG.jar"/>
-	<classpathentry kind="lib" path="/lib/ejml-core-0.44.0.jar"/>
-	<classpathentry kind="lib" path="/lib/ejml-ddense-0.44.0.jar"/>
-	<classpathentry kind="lib" path="/lib/ejml-simple-0.44.0.jar"/>
-	<classpathentry kind="lib" path="/lib/ejml-fdense-0.44.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
